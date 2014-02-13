@@ -90,6 +90,9 @@ grampcGUI.vec.CPUtime = [];
 
 handles.Tsim = 4.0;
 
+handles.radiobutton.size = [22,21];
+handles.textfield.size   = [95,21];
+
 % MPC parameter default values of GUI
 handles.GUI.param.Nx      = [];
 handles.GUI.param.Nu      = [];
@@ -456,6 +459,13 @@ for i = 1:7
     end
 end
 
+tmp = get(handles.editText_MPCopt_11,'Position');
+pos.editText_MPCopt_11 = tmp(1:2);
+tmp = get(handles.editText_MPCopt_12,'Position');
+pos.editText_MPCopt_12 = tmp(1:2);
+tmp = get(handles.editText_MPCopt_13,'Position');
+pos.editText_MPCopt_13 = tmp(1:2);
+
 switch(get(hObject,'Value'))
     case 1  % Line search options
         set(handles.text_MPCopt_11,'String','adaptive');
@@ -467,14 +477,15 @@ switch(get(hObject,'Value'))
         set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
         set(handles.editText_MPCopt_13,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_13,'Position',[pos.editText_MPCopt_13,handles.radiobutton.size]);
         set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
         set(handles.editText_MPCopt_13,'String','');
         set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_13,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.LineSearchType,'adaptive')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -556,26 +567,25 @@ switch(get(hObject,'Value'))
         end
     case 2  % Maximum number of iterations
         set(handles.text_MPCopt_11,'String','value');
-        set(handles.editText_MPCopt_11,'Style','edit');
+        set(handles.editText_MPCopt_11,'Style','edit');        
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.textfield.size]);
         set(handles.editText_MPCopt_11,'BackgroundColor',[1,1,1]);
         set(handles.editText_MPCopt_11,'String',mat2str(handles.GUI.opt.MaxIter));
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),15,pos(4)]);
         set(handles.text_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_11,'Visible','on');
     case 3  % Shift problem
         set(handles.text_MPCopt_11,'String','on');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','off');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');  
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);      
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.ShiftControl,'on')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -584,22 +594,22 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_12,'Visible','on');
     case 4  % Scale problem
         set(handles.text_MPCopt_11,'String','on');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','off');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.ScaleProblem,'on')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -608,22 +618,22 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');        
         set(handles.editText_MPCopt_12,'Visible','on');
     case 5  % Cost integration method
         set(handles.text_MPCopt_11,'String','trapezodial');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','simpson');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
         if strcmp(handles.GUI.opt.CostIntegrator,'trapezodial')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -632,8 +642,8 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_12,'Visible','on');
     case 6  % Integrator
         set(handles.text_MPCopt_11,'String','type');
@@ -641,8 +651,7 @@ switch(get(hObject,'Value'))
         set(handles.editText_MPCopt_11,'Style','popupmenu');
         set(handles.editText_MPCopt_11,'String',{'euler','modeuler','heun','ruku45'});
         set(handles.editText_MPCopt_11,'BackgroundColor',[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),20,pos(4)]);
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.textfield.size]);
         switch (handles.GUI.opt.Integrator)
             case 'euler'
                 set(handles.editText_MPCopt_11,'Value',1);
@@ -669,17 +678,17 @@ switch(get(hObject,'Value'))
         set(handles.editText_MPCopt_11,'Visible','on');
     case 7  % JacobianX
         set(handles.text_MPCopt_11,'String','sysjacxadj');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','sysjacx');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.JacobianX,'sysjacxadj')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -688,22 +697,22 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_12,'Visible','on');
     case 8  % JacobianU
         set(handles.text_MPCopt_11,'String','sysjacuadj');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','sysjacu');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.JacobianU,'sysjacuadj')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -717,17 +726,17 @@ switch(get(hObject,'Value'))
         set(handles.editText_MPCopt_12,'Visible','on');
     case 9  % Integral cost
         set(handles.text_MPCopt_11,'String','on');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','off');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.IntegralCost,'on')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -736,22 +745,22 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_12,'Visible','on');
     case 10 % Final cost
         set(handles.text_MPCopt_11,'String','on');
-        set(handles.editText_MPCopt_11,'String','');
-        set(handles.editText_MPCopt_11,'Value',0);
-        set(handles.editText_MPCopt_11,'Style','radiobutton');
-        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.text_MPCopt_12,'String','off');
+        set(handles.editText_MPCopt_11,'String','');
         set(handles.editText_MPCopt_12,'String','');
+        set(handles.editText_MPCopt_11,'Value',0);
         set(handles.editText_MPCopt_12,'Value',0);
+        set(handles.editText_MPCopt_11,'Style','radiobutton');
         set(handles.editText_MPCopt_12,'Style','radiobutton');
+        set(handles.editText_MPCopt_11,'Position',[pos.editText_MPCopt_11,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_12,'Position',[pos.editText_MPCopt_12,handles.radiobutton.size]);
+        set(handles.editText_MPCopt_11,'BackgroundColor',0.8*[1,1,1]);
         set(handles.editText_MPCopt_12,'BackgroundColor',0.8*[1,1,1]);
-        pos = get(handles.editText_MPCopt_11,'Position');
-        set(handles.editText_MPCopt_11,'Position',[pos(1:2),4.4,pos(4)]);
         if strcmp(handles.GUI.opt.FinalCost,'on')
             set(handles.editText_MPCopt_11,'Value',1);
             set(handles.editText_MPCopt_12,'Value',0);
@@ -760,8 +769,8 @@ switch(get(hObject,'Value'))
             set(handles.editText_MPCopt_12,'Value',1);
         end
         set(handles.text_MPCopt_11,'Visible','on');
-        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.text_MPCopt_12,'Visible','on');
+        set(handles.editText_MPCopt_11,'Visible','on');
         set(handles.editText_MPCopt_12,'Visible','on');
 end
 
