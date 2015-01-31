@@ -107,6 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   param.Thor = mxGetScalar(mxGetField(mxparam,0,"Thor"));
   param.dt   = mxGetScalar(mxGetField(mxparam,0,"dt"));
+  param.tk   = mxGetScalar(mxGetField(mxparam,0,"tk"));
   param.Nhor = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nhor"));
   if (mxGetField(mxparam,0,"pCost") == NULL) {
     param.pCost = NULL;

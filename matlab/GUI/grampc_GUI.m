@@ -1356,6 +1356,13 @@ global CHEADERPATH;
 global BINPATH;
 global grampcGUI;
 
+grampcGUI.STOP  = 1;
+grampcGUI.START = 0;
+grampcGUI.STEP  = 0;
+grampcGUI.INIT  = 0;
+
+pushbutton_Clean_Callback([], [], handles);
+
 curPath = cd;
 cd(handles.GUIpath);
 
@@ -1571,6 +1578,12 @@ guidata(hObject,handles);
 
 % --- Executes on button press in pushbutton_Clean.
 function pushbutton_Clean_Callback(hObject, eventdata, handles) %#ok<*INUSL,*DEFNU>
+
+global grampcGUI;
+grampcGUI.STOP  = 1;
+grampcGUI.START = 0;
+grampcGUI.STEP  = 0;
+grampcGUI.INIT  = 0;
 
 curPath = cd;
 eval(['cd ',handles.GUIpath]);

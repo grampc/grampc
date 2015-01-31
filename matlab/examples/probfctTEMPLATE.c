@@ -26,10 +26,21 @@
 
 /*
  * 
- * Problem function for GRAMPC.
+ * File: probfct.c
  * Authors: Bartosz Kaepernick, Knut Graichen, Tilman Utz
  * Date: February 2014
  * Version: v1.0
+ *
+ * Problem function for grampc toolbox.
+ *
+ *
+ * This probfct file describes the dynamics, the cost function and the corresponding
+ * derivatives of an overhead crane with 6 states and 2 controls. For a more
+ * detailed model, for instance, see
+ *
+ * B. Käpernick and K. Graichen, "Model Predictive Control of an Overhead Crane
+ * Using Constraint Substitution", Proceedings of the American Control Conference,
+ * Washington D.C. (USA), 2013.
  *
  *
  * This probfct file provides an interface to GRAMPC. The underlying
@@ -37,40 +48,43 @@
  * has the following structure
  *                                  _T
  *                                 /
- *      min    J(u) = V(x(T),t) + / L(x(t),u(t),t) dt
+ *      min    J(u,xk) = V(T,x(T)) + / L(t,x(t),u(t)) dt
  *      u(.)                    _/
  *                             0
  *             .
- *      s.t.   x(t) = f(x(t),u(t),t), x(0) = x0
+ *      s.t.   x(t) = f(tk+t,x(t),u(t)), x(0) = xk
  *
  *             Ul <= u(t) <= Uu, t in [0,T]
  *
  * with states x(t), constrained controls u(t) and the fixed prediction horizon T.
- * The functions V(x,t), L(x,u,t) and f(x,u,t) denote the terminal and integral
+ * The functions V(t,x), L(t,x,u) and f(t,x,u) denote the terminal and integral
  * cost and the systems dynamics. Note that no terminal conditions for the states
  * are included in the problem formulation.
  *
- * The function interfaces below have the following meaning:
+ * The necessary optimality conditions can then be derived by means of the
+ * Hamiltonian
  *
- * sysfct:     f(x,u,t)
+ * The function interfaces below have the following meaning (adj denotes the costates):
  *
- * sysjacxadj: df(x,u,t)/dx' * adj
+ * sysfct:     f(t,x,u)
  *
- * sysjacuadj: df(x,u,t)/du' * adj
+ * sysjacxadj: df(t,x,u)/dx' * adj
  *
- * sysjacx:    df(x,u,t)/dx
+ * sysjacuadj: df(t,x,u)/du' * adj
  *
- * sysjacu:    df(x,u,t)/du
+ * sysjacx:    df(t,x,u)/dx
  *
- * icostfct:   L(x,u,t)
+ * sysjacu:    df(t,x,u)/du
  *
- * icostjacx:  dL(x,u,t)/dx
+ * icostfct:   L(t,x,u)
  *
- * icostjacu:  dL(x,u,t)/du
+ * icostjacx:  dL(t,x,u)/dx
  *
- * fcostfct:   V(x,t)
+ * icostjacu:  dL(t,x,u)/du
  *
- * fcostjacx:  dV(x,t)/dx
+ * fcostfct:   V(t,x)
+ *
+ * fcostjacx:  dV(t,x)/dx
  *
  */
 

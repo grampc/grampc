@@ -48,16 +48,16 @@
  * has the following structure
  *                                  _T
  *                                 /
- *      min    J(u) = V(x(T),t) + / L(x(t),u(t),t) dt
+ *      min    J(u,xk) = V(T,x(T)) + / L(t,x(t),u(t)) dt
  *      u(.)                    _/
  *                             0
  *             .
- *      s.t.   x(t) = f(x(t),u(t),t), x(0) = x0
+ *      s.t.   x(t) = f(tk+t,x(t),u(t)), x(0) = xk
  *
  *             Ul <= u(t) <= Uu, t in [0,T]
  *
  * with states x(t), constrained controls u(t) and the fixed prediction horizon T.
- * The functions V(x,t), L(x,u,t) and f(x,u,t) denote the terminal and integral
+ * The functions V(t,x), L(t,x,u) and f(t,x,u) denote the terminal and integral
  * cost and the systems dynamics. Note that no terminal conditions for the states
  * are included in the problem formulation.
  *
@@ -66,25 +66,25 @@
  *
  * The function interfaces below have the following meaning (adj denotes the costates):
  *
- * sysfct:     f(x,u,t)
+ * sysfct:     f(t,x,u)
  *
- * sysjacxadj: df(x,u,t)/dx' * adj
+ * sysjacxadj: df(t,x,u)/dx' * adj
  *
- * sysjacuadj: df(x,u,t)/du' * adj
+ * sysjacuadj: df(t,x,u)/du' * adj
  *
- * sysjacx:    df(x,u,t)/dx
+ * sysjacx:    df(t,x,u)/dx
  *
- * sysjacu:    df(x,u,t)/du
+ * sysjacu:    df(t,x,u)/du
  *
- * icostfct:   L(x,u,t)
+ * icostfct:   L(t,x,u)
  *
- * icostjacx:  dL(x,u,t)/dx
+ * icostjacx:  dL(t,x,u)/dx
  *
- * icostjacu:  dL(x,u,t)/du
+ * icostjacu:  dL(t,x,u)/du
  *
- * fcostfct:   V(x,t)
+ * fcostfct:   V(t,x)
  *
- * fcostjacx:  dV(x,t)/dx
+ * fcostjacx:  dV(t,x)/dx
  *
  */
 

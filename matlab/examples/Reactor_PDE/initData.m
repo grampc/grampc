@@ -31,10 +31,10 @@ function [grampc,Tsim] = initData()
 
 Tsim = 2.0;
 
-NX = 100;
-NU = 1;
-
 grampc = grampc_init_Cmex();
+
+NX = grampc.param.Nx;
+NU = grampc.param.Nu;
 
 %% Options (optional)
 % grampc_setopt_Cmex(grampc,'MaxIter',2);

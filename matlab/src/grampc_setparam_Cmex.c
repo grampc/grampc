@@ -126,6 +126,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   param.Thor    = (typeRNum)mxGetScalar(mxGetField(mxparam,0,"Thor"));
   param.dt      = (typeRNum)mxGetScalar(mxGetField(mxparam,0,"dt"));
+  param.tk      = (typeRNum)mxGetScalar(mxGetField(mxparam,0,"tk"));
   param.Nhor    = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nhor"));
   param.umax    = mxGetPr(mxGetField(mxparam,0,"umax"));
   param.umin    = mxGetPr(mxGetField(mxparam,0,"umin"));
