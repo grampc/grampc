@@ -86,6 +86,10 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->t == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	/* time vector */
+    for (i = 0; i <= grampc->param->Nhor-1; i++) {
+      grampc->rws->t[i] = grampc->param->Thor/(grampc->param->Nhor-1)*i;
+    }
     /* x */
     /* myFree(grampc->rws->x); */
     /* grampc->rws->x = (typeRNum *)myCalloc(grampc->param->Nhor * grampc->param->Nx,sizeof(*(grampc->rws)->x)); */
@@ -93,6 +97,9 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->x == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	for (i = 0; i < grampc->param->Nhor * grampc->param->Nx; i++){
+		grampc->rws->x[i] = 0;
+	}
     /* adj */
     /* myFree(grampc->rws->adj); */
     /* grampc->rws->adj = (typeRNum *)myCalloc(grampc->param->Nhor * grampc->param->Nx,sizeof(*(grampc->rws)->adj)); */
@@ -100,12 +107,28 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->adj == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	for (i = 0; i < grampc->param->Nhor * grampc->param->Nx; i++){
+		grampc->rws->adj[i] = 0;
+	}
     /* u */
     /* myFree(grampc->rws->u); */
     /* grampc->rws->u = (typeRNum *)myCalloc(grampc->param->Nhor * grampc->param->Nu,sizeof(*(grampc->rws)->u)); */
     grampc->rws->u = (typeRNum *)myRealloc(grampc->rws->u,grampc->param->Nhor * grampc->param->Nu * sizeof(*(grampc->rws)->u));
     if (grampc->rws->u == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
+    }
+	/* control vector */
+    if (grampc->param->u0 != NULL) {
+      for (i = 0; i <= grampc->param->Nhor-1; i++) {
+        for (j = 0; j <= grampc->param->Nu-1; j++) {
+          if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+            grampc->rws->u[j+i*grampc->param->Nu] = (grampc->param->u0[j]-grampc->param->uOffset[j])/grampc->param->uScale[j];
+          }
+          else {
+            grampc->rws->u[j+i*grampc->param->Nu] = grampc->param->u0[j];
+          }
+        }
+      }
     }
     /* dHdu */
     /* myFree(grampc->rws->dHdu); */
@@ -121,6 +144,9 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->uls == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	for (i = 0; i < grampc->param->Nhor * grampc->param->Nu; i++){
+		grampc->rws->uls[i] = 0;
+	}
     /* uprev */
     /* myFree(grampc->rws->uprev); */
     /* grampc->rws->uprev = (typeRNum *)myCalloc(grampc->param->Nhor * grampc->param->Nu,sizeof(*(grampc->rws)->uprev)); */
@@ -128,6 +154,9 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->uprev == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	for (i = 0; i < grampc->param->Nhor * grampc->param->Nu; i++){
+		grampc->rws->uprev[i] = 0;
+	}
     /* dHduprev */
     /* myFree(grampc->rws->dHduprev); */
     /* grampc->rws->dHduprev = (typeRNum *)myCalloc(grampc->param->Nhor * grampc->param->Nu,sizeof(*(grampc->rws)->dHduprev)); */
@@ -135,29 +164,15 @@ void grampc_setparam_int(typeGRAMPC *grampc, typeChar paramName[], typeInt param
     if (grampc->rws->dHduprev == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
     }
+	for (i = 0; i < grampc->param->Nhor * grampc->param->Nu; i++){
+		grampc->rws->dHduprev[i] = 0;
+	}
     /* J */
     /* myFree(grampc->rws->J); */
     /* grampc->rws->J = (typeRNum *)myCalloc(grampc->param->Nhor,sizeof(*(grampc->rws)->J)); */
     grampc->rws->J = (typeRNum *)myRealloc(grampc->rws->J,grampc->param->Nhor * sizeof(*(grampc->rws)->J));
     if (grampc->rws->J == NULL) {
       grampc_error(RWS_ELEMENT_ALLOC_FAILED);
-    }
-    /* time vector */
-    for (i = 0; i <= grampc->param->Nhor-1; i++) {
-      grampc->rws->t[i] = grampc->param->Thor/(grampc->param->Nhor-1)*i;
-    }
-    /* control vector */
-    if (grampc->param->u0 != NULL) {
-      for (i = 0; i <= grampc->param->Nhor-1; i++) {
-        for (j = 0; j <= grampc->param->Nu-1; j++) {
-          if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
-            grampc->rws->u[j+i*grampc->param->Nu] = (grampc->param->u0[j]-grampc->param->uOffset[j])/grampc->param->uScale[j];
-          }
-          else {
-            grampc->rws->u[j+i*grampc->param->Nu] = grampc->param->u0[j];
-          }
-        }
-      }
     }
   }
   /* NpCost */

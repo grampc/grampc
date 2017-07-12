@@ -35,8 +35,6 @@
  * MPC parameters of GRAMPC.
  *
  */
-
-#define nGRAMPCrws      	16
 #define nrwsOut                  9
 
 #include "mex.h"
@@ -56,10 +54,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxArray *mxparam = NULL;
   mxArray *mxrws   = NULL;
 
+  typeChar *paramname;
+
   mxArray *paramOut;
   mxArray *rwsOut[nrwsOut];
 
-  const char *rwsOutName[nGRAMPCrws] = {"t","x","adj","u","dHdu","uls","uprev","dHduprev","J","rwsScale","rwsGradient","rwsCostIntegration","rwsAdjIntegration","rwsIntegration","lsAdapt","lsExplicit"};
+	const char *rwsOutName[nrwsOut] = { "t", "x", "adj", "u", "dHdu", "uls", "uprev", "dHduprev", "J" };
 
   typeGRAMPC grampc;
   typeGRAMPCopt opt;
@@ -93,6 +93,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxopt   = mxGetField(prhs[0],0,"opt");
   mxparam = mxGetField(prhs[0],0,"param");
   mxrws   = mxGetField(prhs[0],0,"rws");
+
+  paramname = mxArrayToString(prhs[1]);
 
   param.Nx = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nx"));
   param.Nu = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nu"));
@@ -138,14 +140,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   param.NpSys   = (typeInt)mxGetScalar(mxGetField(mxparam,0,"NpSys"));
   
   if (mxGetField(mxparam,0,"pCost") == NULL ||
-      !strncmp(mxArrayToString(prhs[1]),"pCost",NAME_PCOST)) {
+      !strncmp(paramname,"pCost",NAME_PCOST)) {
     param.pCost = NULL;
   }
   else {
     param.pCost = mxGetPr(mxGetField(mxparam,0,"pCost"));
   }
   if (mxGetField(mxparam,0,"pSys") == NULL ||
-      !strncmp(mxArrayToString(prhs[1]),"pSys",NAME_PSYS)) {
+      !strncmp(paramname,"pSys",NAME_PSYS)) {
     param.pSys = NULL;
   }
   else {
@@ -163,18 +165,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   opt.LineSearchAdaptFactor    = mxGetScalar(mxGetField(mxopt,0,"LineSearchAdaptFactor"));
   opt.LineSearchIntervalTol    = mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalTol"));
 
-  strncpy(opt.ShiftControl,mxArrayToString(mxGetField(mxopt,0,"ShiftControl")),VALUE_ONOFF);
-  strncpy(opt.ScaleProblem,mxArrayToString(mxGetField(mxopt,0,"ScaleProblem")),VALUE_ONOFF);
-  strncpy(opt.CostIntegrator,mxArrayToString(mxGetField(mxopt,0,"CostIntegrator")),VALUE_COSTINTMETHOD);
-  strncpy(opt.Integrator,mxArrayToString(mxGetField(mxopt,0,"Integrator")),VALUE_INTEGRATOR);
-  strncpy(opt.LineSearchType,mxArrayToString(mxGetField(mxopt,0,"LineSearchType")),VALUE_LSTYPE);
-  strncpy(opt.JacobianX,mxArrayToString(mxGetField(mxopt,0,"JacobianX")),VALUE_JACOBIANX);
-  strncpy(opt.JacobianU,mxArrayToString(mxGetField(mxopt,0,"JacobianU")),VALUE_JACOBIANU);
-  strncpy(opt.IntegralCost,mxArrayToString(mxGetField(mxopt,0,"IntegralCost")),VALUE_ONOFF);
-  strncpy(opt.FinalCost,mxArrayToString(mxGetField(mxopt,0,"FinalCost")),VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "ShiftControl"), opt.ShiftControl, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "ScaleProblem"), opt.ScaleProblem, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "CostIntegrator"), opt.CostIntegrator, VALUE_COSTINTMETHOD);
+  mxGetString(mxGetField(mxopt, 0, "Integrator"), opt.Integrator, VALUE_INTEGRATOR);
+  mxGetString(mxGetField(mxopt, 0, "LineSearchType"), opt.LineSearchType, VALUE_LSTYPE);
+  mxGetString(mxGetField(mxopt, 0, "JacobianX"), opt.JacobianX, VALUE_JACOBIANX);
+  mxGetString(mxGetField(mxopt, 0, "JacobianU"), opt.JacobianU, VALUE_JACOBIANU);
+  mxGetString(mxGetField(mxopt, 0, "IntegralCost"), opt.IntegralCost, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "FinalCost"), opt.FinalCost, VALUE_ONOFF);
 
   /* rws structure */
-  if (!strncmp(mxArrayToString(prhs[1]),"Nhor",NAME_NHOR)) {
+  if (!strncmp(paramname,"Nhor",NAME_NHOR)) {
     rws.t        = NULL;
     rws.x        = NULL;
     rws.adj      = NULL;
@@ -185,40 +187,40 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     rws.dHduprev = NULL;
     rws.J        = NULL;
   }
-  if (!strncmp(mxArrayToString(prhs[1]),"Thor",NAME_THOR)) {
+  if (!strncmp(paramname,"Thor",NAME_THOR)) {
     rws.t = mxGetPr(mxGetField(mxrws,0,"t"));
   }
-  if (!strncmp(mxArrayToString(prhs[1]),"u0",NAME_U0) ||
-      !strncmp(mxArrayToString(prhs[1]),"uScale",NAME_USCALE) ||
-      !strncmp(mxArrayToString(prhs[1]),"uOffset",NAME_UOFFSET)) {
+  if (!strncmp(paramname,"u0",NAME_U0) ||
+      !strncmp(paramname,"uScale",NAME_USCALE) ||
+      !strncmp(paramname,"uOffset",NAME_UOFFSET)) {
     rws.u = mxGetPr(mxGetField(mxrws,0,"u"));
   }
 
   /* check array length of pointer supposed to be changed */
-  if ( (!strncmp(mxArrayToString(prhs[1]),"xk",NAME_XK)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"xdes",NAME_XDES)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"xScale",NAME_XSCALE)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"xOffset",NAME_XOFFSET)) ) {
+  if ( (!strncmp(paramname,"xk",NAME_XK)) ||
+       (!strncmp(paramname,"xdes",NAME_XDES)) ||
+       (!strncmp(paramname,"xScale",NAME_XSCALE)) ||
+       (!strncmp(paramname,"xOffset",NAME_XOFFSET)) ) {
     if (mxGetNumberOfElements(prhs[2]) != param.Nx) {
       mexErrMsgTxt("No. of elements of input vector does not correspond to Nx.");
     }
   }
-  if ( (!strncmp(mxArrayToString(prhs[1]),"u0",NAME_U0)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"udes",NAME_UDES)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"uScale",NAME_USCALE)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"uOffset",NAME_UOFFSET)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"umax",NAME_UMAX)) ||
-       (!strncmp(mxArrayToString(prhs[1]),"umin",NAME_UMIN)) ) {
+  if ( (!strncmp(paramname,"u0",NAME_U0)) ||
+       (!strncmp(paramname,"udes",NAME_UDES)) ||
+       (!strncmp(paramname,"uScale",NAME_USCALE)) ||
+       (!strncmp(paramname,"uOffset",NAME_UOFFSET)) ||
+       (!strncmp(paramname,"umax",NAME_UMAX)) ||
+       (!strncmp(paramname,"umin",NAME_UMIN)) ) {
     if (mxGetNumberOfElements(prhs[2]) != param.Nu) {
       mexErrMsgTxt("No. of elements of input vector does not correspond to Nu.");
     }
   }
-  if (!strncmp(mxArrayToString(prhs[1]),"pSys",NAME_PSYS)) {
+  if (!strncmp(paramname,"pSys",NAME_PSYS)) {
     if (mxGetNumberOfElements(prhs[2]) != param.NpSys) {
       mexErrMsgTxt("No. of elements of pSys does not correspond to NpSys.");
     }
   }
-  if (!strncmp(mxArrayToString(prhs[1]),"pCost",NAME_PCOST)) {
+  if (!strncmp(paramname,"pCost",NAME_PCOST)) {
     if (mxGetNumberOfElements(prhs[2]) != param.NpCost) {
       mexErrMsgTxt("No. of elements of pCost does not correspond to NpCost.");
     }
@@ -229,19 +231,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   grampc.rws   = &rws;
 
   /* Set parameters */
-  if ( (!strncmp(mxArrayToString(prhs[1]),"Nhor",NAME_NHOR)) || (!strncmp(mxArrayToString(prhs[1]),"NpCost",NAME_NPCOST)) || (!strncmp(mxArrayToString(prhs[1]),"NpSys",NAME_NPSYS)) ) {
-    grampc_setparam_int(&grampc,mxArrayToString(prhs[1]),(typeInt)mxGetScalar(prhs[2]));
+  if ( (!strncmp(paramname,"Nhor",NAME_NHOR)) || (!strncmp(paramname,"NpCost",NAME_NPCOST)) || (!strncmp(paramname,"NpSys",NAME_NPSYS)) ) {
+    grampc_setparam_int(&grampc,paramname,(typeInt)mxGetScalar(prhs[2]));
   }
-  else if ( (!strncmp(mxArrayToString(prhs[1]),"Thor",NAME_THOR)) || (!strncmp(mxArrayToString(prhs[1]),"dt",NAME_DT)) || (!strncmp(mxArrayToString(prhs[1]),"tk",NAME_TK)) ){
-    grampc_setparam_real(&grampc,mxArrayToString(prhs[1]),mxGetScalar(prhs[2]));
+  else if ( (!strncmp(paramname,"Thor",NAME_THOR)) || (!strncmp(paramname,"dt",NAME_DT)) || (!strncmp(paramname,"tk",NAME_TK)) ){
+    grampc_setparam_real(&grampc,paramname,mxGetScalar(prhs[2]));
   }
   else {
-    grampc_setparam_vector(&grampc,mxArrayToString(prhs[1]),mxGetPr(prhs[2]));
+    grampc_setparam_vector(&grampc,paramname,mxGetPr(prhs[2]));
   }
 
   /* param STRUCTURE **********************************************************/
   /* xk */
-  if (!strncmp(mxArrayToString(prhs[1]),"xk",NAME_XK)) {
+  if (!strncmp(paramname,"xk",NAME_XK)) {
     if (param.xk == NULL) {
       paramOut = NULL;
     }
@@ -253,7 +255,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
   /* u0 */
-  else if (!strncmp(mxArrayToString(prhs[1]),"u0",NAME_U0)) {
+  else if (!strncmp(paramname,"u0",NAME_U0)) {
     if (param.u0 == NULL) {
       paramOut = NULL;
     }
@@ -265,7 +267,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
   /* xdes */
-  else if (!strncmp(mxArrayToString(prhs[1]),"xdes",NAME_XDES)) {
+  else if (!strncmp(paramname,"xdes",NAME_XDES)) {
     if (param.xdes == NULL) {
       paramOut = NULL;
     }
@@ -277,7 +279,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
   /* udes */
-  else if (!strncmp(mxArrayToString(prhs[1]),"udes",NAME_UDES)) {
+  else if (!strncmp(paramname,"udes",NAME_UDES)) {
     if (param.udes == NULL) {
       paramOut = NULL;
     }
@@ -289,27 +291,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
   /* Thor */
-  else if (!strncmp(mxArrayToString(prhs[1]),"Thor",NAME_THOR)) {
+  else if (!strncmp(paramname,"Thor",NAME_THOR)) {
     paramOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(paramOut)) = param.Thor;
   }
   /* dt */
-  else if (!strncmp(mxArrayToString(prhs[1]),"dt",NAME_DT)) {
+  else if (!strncmp(paramname,"dt",NAME_DT)) {
     paramOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(paramOut)) = param.dt;
   }
   /* tk */
-  else if (!strncmp(mxArrayToString(prhs[1]),"tk",NAME_TK)) {
+  else if (!strncmp(paramname,"tk",NAME_TK)) {
     paramOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(paramOut)) = param.tk;
   }
   /* Nhor */
-  else if (!strncmp(mxArrayToString(prhs[1]),"Nhor",NAME_NHOR)) {
+  else if (!strncmp(paramname,"Nhor",NAME_NHOR)) {
     paramOut = mxCreateNumericMatrix(1,1,mxINT32_CLASS,mxREAL);
     *((typeInt *)mxGetData(paramOut)) = param.Nhor;
   }
   /* pCost */
-  else if (!strncmp(mxArrayToString(prhs[1]),"pCost",NAME_PCOST)) {
+  else if (!strncmp(paramname,"pCost",NAME_PCOST)) {
     if (param.pCost == NULL) {
       paramOut = NULL;
     }
@@ -318,10 +320,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       for (i = 0; i <= param.NpCost-1; i++) {
         *(mxGetPr(paramOut)+i) = param.pCost[i];
       }
+	  free(param.pCost);
     }
   }
   /* pSys */
-  else if (!strncmp(mxArrayToString(prhs[1]),"pSys",NAME_PSYS)) {
+  else if (!strncmp(paramname,"pSys",NAME_PSYS)) {
     if (param.pSys == NULL) {
       paramOut = NULL;
     }
@@ -330,139 +333,139 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       for (i = 0; i <= param.NpSys-1; i++) {
         *(mxGetPr(paramOut)+i) = param.pSys[i];
       }
+	  free(param.pSys);
     }
   }
   /* umax */
-  else if (!strncmp(mxArrayToString(prhs[1]),"umax",NAME_UMAX)) {
+  else if (!strncmp(paramname,"umax",NAME_UMAX)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nu,mxREAL);
     for (i = 0; i <= param.Nu-1; i++) {
       *(mxGetPr(paramOut)+i) = param.umax[i];
     }
   }
   /* umin */
-  else if (!strncmp(mxArrayToString(prhs[1]),"umin",NAME_UMIN)) {
+  else if (!strncmp(paramname,"umin",NAME_UMIN)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nu,mxREAL);
     for (i = 0; i <= param.Nu-1; i++) {
       *(mxGetPr(paramOut)+i) = param.umin[i];
     }
   }
   /* xScale */
-  else if (!strncmp(mxArrayToString(prhs[1]),"xScale",NAME_XSCALE)) {
+  else if (!strncmp(paramname,"xScale",NAME_XSCALE)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nx,mxREAL);
     for (i = 0; i <= param.Nx-1; i++) {
       *(mxGetPr(paramOut)+i) = param.xScale[i];
     }
   }
   /* xOffset */
-  else if (!strncmp(mxArrayToString(prhs[1]),"xOffset",NAME_XOFFSET)) {
+  else if (!strncmp(paramname,"xOffset",NAME_XOFFSET)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nx,mxREAL);
     for (i = 0; i <= param.Nx-1; i++) {
       *(mxGetPr(paramOut)+i) = param.xOffset[i];
     }
   }
   /* uScale */
-  else if (!strncmp(mxArrayToString(prhs[1]),"uScale",NAME_USCALE)) {
+  else if (!strncmp(paramname,"uScale",NAME_USCALE)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nu,mxREAL);
     for (i = 0; i <= param.Nu-1; i++) {
       *(mxGetPr(paramOut)+i) = param.uScale[i];
     }
   }
   /* uOffset */
-  else if (!strncmp(mxArrayToString(prhs[1]),"uOffset",NAME_UOFFSET)) {
+  else if (!strncmp(paramname,"uOffset",NAME_UOFFSET)) {
     paramOut = mxCreateDoubleMatrix(1,param.Nu,mxREAL);
     for (i = 0; i <= param.Nu-1; i++) {
       *(mxGetPr(paramOut)+i) = param.uOffset[i];
     }
   }
   /* NpCost */
-  else if (!strncmp(mxArrayToString(prhs[1]),"NpCost",NAME_NPCOST)) {
+  else if (!strncmp(paramname,"NpCost",NAME_NPCOST)) {
     paramOut = mxCreateNumericMatrix(1,1,mxINT32_CLASS,mxREAL);
     *((typeInt *)mxGetData(paramOut)) = param.NpCost;
   }
   /* NpSys */
-  else if (!strncmp(mxArrayToString(prhs[1]),"NpSys",NAME_NPSYS)) {
+  else if (!strncmp(paramname,"NpSys",NAME_NPSYS)) {
     paramOut = mxCreateNumericMatrix(1,1,mxINT32_CLASS,mxREAL);
     *((typeInt *)mxGetData(paramOut)) = param.NpSys;
   }
   /* Set field */
-  mxSetField(mxparam,0,mxArrayToString(prhs[1]),paramOut);
+  mxDestroyArray(mxGetField(mxparam, 0, paramname));
+  mxSetField(mxparam,0,paramname,paramOut);
   /**************************************************************************/
 
   /* RWS STRUCTURE **********************************************************/
-  if (!strncmp(mxArrayToString(prhs[1]),"Nhor",NAME_NHOR)) {
+  if (!strncmp(paramname,"Nhor",NAME_NHOR)) {
     /* t */
     idx = 0;
     rwsOut[idx] = mxCreateDoubleMatrix(1,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.t[i];
     }
+	free(rws.t);
     /* x */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nx,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nx-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.x[i];
     }
+	free(rws.x);
     /* adj */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nx,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nx-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.adj[i];
     }
+	free(rws.adj);
     /* u */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.u[i];
     }
+	free(rws.u);
     /* dHdu */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.dHdu[i];
     }
+	free(rws.dHdu);
     /* uls */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.uls[i];
     }
+	free(rws.uls);
     /* uprev */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.uprev[i];
     }
+	free(rws.uprev);
     /* dHduprev */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.dHduprev[i];
     }
+	free(rws.dHduprev);
     /* J */
     idx += 1;
     rwsOut[idx] = mxCreateDoubleMatrix(1,param.Nhor,mxREAL);
     for (i = 0; i <= param.Nhor-1; i++) {
       *(mxGetPr(rwsOut[idx])+i) = rws.J[i];
     }
+	free(rws.J);
     /* Set field */
     for (i = 0; i <= nrwsOut-1; i++) {
+	  mxDestroyArray(mxGetField(mxrws, 0, rwsOutName[i]));
       mxSetField(mxrws,0,rwsOutName[i],rwsOut[i]);
+	  
     }
   }
-  else if (!strncmp(mxArrayToString(prhs[1]),"Thor",NAME_THOR)) {
-    rwsOut[0] = mxCreateDoubleMatrix(1,param.Nhor,mxREAL);
-    for (i = 0; i <= param.Nhor-1; i++) {
-      *(mxGetPr(rwsOut[0])+i) = rws.t[i];
-    }
-    mxSetField(mxrws,0,"t",rwsOut[0]);
-  }
-  else if (!strncmp(mxArrayToString(prhs[1]),"u0",NAME_U0)) {
-    rwsOut[0] = mxCreateDoubleMatrix(param.Nu,param.Nhor,mxREAL);
-    for (i = 0; i <= param.Nhor*param.Nu-1; i++) {
-      *(mxGetPr(rwsOut[0])+i) = rws.u[i];
-    }
-    mxSetField(mxrws,0,"u",rwsOut[0]);
-  }
+  mxFree(paramname);
   /**************************************************************************/
 
 }

@@ -135,15 +135,17 @@ if ~isempty(PROBFCT)
     if ~strcmp('probfct.c',PROBFCT)
       movefile([PROBFCT(1:end-1),OBJEXT],['probfct.',OBJEXT]);
     end
-  catch
-    error([PROBFCT,': Invalid problem function.']);
+  catch e
+    disp([PROBFCT,': Invalid problem function.']);
+    rethrow(e)
   end
   for i = 1:length(EXE)
     disp(['Building ',EXE{i},' ...']);
     try
       eval(['mex -output ',EXE{i},' ',BINPATH,'/',EXE{i},'.',OBJEXT,OBJ,' probfct.',OBJEXT,' -I',CHEADERPATH,VERBOSE,DEBUG]);
-    catch %#ok<*CTCH>
-      error([EXE{i},': Error during building process.']);
+    catch e %#ok<*CTCH>
+      disp([EXE{i},': Error during building process.'])
+      rethrow(e)
     end
   end
   disp('Building process successively finished.');

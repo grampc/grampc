@@ -42,7 +42,7 @@
 
 void grampc_run(typeGRAMPC *grampc)
 {
-  typeInt i, j, k, igrad;
+  typeInt i, j, k, igrad,shift,shiftu;
   typeInt NLS_adapt = 2*(NLS + 1);
   typeRNum *ui;
   typeRNum *t          = grampc->rws->t;
@@ -55,8 +55,8 @@ void grampc_run(typeGRAMPC *grampc)
   typeRNum *lsExplicit = grampc->rws->lsExplicit;
   typeRNum *uprev      = grampc->rws->uprev;
   typeRNum *dHduprev   = grampc->rws->dHduprev;
-
   typeRNum *x_unscaled = NULL;
+  typeRNum interpfact;
 
   /* function pointers for system and cost integration */
   void (*pIntSys)(typeRNum *, typeInt , typeInt, typeRNum *, typeRNum *, typeRNum *,
@@ -130,16 +130,45 @@ void grampc_run(typeGRAMPC *grampc)
   /* shift of input trajectory */
   if (!strncmp(grampc->opt->ShiftControl,"on",VALUE_ONOFF)) {
     ui = u;
-    for (i = 0; i <= grampc->param->Nhor-2; i++) {
+
+	/* compute how far the sampling points must be shifted */
+	shift = (typeInt)(grampc->param->dt / (t[1] - t[0]));
+	shiftu = shift*grampc->param->Nu;
+	interpfact = (grampc->param->dt / (t[1] - t[0])) - shift;
+
+	if (shift >= grampc->param->Nhor){
+		grampc_error("Horizon too short for the current sampling time.");
+	}
+
+	/* Interpolation between the sampling points */
+    for (i = 0; i <= grampc->param->Nhor-2-shift; i++) {
       for (j = 0; j <= grampc->param->Nu-1; j++) {
-        ui[j] = ui[j] + (ui[j+grampc->param->Nu]-ui[j])/(t[i+1]-t[i])*grampc->param->dt;
+		  ui[j] = ui[shiftu + j] + (ui[shiftu + j + grampc->param->Nu] - ui[shiftu + j]) *interpfact;
       }
       ui += grampc->param->Nu;
     }
-    /* last element: extrapolation */
-    for (j = 0; j <= grampc->param->Nu-1; j++) {
-      ui[j] = ui[j] + (ui[j]-ui[j-grampc->param->Nu])/(t[grampc->param->Nhor-1]-t[grampc->param->Nhor-2])*grampc->param->dt;
+
+    /* next element: extrapolation */
+	if (shift == grampc->param->Nhor - 1){
+		for (j = 0; j <= grampc->param->Nu - 1; j++) {
+			ui[j] = ui[shiftu + j] + (ui[shiftu + j] - ui[shiftu + j - grampc->param->Nu])* interpfact;
+		}
+	}
+	else{
+		for (j = 0; j <= grampc->param->Nu - 1; j++) {
+			ui[j] = ui[shiftu + j] + (ui[shiftu + j] - ui[j - grampc->param->Nu]) / (1 / interpfact - 1);
+		}
     }
+	ui += grampc->param->Nu;
+	i++;
+
+	/* if there are elements left hold last value */
+	for (; i <= grampc->param->Nhor - 1; i++){
+		for (j = 0; j <= grampc->param->Nu - 1; j++) {
+			ui[j] = ui[j - grampc->param->Nu];
+		}
+		ui += grampc->param->Nu;
+	}
   }
 
   /* LOOP OVER NO. OF GRADIENT STEPS *********************************************/
@@ -251,24 +280,15 @@ void grampc_run(typeGRAMPC *grampc)
       grampc->sol->unext[i] = u[i];
     }
   }
-  if (!strncmp(grampc->opt->LineSearchType,"adaptive",VALUE_LSTYPE)) {
-    /* calculation of cost value */
-    grampc->sol->J[0] = lsAdapt[2*NLS+1];
-    /* calculation of xnext */
-    i = 0;
-    while (t[i] < grampc->param->dt) {
+
+  /* calculation of cost value */
+  (*pIntSys)(x,FWINT,grampc->param->Nhor,t,x,u,grampc,&Wsys);
+  (*pIntCost)(grampc->sol->J,t,x,u,grampc);
+  
+  /* calculation of xnext */
+  i = 0;
+  while (t[i] < grampc->param->dt) {
       i++;
-    }
-    (*pIntSys)(x,FWINT,i+1,t,x,u,grampc,&Wsys);
-  }
-  else {
-    (*pIntSys)(x,FWINT,grampc->param->Nhor,t,x,u,grampc,&Wsys);
-    (*pIntCost)(grampc->sol->J,t,x,u,grampc);
-    /* calculation of xnext */
-    i = 0;
-    while (t[i] < grampc->param->dt) {
-      i++;
-    }
   }
   interplin(grampc->sol->xnext,t,x,grampc->param->dt,grampc->param->Nx,i+1,1);
   if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
@@ -575,117 +595,176 @@ void Wsys(typeRNum *s, typeRNum *x, typeRNum *t, typeRNum *dummy, typeRNum *u, t
 
 void intCostTrapezodial(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, typeGRAMPC *grampc)
 {
-  typeInt i,j;
+  typeInt i, j, k;
   typeRNum h;
+  typeRNum c;
   typeRNum *s1 = grampc->rws->rwsCostIntegration;
-  typeRNum *s2 = s1 + 1;
-
-  typeRNum *x_unscaled1 = NULL;
-  typeRNum *x_unscaled2 = NULL;
-  typeRNum *u_unscaled1 = NULL;
-  typeRNum *u_unscaled2 = NULL;
-
+  
+  typeRNum *x_ = NULL;
+  typeRNum *u_ = NULL;
+  
   s[0]  = 0;
-  s1[0] = 0;
-  s2[0] = 0;
-
-  if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
-    x_unscaled1 = grampc->rws->rwsScale;
-    x_unscaled2 = x_unscaled1 + grampc->param->Nx;
-    u_unscaled1 = x_unscaled2 + grampc->param->Nx;
-    u_unscaled2 = u_unscaled1 + grampc->param->Nu;
-    for (i = 0; i <= grampc->param->Nhor-2; i++) {
-      h = 0.5*(t[i+1]-t[i]);
-      for (j = 0; j <= grampc->param->Nx-1; j++) {
-        x_unscaled1[j] = grampc->param->xScale[j]*x[j+i*grampc->param->Nx]+grampc->param->xOffset[j];
-        x_unscaled2[j] = grampc->param->xScale[j]*x[j+(i+1)*grampc->param->Nx]+grampc->param->xOffset[j];
+  
+  /* Integral Cost */
+  if (!strncmp(grampc->opt->IntegralCost, "on", VALUE_ONOFF)) {
+    for (i = 0; i <= grampc->param->Nhor - 1; i++) {
+      
+      /* Scaling */
+      if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+        x_ = grampc->rws->rwsScale;
+        u_ = x_ + grampc->param->Nx;
+        for (j = 0; j <= grampc->param->Nx-1; j++) {
+          x_[j] = grampc->param->xScale[j] * x[j+i*grampc->param->Nx] + grampc->param->xOffset[j];
+        }
+        for (j = 0; j <= grampc->param->Nu-1; j++) {
+          u_[j] = grampc->param->uScale[j] * u[j+i*grampc->param->Nu] + grampc->param->uOffset[j];
+        }
       }
-      for (j = 0; j <= grampc->param->Nu-1; j++) {
-        u_unscaled1[j] = grampc->param->uScale[j]*u[j+i*grampc->param->Nu]+grampc->param->uOffset[j];
-        u_unscaled2[j] = grampc->param->uScale[j]*u[j+(i+1)*grampc->param->Nu]+grampc->param->uOffset[j];
+      else {
+        x_ = x + i * grampc->param->Nx;
+        u_ = u + i * grampc->param->Nu;
       }
-      icostfct(s1,t[i],x_unscaled1,u_unscaled1,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s2,t[i+1],x_unscaled2,u_unscaled2,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      s[0] = s[0] + h*(s1[0] + s2[0]);
+      
+      s1[0] = 0;
+      icostfct(s1, t[i], x_, u_, grampc->param->xdes, grampc->param->udes, grampc->param->pCost);
+      
+      /* Integration */
+      if(i == 0) {
+        h = 0.5 * (t[i+1] - t[i]);
+      }
+      else if(i <= grampc->param->Nhor - 2) {
+        h = 0.5 * (t[i+1] - t[i-1]);
+      }
+      else {
+        h = 0.5 * (t[i] - t[i-1]);
+      }
+      s[0] = s[0] + h * s1[0];
     }
-    fcostfct(s1,t[grampc->param->Nhor-1],x_unscaled2,grampc->param->xdes,grampc->param->pCost);
-    s[0] = s[0] + s1[0];
   }
-  else {
-    for (i = 0; i <= grampc->param->Nhor-2; i++) {
-      h = 0.5*(t[i+1]-t[i]);
-      icostfct(s1,t[i],x+i*grampc->param->Nx,u+i*grampc->param->Nu,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s2,t[i+1],x+(i+1)*grampc->param->Nx,u+(i+1)*grampc->param->Nu,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      s[0] = s[0] + h*(s1[0] + s2[0]);
+  
+  /* Final Cost */
+  if (!strncmp(grampc->opt->FinalCost, "on", VALUE_ONOFF)) {
+    /* Scaling */
+    if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+      x_ = grampc->rws->rwsScale;
+      for (j = 0; j <= grampc->param->Nx-1; j++) {
+        x_[j] = grampc->param->xScale[j] * x[j+(grampc->param->Nhor-1)*grampc->param->Nx] + grampc->param->xOffset[j];
+      }
     }
-    fcostfct(s1,t[grampc->param->Nhor-1],x+grampc->param->Nx*(grampc->param->Nhor-1),grampc->param->xdes,grampc->param->pCost);
-    s[0] = s[0] + s1[0];
+    else {
+      x_ = x + (grampc->param->Nhor - 1) * grampc->param->Nx;
+    }
+    fcostfct(s1, t[grampc->param->Nhor - 1], x_, grampc->param->xdes, grampc->param->pCost);
+    if (isfinite(s1[0])) {
+      s[0] = s[0] + s1[0];
+    }
   }
 }
 
 void intCostSimpson(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, typeGRAMPC *grampc)
 {
-  typeInt i,j;
+  typeInt i, j, k;
   typeRNum h;
+  typeRNum c;
+    
   typeRNum *s1 = grampc->rws->rwsCostIntegration;
   typeRNum *s2 = s1 + 1;
-  typeRNum *s3 = s2 + 1;
-  typeRNum *ts = s3 + 1;
+  typeRNum *ts = s2 + 1;
   typeRNum *xs = ts + 1;
-  typeRNum *us = xs + grampc->param->Nx;
+  typeRNum *us = xs + grampc->param->Nx;  
 
-  typeRNum *x_unscaled1 = NULL;
-  typeRNum *x_unscaled2 = NULL;
-  typeRNum *u_unscaled1 = NULL;
-  typeRNum *u_unscaled2 = NULL;
-
+  typeRNum *x1_ = NULL;
+  typeRNum *u1_ = NULL;
+  typeRNum *x2_ = NULL;
+  typeRNum *u2_ = NULL;
+      
   s[0]  = 0;
-  s1[0] = 0;
-  s2[0] = 0;
-  s3[0] = 0;
-
-  if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
-    x_unscaled1 = grampc->rws->rwsScale;
-    x_unscaled2 = x_unscaled1 + grampc->param->Nx;
-    u_unscaled1 = x_unscaled2 + grampc->param->Nx;
-    u_unscaled2 = u_unscaled1 + grampc->param->Nu;
-    for (i = 0; i <= grampc->param->Nhor-2; i++) {
-      h = (t[i+1] - t[i])/6;
-      for (j = 0; j <= grampc->param->Nx-1; j++) {
-        x_unscaled1[j] = grampc->param->xScale[j]*x[j+i*grampc->param->Nx]+grampc->param->xOffset[j];
-        x_unscaled2[j] = grampc->param->xScale[j]*x[j+(i+1)*grampc->param->Nx]+grampc->param->xOffset[j];
-        xs[j]          = 0.5*(x_unscaled1[j] + x_unscaled2[j]);
+  
+  /* Integral Cost */
+  if (!strncmp(grampc->opt->IntegralCost,"on",VALUE_ONOFF)) {
+    for (i = 0; i <= grampc->param->Nhor - 1; i++) {
+      
+      /* Scaling */
+      if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+        x1_ = grampc->rws->rwsScale;
+        u1_ = x1_ + grampc->param->Nx;
+        for (j = 0; j <= grampc->param->Nx-1; j++) {
+          x1_[j] = grampc->param->xScale[j] * x[j+i*grampc->param->Nx] + grampc->param->xOffset[j];
+        }
+        for (j = 0; j <= grampc->param->Nu-1; j++) {
+          u1_[j] = grampc->param->uScale[j] * u[j+i*grampc->param->Nu] + grampc->param->uOffset[j];
+        }
       }
-      for (j = 0; j <= grampc->param->Nu-1; j++) {
-        u_unscaled1[j] = grampc->param->uScale[j]*u[j+i*grampc->param->Nu]+grampc->param->uOffset[j];
-        u_unscaled2[j] = grampc->param->uScale[j]*u[j+(i+1)*grampc->param->Nu]+grampc->param->uOffset[j];
-        us[j]          = 0.5*(u_unscaled1[j] + u_unscaled2[j]);
+      else {
+        x1_ = x + i * grampc->param->Nx;
+        u1_ = u + i * grampc->param->Nu;
       }
-      ts[0] = 0.5*(t[i] + t[i+1]);
-      icostfct(s1,t[i],x_unscaled1,u_unscaled1,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s2,ts[0],xs,us,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s3,t[i+1],x_unscaled2,u_unscaled2,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      s[0] = s[0] + h*(s1[0] + 4*s2[0] + s3[0]);
+      
+      s1[0] = 0;
+      icostfct(s1, t[i], x1_, u1_, grampc->param->xdes, grampc->param->udes, grampc->param->pCost);
+      
+      /* Integration */
+      if(i == 0) {
+        h = (t[i+1] - t[i]) / 6;
+      }
+      else if(i <= grampc->param->Nhor - 2) {
+        h = (t[i+1] - t[i-1]) / 6;
+      }
+      else {
+        h = (t[i] - t[i-1]) / 6;
+      }
+      s[0] = s[0] + h * s1[0];
+      
+      /* Cost for intermediate points */
+      if (i <= grampc->param->Nhor - 2) {
+        
+        /* Scaling */
+        if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+          x2_ = u1_ + grampc->param->Nu;
+          u2_ = x2_ + grampc->param->Nx;
+          for (j = 0; j <= grampc->param->Nx-1; j++) {
+            x2_[j] = grampc->param->xScale[j] * x[j+(i+1)*grampc->param->Nx] + grampc->param->xOffset[j];
+          }
+          for (j = 0; j <= grampc->param->Nu-1; j++) {
+            u2_[j] = grampc->param->uScale[j] * u[j+(i+1)*grampc->param->Nu] + grampc->param->uOffset[j];
+          }
+        }
+        else {
+          x2_ = x + (i+1) * grampc->param->Nx;
+          u2_ = u + (i+1) * grampc->param->Nu;
+        }
+        
+        /* Interpolation */
+        ts[0] = 0.5 * (t[i] + t[i+1]);
+        for (j = 0; j <= grampc->param->Nx - 1; j++) {
+          xs[j] = 0.5 * (x1_[j] + x2_[j]);
+        }
+        for (j = 0; j <= grampc->param->Nu - 1; j++) {
+          us[j] = 0.5 * (u1_[j] + u2_[j]);
+        }
+        
+        s2[0] = 0;
+        icostfct(s2, ts[0], xs, us, grampc->param->xdes, grampc->param->udes, grampc->param->pCost);
+        
+        /* Integration */
+        h = 4 * (t[i+1] - t[i]) / 6;
+        s[0] = s[0] + h * s2[0];
+      }
     }
-    fcostfct(s1,t[grampc->param->Nhor-1],x_unscaled2,grampc->param->xdes,grampc->param->pCost);
-    s[0] = s[0] + s1[0];
   }
-  else {
-    for (i = 0; i <= grampc->param->Nhor-2; i++) {
-      h = (t[i+1] - t[i])/6;
+	/* Final Cost */
+  if (!strncmp(grampc->opt->FinalCost, "on", VALUE_ONOFF)) {
+    /* Scaling */
+    if (!strncmp(grampc->opt->ScaleProblem,"on",VALUE_ONOFF)) {
+      x1_ = grampc->rws->rwsScale;
       for (j = 0; j <= grampc->param->Nx-1; j++) {
-        xs[j] = 0.5*(x[j+i*grampc->param->Nx] + x[j+(i+1)*grampc->param->Nx]);
+        x1_[j] = grampc->param->xScale[j] * x[j+(grampc->param->Nhor-1)*grampc->param->Nx] + grampc->param->xOffset[j];
       }
-      for (j = 0; j <= grampc->param->Nu-1; j++) {
-        us[j] = 0.5*(u[j+i*grampc->param->Nu] + u[j+(i+1)*grampc->param->Nu]);
-      }
-      ts[0] = 0.5*(t[i] + t[i+1]);
-      icostfct(s1,t[i],x+i*grampc->param->Nx,u+i*grampc->param->Nu,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s2,ts[0],xs,us,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      icostfct(s3,t[i+1],x+(i+1)*grampc->param->Nx,u+(i+1)*grampc->param->Nu,grampc->param->xdes,grampc->param->udes,grampc->param->pCost);
-      s[0] = s[0] + h*(s1[0] + 4*s2[0] + s3[0]);
     }
-    fcostfct(s1,t[grampc->param->Nhor-1],x+grampc->param->Nx*(grampc->param->Nhor-1),grampc->param->xdes,grampc->param->pCost);
+    else {
+      x1_ = x + (grampc->param->Nhor - 1) * grampc->param->Nx;
+    }
+    fcostfct(s1, t[grampc->param->Nhor - 1], x1_, grampc->param->xdes, grampc->param->pCost);
     s[0] = s[0] + s1[0];
   }
 }

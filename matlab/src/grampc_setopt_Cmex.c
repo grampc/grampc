@@ -61,6 +61,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   typeGRAMPCopt opt;
   typeGRAMPCrws rws;
 
+  typeChar *optname;
+  typeChar *optvalue;
+
   /* check proper number of input arguments */
   if (nrhs < 3) {
     mexErrMsgTxt("Not enough input arguments.");
@@ -84,6 +87,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 0) {
     mexErrMsgTxt("No output arguments.");
   }
+  optname = mxArrayToString(prhs[1]);
 
   mxopt = mxGetField(prhs[0],0,"opt");
 
@@ -97,23 +101,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   opt.LineSearchAdaptFactor    = mxGetScalar(mxGetField(mxopt,0,"LineSearchAdaptFactor"));
   opt.LineSearchIntervalTol    = mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalTol"));
 
-  strncpy(opt.ShiftControl,mxArrayToString(mxGetField(mxopt,0,"ShiftControl")),VALUE_ONOFF);
-  strncpy(opt.ScaleProblem,mxArrayToString(mxGetField(mxopt,0,"ScaleProblem")),VALUE_ONOFF);
-  strncpy(opt.CostIntegrator,mxArrayToString(mxGetField(mxopt,0,"CostIntegrator")),VALUE_COSTINTMETHOD);
-  strncpy(opt.Integrator,mxArrayToString(mxGetField(mxopt,0,"Integrator")),VALUE_INTEGRATOR);
-  strncpy(opt.LineSearchType,mxArrayToString(mxGetField(mxopt,0,"LineSearchType")),VALUE_LSTYPE);
-  strncpy(opt.JacobianX,mxArrayToString(mxGetField(mxopt,0,"JacobianX")),VALUE_JACOBIANX);
-  strncpy(opt.JacobianU,mxArrayToString(mxGetField(mxopt,0,"JacobianU")),VALUE_JACOBIANU);
-  strncpy(opt.IntegralCost,mxArrayToString(mxGetField(mxopt,0,"IntegralCost")),VALUE_ONOFF);
-  strncpy(opt.FinalCost,mxArrayToString(mxGetField(mxopt,0,"FinalCost")),VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "ShiftControl"), opt.ShiftControl, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "ScaleProblem"), opt.ScaleProblem, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "CostIntegrator"),opt.CostIntegrator,  VALUE_COSTINTMETHOD);
+  mxGetString(mxGetField(mxopt,0,"Integrator"),opt.Integrator,VALUE_INTEGRATOR);
+  mxGetString(mxGetField(mxopt,0,"LineSearchType"),opt.LineSearchType,VALUE_LSTYPE);
+  mxGetString(mxGetField(mxopt,0,"JacobianX"),opt.JacobianX,VALUE_JACOBIANX);
+  mxGetString(mxGetField(mxopt,0,"JacobianU"),opt.JacobianU,VALUE_JACOBIANU);
+  mxGetString(mxGetField(mxopt,0,"IntegralCost"),opt.IntegralCost,VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt,0,"FinalCost"),opt.FinalCost,VALUE_ONOFF);
 
-  /* rws structure (only necessary if MaxIter is modified */
+  /* rws structure (only necessary if MaxIter is modified) */
   mxrws = mxGetField(prhs[0],0,"rws");
-  if (!strncmp(mxArrayToString(prhs[1]),"MaxIter",NAME_MAXITER)) {
+  if (!strncmp(optname,"MaxIter",NAME_MAXITER)) {
     rws.lsAdapt = NULL;
+	//rws.lsAdapt = mxGetPr(mxGetField(mxrws, 0, "lsAdapt"));
   }
-  if (!strncmp(mxArrayToString(prhs[1]),"LineSearchInit",NAME_LSINIT) ||
-      !strncmp(mxArrayToString(prhs[1]),"LineSearchIntervalFactor",NAME_LSINTFACTOR)) {
+  if (!strncmp(optname,"LineSearchInit",NAME_LSINIT) ||
+      !strncmp(optname,"LineSearchIntervalFactor",NAME_LSINTFACTOR)) {
     rws.lsAdapt    = mxGetPr(mxGetField(mxrws,0,"lsAdapt"));
     rws.lsExplicit = mxGetPr(mxGetField(mxrws,0,"lsExplicit"));
   }
@@ -122,122 +127,108 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   grampc.rws = &rws;
 
   if (mxIsChar(prhs[2])) {
-    grampc_setopt_string(&grampc,mxArrayToString(prhs[1]),mxArrayToString(prhs[2]));
+	  optvalue = mxArrayToString(prhs[2]);
+	  grampc_setopt_string(&grampc, optname, optvalue);
+	  mxFree(optvalue);
   }
-  else if (!strncmp(mxArrayToString(prhs[1]),"MaxIter",NAME_MAXITER)) {
-    grampc_setopt_int(&grampc,mxArrayToString(prhs[1]),(typeInt)mxGetScalar(prhs[2]));
+  else if (!strncmp(optname,"MaxIter",NAME_MAXITER)) {
+    grampc_setopt_int(&grampc,optname,(typeInt)mxGetScalar(prhs[2]));
   }
   else {
-    grampc_setopt_real(&grampc,mxArrayToString(prhs[1]),mxGetScalar(prhs[2]));
+    grampc_setopt_real(&grampc,optname,mxGetScalar(prhs[2]));
   }
 
   /* MaxIter */
-  if (!strncmp(mxArrayToString(prhs[1]),"MaxIter",NAME_MAXITER)) {
+  if (!strncmp(optname,"MaxIter",NAME_MAXITER)) {
     optOut = mxCreateNumericMatrix(1,1,mxINT32_CLASS,mxREAL);
     *((typeInt *)mxGetData(optOut)) = opt.MaxIter;
-    rwsOut[0] = mxCreateDoubleMatrix(1,2*(NLS+1)*(1+opt.MaxIter),mxREAL);
+	rwsOut[0] = mxCreateDoubleMatrix(1,2*(NLS+1)*(1+opt.MaxIter),mxREAL);
     for (i = 0; i <= 2*(NLS+1)*(1+opt.MaxIter)-1; i++) {
       *(mxGetPr(rwsOut[0])+i) = rws.lsAdapt[i];
     }
+	free(rws.lsAdapt);
+	mxDestroyArray(mxGetField(mxrws, 0, "lsAdapt"));
     mxSetField(mxrws,0,"lsAdapt",rwsOut[0]);
   }
   /* ShiftControl */
-  else if (!strncmp(mxArrayToString(prhs[1]),"ShiftControl",NAME_SHIFTCONTROL)) {
+  else if (!strncmp(optname,"ShiftControl",NAME_SHIFTCONTROL)) {
     optOut = mxCreateString(opt.ShiftControl);
   }
   /* ScaleProblem */
-  else if (!strncmp(mxArrayToString(prhs[1]),"ScaleProblem",NAME_SCALEPROBLEM)) {
+  else if (!strncmp(optname,"ScaleProblem",NAME_SCALEPROBLEM)) {
     optOut = mxCreateString(opt.ScaleProblem);
   }
   /* CostIntegrator */
-  else if (!strncmp(mxArrayToString(prhs[1]),"CostIntegrator",NAME_COSTINTMETHOD)) {
+  else if (!strncmp(optname,"CostIntegrator",NAME_COSTINTMETHOD)) {
     optOut = mxCreateString(opt.CostIntegrator);
   }
   /* Integrator */
-  else if (!strncmp(mxArrayToString(prhs[1]),"Integrator",NAME_INTEGRATOR)) {
+  else if (!strncmp(optname,"Integrator",NAME_INTEGRATOR)) {
     optOut = mxCreateString(opt.Integrator);
   }
   /* IntegratorRelTol */
-  else if (!strncmp(mxArrayToString(prhs[1]),"IntegratorRelTol",NAME_INTRELTOL)) {
+  else if (!strncmp(optname,"IntegratorRelTol",NAME_INTRELTOL)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.IntegratorRelTol;
   }
   /* IntegratorAbsTol */
-  else if (!strncmp(mxArrayToString(prhs[1]),"IntegratorAbsTol",NAME_INTABSTOL)) {
+  else if (!strncmp(optname,"IntegratorAbsTol",NAME_INTABSTOL)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.IntegratorAbsTol;
   }
   /* LineSearchType */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchType",NAME_LSTYPE)) {
+  else if (!strncmp(optname,"LineSearchType",NAME_LSTYPE)) {
     optOut = mxCreateString(opt.LineSearchType);
   }
   /* LineSearchMax */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchMax",NAME_LSMAX)) {
+  else if (!strncmp(optname,"LineSearchMax",NAME_LSMAX)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchMax;
   }
   /* LineSearchMin */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchMin",NAME_LSMIN)) {
+  else if (!strncmp(optname,"LineSearchMin",NAME_LSMIN)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchMin;
   }
   /* LineSearchInit */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchInit",NAME_LSINIT)) {
+  else if (!strncmp(optname,"LineSearchInit",NAME_LSINIT)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchInit;
-    rwsOut[0] = mxCreateDoubleMatrix(1,2*(NLS+1)*(1+opt.MaxIter),mxREAL);
-    rwsOut[1] = mxCreateDoubleMatrix(1,NLS,mxREAL);
-    for (i = 0; i <= 2*(NLS+1)*(1+opt.MaxIter)-1; i++) {
-      *(mxGetPr(rwsOut[0])+i) = rws.lsAdapt[i];
-    }
-    for (i = 0; i <= NLS-1; i++) {
-      *(mxGetPr(rwsOut[1])+i) = rws.lsExplicit[i];
-    }
-    mxSetField(mxrws,0,"lsAdapt",rwsOut[0]);
-    mxSetField(mxrws,0,"lsExplicit",rwsOut[1]);
   }
   /* LineSearchIntervalFactor */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchIntervalFactor",NAME_LSINTFACTOR)) {
+  else if (!strncmp(optname,"LineSearchIntervalFactor",NAME_LSINTFACTOR)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchIntervalFactor;
-    rwsOut[0] = mxCreateDoubleMatrix(1,2*(NLS+1)*(1+opt.MaxIter),mxREAL);
-    rwsOut[1] = mxCreateDoubleMatrix(1,NLS,mxREAL);
-    for (i = 0; i <= 2*(NLS+1)*(1+opt.MaxIter)-1; i++) {
-      *(mxGetPr(rwsOut[0])+i) = rws.lsAdapt[i];
-    }
-    for (i = 0; i <= NLS-1; i++) {
-      *(mxGetPr(rwsOut[1])+i) = rws.lsExplicit[i];
-    }
-    mxSetField(mxrws,0,"lsAdapt",rwsOut[0]);
-    mxSetField(mxrws,0,"lsExplicit",rwsOut[1]);
   }
   /* LineSearchAdaptFactor */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchAdaptFactor",NAME_LSADAPTFACTOR)) {
+  else if (!strncmp(optname,"LineSearchAdaptFactor",NAME_LSADAPTFACTOR)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchAdaptFactor;
   }
   /* LineSearchIntervalTol */
-  else if (!strncmp(mxArrayToString(prhs[1]),"LineSearchIntervalTol",NAME_LSINTTOL)) {
+  else if (!strncmp(optname,"LineSearchIntervalTol",NAME_LSINTTOL)) {
     optOut = mxCreateDoubleMatrix(1,1,mxREAL);
     *(mxGetPr(optOut)) = opt.LineSearchIntervalTol;
   }
   /* JacobianX */
-  else if (!strncmp(mxArrayToString(prhs[1]),"JacobianX",NAME_JACOBIANX)) {
+  else if (!strncmp(optname,"JacobianX",NAME_JACOBIANX)) {
     optOut = mxCreateString(opt.JacobianX);
   }
   /* JacobianU */
-  else if (!strncmp(mxArrayToString(prhs[1]),"JacobianU",NAME_JACOBIANU)) {
+  else if (!strncmp(optname,"JacobianU",NAME_JACOBIANU)) {
     optOut = mxCreateString(opt.JacobianU);
   }
   /* IntegralCost */
-  else if (!strncmp(mxArrayToString(prhs[1]),"IntegralCost",NAME_INTEGRALCOST)) {
+  else if (!strncmp(optname,"IntegralCost",NAME_INTEGRALCOST)) {
     optOut = mxCreateString(opt.IntegralCost);
   }
   /* FinalCost */
-  else if (!strncmp(mxArrayToString(prhs[1]),"FinalCost",NAME_FINALCOST)) {
+  else if (!strncmp(optname,"FinalCost",NAME_FINALCOST)) {
     optOut = mxCreateString(opt.FinalCost);
   }
   /* Set field */
-  mxSetField(mxopt,0,mxArrayToString(prhs[1]),optOut);
+  mxDestroyArray(mxGetField(mxopt, 0, optname));
+  mxSetField(mxopt,0,optname,optOut);
 
+  mxFree(optname);
 }

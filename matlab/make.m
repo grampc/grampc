@@ -140,20 +140,22 @@ if ALL
     disp(['Building ',CFiles{i}(1:end-2),' ...']);
     try
       eval(['mex -c ',CFiles{i},' -DMEXCOMPILE -I',CHEADERPATH,VERBOSE,DEBUG]);
-    catch %#ok<*CTCH>
+    catch e %#ok<*CTCH>
       delete('*');
       cd(destPath);
-      error('Error during building process.');
+      disp('Error during building process.');
+      rethrow(e)
     end
   end
   for i = 1:length(CmexFiles)
     disp(['Building ',CmexFiles{i}(1:end-2),' ...']);
     try
       eval(['mex -c ',CmexFiles{i},' -I',CHEADERPATH,VERBOSE,DEBUG]);
-    catch %#ok<*CTCH>
+    catch e %#ok<*CTCH>
       delete('*');
       cd(destPath);
-      error('Error during building process.');
+      disp('Error during building process.');
+      rethrow(e)
     end
   end
   disp('Building process successively finished.');

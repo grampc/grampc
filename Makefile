@@ -26,7 +26,7 @@
 # compiler
 #
 COMPILER = gcc
-AR       = ar r
+AR       = ar -r
 RM       = rm -f
 OBJEXT   = o
 LIBEXT   = a
@@ -72,7 +72,7 @@ all: $(GRAMPC_LIB)
 
 $(GRAMPC_LIB): $(GRAMPC_OBJS)
 			@echo 'Building library: $@'
-			$(AR) -o "$@" $(GRAMPC_OBJS)
+			$(AR) "$@" $(GRAMPC_OBJS)
 			@echo 'Finished building: $@'
 			@echo ''
 

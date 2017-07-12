@@ -253,7 +253,7 @@ void grampc_init(typeGRAMPC **grampc)
     grampc_error(RWS_ELEMENT_ALLOC_FAILED);
   }
   /* rwsCostIntegration */
-  Nrws = 4 + (*grampc)->param->Nx + (*grampc)->param->Nu;
+  Nrws = 3 + (*grampc)->param->Nx + (*grampc)->param->Nu;
   (*grampc)->rws->rwsCostIntegration = (typeRNum *)myCalloc(Nrws,sizeof(*(*grampc)->rws->rwsCostIntegration));
   if ((*grampc)->rws->rwsCostIntegration == NULL) {
     grampc_error(RWS_ELEMENT_ALLOC_FAILED);

@@ -272,7 +272,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     *(mxGetPr(rwsOut[idx])+i) = grampc->rws->rwsGradient[i];
   }
   /* rwsCostIntegration */
-  Nrws = 4 + grampc->param->Nx + grampc->param->Nu;
+  Nrws = 3 + grampc->param->Nx + grampc->param->Nu;
   idx += 1;
   rwsOut[idx] = mxCreateDoubleMatrix(1,Nrws,mxREAL);
   for (i = 0; i <= Nrws-1; i++) {

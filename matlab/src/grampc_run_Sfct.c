@@ -68,15 +68,20 @@ static void mdlInitializeSizes(SimStruct *S)
   /*Input ports*/
   if(!ssSetNumInputPorts(S, 4)) return;       	/* number of input ports */
 
-  ssSetInputPortWidth(S, 0, Nx);		/* no. of inputs at input port 0 (xk)   */
-  ssSetInputPortWidth(S, 1,  1);		/* no. of inputs at input port 1 (tk)   */
-  ssSetInputPortWidth(S, 2, Nx);	        /* no. of inputs at input port 2 (xdes) */
+  ssSetInputPortWidth(S, 0, Nx);				/* no. of inputs at input port 0 (xk)   */
+  ssSetInputPortWidth(S, 1,  1);				/* no. of inputs at input port 1 (tk)   */
+  ssSetInputPortWidth(S, 2, Nx);	        	/* no. of inputs at input port 2 (xdes) */
   ssSetInputPortWidth(S, 3, Nu);                /* no. of inputs at input port 3 (udes) */
 
   ssSetInputPortDirectFeedThrough(S, 0, 1);    	/* direct input feedthrough */
   ssSetInputPortDirectFeedThrough(S, 1, 1);    	/* direct input feedthrough */
   ssSetInputPortDirectFeedThrough(S, 2, 1);    	/* direct input feedthrough */
   ssSetInputPortDirectFeedThrough(S, 3, 1);    	/* direct input feedthrough */
+  
+  ssSetInputPortRequiredContiguous(S, 0, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
+  ssSetInputPortRequiredContiguous(S, 1, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
+  ssSetInputPortRequiredContiguous(S, 2, 1);    /* must be contiguous to use  ssGetInputPortRealSignal*/
+  ssSetInputPortRequiredContiguous(S, 3, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
 
   /*Output ports*/
   if(!ssSetNumOutputPorts(S, 3)) return;      	/* number of output ports                  */
@@ -119,6 +124,7 @@ static void mdlStart(SimStruct *S)
   void **ptr;
   mxArray *mxopt   = mxGetField(ssGetSFcnParam(S,0),0,"opt");
   mxArray *mxparam = mxGetField(ssGetSFcnParam(S,0),0,"param");
+  typeChar *optvalue;
 
   ptr = ssGetPWork(S);
 
@@ -127,23 +133,42 @@ static void mdlStart(SimStruct *S)
 
   /* adapt option structure */
   grampc_setopt_int(grampc,"MaxIter",(typeInt)mxGetScalar(mxGetField(mxopt,0,"MaxIter")));
-  grampc_setopt_string(grampc,"ShiftControl",mxArrayToString(mxGetField(mxopt,0,"ShiftControl")));
-  grampc_setopt_string(grampc,"ScaleProblem",mxArrayToString(mxGetField(mxopt,0,"ScaleProblem")));
-  grampc_setopt_string(grampc,"CostIntegrator",mxArrayToString(mxGetField(mxopt,0,"CostIntegrator")));
-  grampc_setopt_string(grampc,"Integrator",mxArrayToString(mxGetField(mxopt,0,"Integrator")));  
-  grampc_setopt_real(grampc,"IntegratorRelTol",mxGetScalar(mxGetField(mxopt,0,"IntegratorRelTol")));
-  grampc_setopt_real(grampc,"IntegratorAbsTol",mxGetScalar(mxGetField(mxopt,0,"IntegratorAbsTol")));
-  grampc_setopt_string(grampc,"LineSearchType",mxArrayToString(mxGetField(mxopt,0,"LineSearchType")));  
-  grampc_setopt_real(grampc,"LineSearchMax",mxGetScalar(mxGetField(mxopt,0,"LineSearchMax")));
-  grampc_setopt_real(grampc,"LineSearchMin",mxGetScalar(mxGetField(mxopt,0,"LineSearchMin")));
-  grampc_setopt_real(grampc,"LineSearchInit",mxGetScalar(mxGetField(mxopt,0,"LineSearchInit")));
-  grampc_setopt_real(grampc,"LineSearchIntervalFactor",mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalFactor")));
-  grampc_setopt_real(grampc,"LineSearchAdaptFactor",mxGetScalar(mxGetField(mxopt,0,"LineSearchAdaptFactor")));
-  grampc_setopt_real(grampc,"LineSearchIntervalTol",mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalTol")));
-  grampc_setopt_string(grampc,"JacobianX",mxArrayToString(mxGetField(mxopt,0,"JacobianX")));
-  grampc_setopt_string(grampc,"JacobianU",mxArrayToString(mxGetField(mxopt,0,"JacobianU")));
-  grampc_setopt_string(grampc,"IntegralCost",mxArrayToString(mxGetField(mxopt,0,"IntegralCost")));
-  grampc_setopt_string(grampc,"FinalCost",mxArrayToString(mxGetField(mxopt,0,"FinalCost")));
+  grampc_setopt_real(grampc, "LineSearchMax", mxGetScalar(mxGetField(mxopt, 0, "LineSearchMax")));
+  grampc_setopt_real(grampc, "LineSearchMin", mxGetScalar(mxGetField(mxopt, 0, "LineSearchMin")));
+  grampc_setopt_real(grampc, "LineSearchInit", mxGetScalar(mxGetField(mxopt, 0, "LineSearchInit")));
+  grampc_setopt_real(grampc, "IntegratorRelTol", mxGetScalar(mxGetField(mxopt, 0, "IntegratorRelTol")));
+  grampc_setopt_real(grampc, "IntegratorAbsTol", mxGetScalar(mxGetField(mxopt, 0, "IntegratorAbsTol")));
+  grampc_setopt_real(grampc, "LineSearchIntervalFactor", mxGetScalar(mxGetField(mxopt, 0, "LineSearchIntervalFactor")));
+  grampc_setopt_real(grampc, "LineSearchAdaptFactor", mxGetScalar(mxGetField(mxopt, 0, "LineSearchAdaptFactor")));
+  grampc_setopt_real(grampc, "LineSearchIntervalTol", mxGetScalar(mxGetField(mxopt, 0, "LineSearchIntervalTol")));
+
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "ShiftControl"));	  
+  grampc_setopt_string(grampc, "ShiftControl", optvalue);
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "ScaleProblem"));	  
+  grampc_setopt_string(grampc, "ScaleProblem", optvalue);
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "CostIntegrator")); 
+  grampc_setopt_string(grampc, "CostIntegrator", optvalue);
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "Integrator"));	  
+  grampc_setopt_string(grampc, "Integrator", optvalue);
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "LineSearchType")); 
+  grampc_setopt_string(grampc, "LineSearchType", optvalue); 
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "JacobianX"));	  
+  grampc_setopt_string(grampc, "JacobianX", optvalue);
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "JacobianU"));	  
+  grampc_setopt_string(grampc, "JacobianU", optvalue); 
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "IntegralCost"));	  
+  grampc_setopt_string(grampc, "IntegralCost", optvalue); 
+  mxFree(optvalue);
+  optvalue = mxArrayToString(mxGetField(mxopt, 0, "FinalCost"));	  
+  grampc_setopt_string(grampc, "FinalCost", optvalue); 
+  mxFree(optvalue);
 
   /* adapt param structure */
   grampc_setparam_int(grampc,"Nhor",(typeInt)mxGetScalar(mxGetField(mxparam,0,"Nhor")));
@@ -187,10 +212,10 @@ static void mdlStart(SimStruct *S)
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
   /*inputs*/
-  typeRNum *xk   = (typeRNum *)ssGetInputPortRealSignalPtrs(S,0)[0];
-  typeRNum tk    = (typeInt)ssGetInputPortRealSignalPtrs(S,1)[0];
-  typeRNum *xdes = (typeRNum *)ssGetInputPortRealSignalPtrs(S,2)[0];
-  typeRNum *udes = (typeRNum *)ssGetInputPortRealSignalPtrs(S,3)[0];
+  typeRNum *xk = (typeRNum *)ssGetInputPortRealSignal(S, 0);
+  typeRNum *tk = (typeRNum *)ssGetInputPortRealSignal(S, 1);
+  typeRNum *xdes = (typeRNum *)ssGetInputPortRealSignal(S, 2);
+  typeRNum *udes = (typeRNum *)ssGetInputPortRealSignal(S, 3);
 
   /*outputs*/
   typeRNum *xnext  = (typeRNum *)ssGetOutputPortRealSignal(S,0);
@@ -203,12 +228,12 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S,0);
 
   grampc_setparam_vector(grampc, "xk", xk);
-  grampc_setparam_real(grampc, "tk", tk);
+  grampc_setparam_real(grampc, "tk", tk[0]);
   grampc_setparam_vector(grampc, "xdes", xdes);
   grampc_setparam_vector(grampc, "udes", udes);
 
   grampc_run(grampc);
-
+	
   for (i = 0; i <= grampc->param->Nx-1; i++) {
     xnext[i] = grampc->sol->xnext[i];
   }

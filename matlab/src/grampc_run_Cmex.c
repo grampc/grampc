@@ -157,15 +157,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   opt.LineSearchAdaptFactor    = mxGetScalar(mxGetField(mxopt,0,"LineSearchAdaptFactor"));
   opt.LineSearchIntervalTol    = mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalTol"));
 
-  strcpy(opt.ShiftControl,mxArrayToString(mxGetField(mxopt,0,"ShiftControl")));
-  strcpy(opt.ScaleProblem,mxArrayToString(mxGetField(mxopt,0,"ScaleProblem")));
-  strcpy(opt.CostIntegrator,mxArrayToString(mxGetField(mxopt,0,"CostIntegrator")));
-  strcpy(opt.Integrator,mxArrayToString(mxGetField(mxopt,0,"Integrator")));
-  strcpy(opt.LineSearchType,mxArrayToString(mxGetField(mxopt,0,"LineSearchType")));
-  strcpy(opt.JacobianX,mxArrayToString(mxGetField(mxopt,0,"JacobianX")));
-  strcpy(opt.JacobianU,mxArrayToString(mxGetField(mxopt,0,"JacobianU")));
-  strcpy(opt.IntegralCost,mxArrayToString(mxGetField(mxopt,0,"IntegralCost")));
-  strcpy(opt.FinalCost,mxArrayToString(mxGetField(mxopt,0,"FinalCost")));
+  mxGetString(mxGetField(mxopt, 0, "ShiftControl"), opt.ShiftControl, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "ScaleProblem"), opt.ScaleProblem, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "CostIntegrator"), opt.CostIntegrator, VALUE_COSTINTMETHOD);
+  mxGetString(mxGetField(mxopt, 0, "Integrator"), opt.Integrator, VALUE_INTEGRATOR);
+  mxGetString(mxGetField(mxopt, 0, "LineSearchType"), opt.LineSearchType, VALUE_LSTYPE);
+  mxGetString(mxGetField(mxopt, 0, "JacobianX"), opt.JacobianX, VALUE_JACOBIANX);
+  mxGetString(mxGetField(mxopt, 0, "JacobianU"), opt.JacobianU, VALUE_JACOBIANU);
+  mxGetString(mxGetField(mxopt, 0, "IntegralCost"), opt.IntegralCost, VALUE_ONOFF);
+  mxGetString(mxGetField(mxopt, 0, "FinalCost"), opt.FinalCost, VALUE_ONOFF);
 
   plhs[0] = mxCreateDoubleMatrix(param.Nx,1,mxREAL);
   plhs[1] = mxCreateDoubleMatrix(param.Nu,1,mxREAL);

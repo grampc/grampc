@@ -89,7 +89,7 @@
  */
 
 
-#define NN   20
+#define NN   5
 #define NX   2*NN
 #define NU   2
 
