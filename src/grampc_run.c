@@ -595,9 +595,8 @@ void Wsys(typeRNum *s, typeRNum *x, typeRNum *t, typeRNum *dummy, typeRNum *u, t
 
 void intCostTrapezodial(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, typeGRAMPC *grampc)
 {
-  typeInt i, j, k;
+  typeInt i, j;
   typeRNum h;
-  typeRNum c;
   typeRNum *s1 = grampc->rws->rwsCostIntegration;
   
   typeRNum *x_ = NULL;
@@ -655,17 +654,13 @@ void intCostTrapezodial(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, type
       x_ = x + (grampc->param->Nhor - 1) * grampc->param->Nx;
     }
     fcostfct(s1, t[grampc->param->Nhor - 1], x_, grampc->param->xdes, grampc->param->pCost);
-    if (isfinite(s1[0])) {
-      s[0] = s[0] + s1[0];
-    }
   }
 }
 
 void intCostSimpson(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, typeGRAMPC *grampc)
 {
-  typeInt i, j, k;
+  typeInt i, j;
   typeRNum h;
-  typeRNum c;
     
   typeRNum *s1 = grampc->rws->rwsCostIntegration;
   typeRNum *s2 = s1 + 1;
