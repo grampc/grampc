@@ -654,6 +654,7 @@ void intCostTrapezodial(typeRNum *s, typeRNum *t, typeRNum *x, typeRNum *u, type
       x_ = x + (grampc->param->Nhor - 1) * grampc->param->Nx;
     }
     fcostfct(s1, t[grampc->param->Nhor - 1], x_, grampc->param->xdes, grampc->param->pCost);
+	s[0] = s[0] + s1[0];
   }
 }
 

@@ -126,6 +126,9 @@ if CLEAN
 end
 
 if ALL 
+  if ~exist(BINPATH,'var')
+      mkdir(BINPATH);
+  end
   cd(BINPATH);
   % copying of corresponding source files into bin folder
   % and subsequent compilation
