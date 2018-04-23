@@ -1,16 +1,16 @@
-/*
+/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
  *
- * This file is part of GRAMPC.
+ * GRAMPC -- A software framework for embedded nonlinear model predictive
+ * control using a gradient-based augmented Lagrangian approach
  *
- * GRAMPC - a gradient-based MPC software for real-time applications
- *
- * Copyright (C) 2014 by Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Developed at the Institute of Measurement, Control, and
- * Microtechnology, University of Ulm. All rights reserved.
+ * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Developed at the Institute of Measurement, Control, and Microtechnology,
+ * Ulm University. All rights reserved.
  *
  * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
  *
  * GRAMPC is distributed in the hope that it will be useful,
@@ -18,29 +18,27 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public 
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
-
-/*
- *
- * File: grampc_run_Cmex.c
- * Authors: Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Date: February 2014
- * Version: v1.0
- * 
- * Mex function interface to use the function grampc_run 
- * for running GRAMPC.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
  *
  */
 
 #include "mex.h"
-#include "matrix.h"
-
-
 #include "grampc.h"
+#include "grampc_conversion_Cmex.h"
+
+#ifndef N_TIMER
+#define N_TIMER 1
+#endif
+
+/* Runtime measurement */
+#ifdef N_TIMER
+#ifdef _WIN32
+#include <Windows.h>
+#elif defined(__linux__) || defined(__APPLE__)
+#include <sys/time.h> 
+#endif
+#endif
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
@@ -48,137 +46,95 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  typeGRAMPC grampc;
-  typeGRAMPCparam param;
-  typeGRAMPCsol sol;
-  typeGRAMPCrws rws;
-  typeGRAMPCopt opt;
+	typeGRAMPC* grampc;
+	typeRNum * comptime;
 
-  mxArray *mxopt   = NULL;
-  mxArray *mxparam = NULL;
-  mxArray *mxrws   = NULL;
+	mxArray *mxuserparam = NULL;
 
-  /* check proper number of input arguments */
-  if (nrhs < 1) {
-    mexErrMsgTxt("Not enough input arguments.");
-  }
-  if (nrhs > 1) {
-    mexErrMsgTxt("Too many input arguments.");
-  }
-  /* first argument: param structure */
-  if (!mxIsStruct(prhs[0])) {
-    mexErrMsgTxt("First argument (grampc structure) must be a struct.");
-  }
+	/* variables for runtime measurement */
+#ifdef N_TIMER
+	typeInt i;
+	typeGRAMPC* grampcArray[N_TIMER];
+#ifdef _WIN32
+	LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
+	LARGE_INTEGER Frequency;
+#elif defined(__linux__) || defined(__APPLE__)
+	struct timeval StartingTime, EndingTime;
+#endif
+#endif
 
-  /* check proper number of output arguments */
-  if (nlhs > 3) {
-    mexErrMsgTxt("Too many output arguments.");
-  }
+	/* check proper number of input arguments */
+	if (nrhs < 1) {
+		mexErrMsgTxt("Not enough input arguments.");
+	}
+	if (nrhs > 1) {
+		mexErrMsgTxt("Too many input arguments.");
+	}
+	/* first argument: param structure */
+	if (!mxIsStruct(prhs[0])) {
+		mexErrMsgTxt("First argument (grampc structure) must be a struct.");
+	}
+	/* check proper number of output arguments */
+	if (nlhs > 7) {
+		mexErrMsgTxt("Too many output arguments.");
+	}
 
-  mxopt   = mxGetField(prhs[0],0,"opt");
-  mxparam = mxGetField(prhs[0],0,"param");
-  mxrws   = mxGetField(prhs[0],0,"rws");
+	/* Allocate grampc struct and copy mxData */
+	mxuserparam = mxDuplicateArray(mxGetField(prhs[0], 0, "userparam"));
+	mx2typeGRAMPC(&grampc, prhs[0], mxuserparam);
 
-  param.Nx = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nx"));
-  param.Nu = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nu"));
-  if (mxGetField(mxparam,0,"xk") == NULL) {
-    param.xk = NULL;
-  }
-  else {
-    param.xk = mxGetPr(mxGetField(mxparam,0,"xk"));
-  }
-  if (mxGetField(mxparam,0,"u0") == NULL) {
-    param.u0 = NULL;
-  }
-  else {
-    param.u0 = mxGetPr(mxGetField(mxparam,0,"u0"));
-  }
-  if (mxGetField(mxparam,0,"xdes") == NULL) {
-    param.xdes = NULL;
-  }
-  else {
-    param.xdes = mxGetPr(mxGetField(mxparam,0,"xdes"));
-  }
-  if (mxGetField(mxparam,0,"udes") == NULL) {
-    param.udes = NULL;
-  }
-  else {
-    param.udes = mxGetPr(mxGetField(mxparam,0,"udes"));
-  }
-  param.Thor = mxGetScalar(mxGetField(mxparam,0,"Thor"));
-  param.dt   = mxGetScalar(mxGetField(mxparam,0,"dt"));
-  param.tk   = mxGetScalar(mxGetField(mxparam,0,"tk"));
-  param.Nhor = (typeInt)mxGetScalar(mxGetField(mxparam,0,"Nhor"));
-  if (mxGetField(mxparam,0,"pCost") == NULL) {
-    param.pCost = NULL;
-  }
-  else {
-    param.pCost = mxGetPr(mxGetField(mxparam,0,"pCost"));
-  }
-  if (mxGetField(mxparam,0,"pSys") == NULL) {
-    param.pSys = NULL;
-  }
-  else {
-    param.pSys = mxGetPr(mxGetField(mxparam,0,"pSys"));
-  }
-  param.umax    = mxGetPr(mxGetField(mxparam,0,"umax"));
-  param.umin    = mxGetPr(mxGetField(mxparam,0,"umin"));
-  param.xScale  = mxGetPr(mxGetField(mxparam,0,"xScale"));
-  param.xOffset = mxGetPr(mxGetField(mxparam,0,"xOffset"));
-  param.uScale  = mxGetPr(mxGetField(mxparam,0,"uScale"));
-  param.uOffset = mxGetPr(mxGetField(mxparam,0,"uOffset"));
-  param.NpCost  = (typeInt)mxGetScalar(mxGetField(mxparam,0,"NpCost"));
-  param.NpSys   = (typeInt)mxGetScalar(mxGetField(mxparam,0,"NpSys"));
+	/* Allocate memory for the outputs */
+	plhs[1] = mxCreateNumericMatrix(1, 1, mxtypeRNum_CLASS, mxREAL);
+	comptime = (typeRNum*)mxGetPr(plhs[1]);
+	*comptime = -1;
 
-  rws.t                  = mxGetPr(mxGetField(mxrws,0,"t"));
-  rws.x                  = mxGetPr(mxGetField(mxrws,0,"x"));
-  rws.adj                = mxGetPr(mxGetField(mxrws,0,"adj"));
-  rws.u                  = mxGetPr(mxGetField(mxrws,0,"u"));
-  rws.dHdu               = mxGetPr(mxGetField(mxrws,0,"dHdu"));
-  rws.lsAdapt            = mxGetPr(mxGetField(mxrws,0,"lsAdapt"));
-  rws.uls                = mxGetPr(mxGetField(mxrws,0,"uls"));
-  rws.lsExplicit         = mxGetPr(mxGetField(mxrws,0,"lsExplicit"));
-  rws.uprev              = mxGetPr(mxGetField(mxrws,0,"uprev"));
-  rws.dHduprev           = mxGetPr(mxGetField(mxrws,0,"dHduprev"));
-  rws.J                  = mxGetPr(mxGetField(mxrws,0,"J"));
-  rws.rwsScale           = mxGetPr(mxGetField(mxrws,0,"rwsScale"));
-  rws.rwsGradient        = mxGetPr(mxGetField(mxrws,0,"rwsGradient"));
-  rws.rwsCostIntegration = mxGetPr(mxGetField(mxrws,0,"rwsCostIntegration"));
-  rws.rwsAdjIntegration  = mxGetPr(mxGetField(mxrws,0,"rwsAdjIntegration"));
-  rws.rwsIntegration     = mxGetPr(mxGetField(mxrws,0,"rwsIntegration"));
+	/* runtime analysis */
 
-  opt.MaxIter                  = (typeInt)mxGetScalar(mxGetField(mxopt,0,"MaxIter"));
-  opt.IntegratorRelTol         = mxGetScalar(mxGetField(mxopt,0,"IntegratorRelTol"));
-  opt.IntegratorAbsTol         = mxGetScalar(mxGetField(mxopt,0,"IntegratorAbsTol"));
-  opt.LineSearchMax            = mxGetScalar(mxGetField(mxopt,0,"LineSearchMax"));
-  opt.LineSearchMin            = mxGetScalar(mxGetField(mxopt,0,"LineSearchMin"));
-  opt.LineSearchInit           = mxGetScalar(mxGetField(mxopt,0,"LineSearchInit"));
-  opt.LineSearchIntervalFactor = mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalFactor"));
-  opt.LineSearchAdaptFactor    = mxGetScalar(mxGetField(mxopt,0,"LineSearchAdaptFactor"));
-  opt.LineSearchIntervalTol    = mxGetScalar(mxGetField(mxopt,0,"LineSearchIntervalTol"));
+#ifdef N_TIMER
+	/* copy GRAMPC struct for runtime analysis */
+	for (i = 0; i < N_TIMER; i++) {
+		mx2typeGRAMPC((grampcArray + i), prhs[0], mxuserparam);
+	}
 
-  mxGetString(mxGetField(mxopt, 0, "ShiftControl"), opt.ShiftControl, VALUE_ONOFF);
-  mxGetString(mxGetField(mxopt, 0, "ScaleProblem"), opt.ScaleProblem, VALUE_ONOFF);
-  mxGetString(mxGetField(mxopt, 0, "CostIntegrator"), opt.CostIntegrator, VALUE_COSTINTMETHOD);
-  mxGetString(mxGetField(mxopt, 0, "Integrator"), opt.Integrator, VALUE_INTEGRATOR);
-  mxGetString(mxGetField(mxopt, 0, "LineSearchType"), opt.LineSearchType, VALUE_LSTYPE);
-  mxGetString(mxGetField(mxopt, 0, "JacobianX"), opt.JacobianX, VALUE_JACOBIANX);
-  mxGetString(mxGetField(mxopt, 0, "JacobianU"), opt.JacobianU, VALUE_JACOBIANU);
-  mxGetString(mxGetField(mxopt, 0, "IntegralCost"), opt.IntegralCost, VALUE_ONOFF);
-  mxGetString(mxGetField(mxopt, 0, "FinalCost"), opt.FinalCost, VALUE_ONOFF);
+	/* initialize variables for runtime check */
+#ifdef _WIN32
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&StartingTime);
+#elif defined(__linux__) || defined(__APPLE__)
+	gettimeofday(&StartingTime, NULL);
+#endif
 
-  plhs[0] = mxCreateDoubleMatrix(param.Nx,1,mxREAL);
-  plhs[1] = mxCreateDoubleMatrix(param.Nu,1,mxREAL);
-  plhs[2] = mxCreateDoubleMatrix(1,1,mxREAL);
+	/* run GRAMPC while measuring time */
+	grampc_run(grampc);
 
-  sol.xnext = mxGetPr(plhs[0]);
-  sol.unext = mxGetPr(plhs[1]);
-  sol.J     = mxGetPr(plhs[2]);
+	for (i = 0; i < N_TIMER-1; i++) {
+		grampc_run(grampcArray[i]);
+	}
 
-  grampc.param = &param;
-  grampc.opt   = &opt;
-  grampc.rws   = &rws;
-  grampc.sol   = &sol;
+	/* runtime evaluation */
+#ifdef _WIN32
+	QueryPerformanceCounter(&EndingTime);
+	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+	ElapsedMicroseconds.QuadPart *= (100000000 / N_TIMER); /* 100ns */
+	ElapsedMicroseconds.QuadPart /= (Frequency.QuadPart);
+	*comptime = ((typeRNum)(ElapsedMicroseconds.QuadPart) / 100000); /* time in ms */
+#elif defined(__linux__) || defined(__APPLE__)
+	gettimeofday(&EndingTime, NULL);
+	*comptime = (EndingTime.tv_sec - StartingTime.tv_sec) * 1000000.0;      /* sec to µs */
+	*comptime += (EndingTime.tv_usec - StartingTime.tv_usec) * 1.0;         /* µs to µs */
+	*comptime /= 1000.0;																										/* µs to ms */
+	*comptime /= N_TIMER; /* Time of one MPC step */
+#endif
 
-  grampc_run(&grampc);
+	/* free copies of GRAMPC struct */
+	for (i = 0; i < N_TIMER; i++) {
+		grampc_free((grampcArray + i));
+	}
+#endif
+
+	/* create mx structure */
+	typeGRAMPC2mx(plhs, grampc, mxuserparam);
+
+	/* free allocated memory */
+	grampc_free(&grampc);
 }

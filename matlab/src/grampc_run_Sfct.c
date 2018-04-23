@@ -1,16 +1,16 @@
-/*
+/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
  *
- * This file is part of GRAMPC.
+ * GRAMPC -- A software framework for embedded nonlinear model predictive
+ * control using a gradient-based augmented Lagrangian approach
  *
- * GRAMPC - a gradient-based MPC software for real-time applications
- *
- * Copyright (C) 2014 by Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Developed at the Institute of Measurement, Control, and
- * Microtechnology, University of Ulm. All rights reserved.
+ * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Developed at the Institute of Measurement, Control, and Microtechnology,
+ * Ulm University. All rights reserved.
  *
  * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
  *
  * GRAMPC is distributed in the hope that it will be useful,
@@ -18,22 +18,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public 
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
-
-/*
- *
- * File: grampc_run_Sfct.c
- * Authors: Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Date: February 2014
- * Version: v1.0
- * 
- * Level 2 S-function to use GRAMPC in MATLAB/Simulink.
- * The function requires a variable of datatype typeGRAMPC
- * as input parameter for the MATLAB/Simulink block.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
  *
  */
 
@@ -41,7 +27,6 @@
 #define S_FUNCTION_LEVEL 2
 
 #include "simstruc.h"
-#include <math.h>
 
 #ifdef MATLAB_MEX_FILE
 #include "mex.h"
@@ -50,53 +35,160 @@
 /*include functions for gradient algorithm*/
 #include "grampc.h"
 
+void sdata2typeGRAMPC(const typeGRAMPC *grampc, ctypeInt *intoptidx, ctypeInt *intopt, ctypeInt *numoptidx,
+	ctypeRNum *numopt, ctypeInt *numparamidx, ctypeRNum *numparam) {
+	/* The option and parameter sequences must correspond to the sequence in typeGRAMPC2mx */
+	typeInt i;
+
+	/* vector parameters */
+	i = 0;
+	grampc_setparam_real_vector(grampc, "x0", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "xdes", (numparam + numparamidx[i])); i++;
+
+	grampc_setparam_real_vector(grampc, "u0", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "udes", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "umax", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "umin", (numparam + numparamidx[i])); i++;
+
+	grampc_setparam_real_vector(grampc, "p0", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "pmax", (numparam + numparamidx[i])); i++;
+	grampc_setparam_real_vector(grampc, "pmin", (numparam + numparamidx[i])); i++;
+
+	grampc_setparam_real(grampc, "Thor", numparam[numparamidx[i]]); i++;
+	grampc_setparam_real(grampc, "Tmax", numparam[numparamidx[i]]); i++;
+	grampc_setparam_real(grampc, "Tmin", numparam[numparamidx[i]]); i++;
+
+	grampc_setparam_real(grampc, "dt", numparam[numparamidx[i]]); i++;
+	grampc_setparam_real(grampc, "t0", numparam[numparamidx[i]]); i++;
+
+
+	/* Integer options */
+	i = 0;
+	grampc_setopt_int(grampc, "Nhor", intopt[intoptidx[i]]); i++;
+	grampc_setopt_int(grampc, "MaxGradIter", intopt[intoptidx[i]]); i++;
+	grampc_setopt_int(grampc, "MaxMultIter", intopt[intoptidx[i]]); i++;
+	grampc_setopt_string(grampc, "ShiftControl", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+
+	grampc_setopt_string(grampc, "TimeDiscretization", intopt[intoptidx[i]] == INT_UNIFORM ? "uniform" : "nonuniform"); i++;
+
+	grampc_setopt_string(grampc, "IntegralCost", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "TerminalCost", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "IntegratorCost", intopt[intoptidx[i]] == INT_TRAPZ ? "trapezodial" : "simpson"); i++;
+
+	grampc_setopt_string(grampc, "Integrator", IntegratorInt2Str(intopt[intoptidx[i]])); i++;
+	grampc_setopt_int(grampc, "IntegratorMaxSteps", intopt[intoptidx[i]]); i++;
+	grampc_setopt_int_vector(grampc, "FlagsRodas", (intopt + intoptidx[i])); i++;
+
+	grampc_setopt_string(grampc, "LineSearchType", LineSearchTypeInt2Str(intopt[intoptidx[i]])); i++;
+	grampc_setopt_string(grampc, "LineSearchExpAutoFallback", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+
+	grampc_setopt_string(grampc, "OptimControl", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "OptimParam", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "OptimTime", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+
+	grampc_setopt_string(grampc, "ScaleProblem", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+
+	grampc_setopt_string(grampc, "EqualityConstraints", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "InequalityConstraints", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "TerminalEqualityConstraints", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "TerminalInequalityConstraints", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+	grampc_setopt_string(grampc, "ConstraintsHandling", intopt[intoptidx[i]] == INT_EXTPEN ? "extpen" : "auglag"); i++;
+
+	grampc_setopt_string(grampc, "ConvergenceCheck", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
+
+	/* real options */
+	i = 0;
+	grampc_setopt_real(grampc, "IntegratorRelTol", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "IntegratorAbsTol", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "IntegratorMinStepSize", numopt[numoptidx[i]]); i++;
+
+	grampc_setopt_real(grampc, "LineSearchMax", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchMin", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchInit", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchIntervalFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchAdaptFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchIntervalTol", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "OptimParamLineSearchFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "OptimTimeLineSearchFactor", numopt[numoptidx[i]]); i++;
+
+	grampc_setopt_real_vector(grampc, "xScale", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real_vector(grampc, "xOffset", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real_vector(grampc, "uScale", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real_vector(grampc, "uOffset", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real_vector(grampc, "pScale", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real_vector(grampc, "pOffset", (numopt + numoptidx[i])); i++;
+	grampc_setopt_real(grampc, "TScale", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "TOffset", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "JScale", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real_vector(grampc, "cScale", (numopt + numoptidx[i])); i++;
+
+	grampc_setopt_real_vector(grampc, "ConstraintsAbsTol", (numopt + numoptidx[i])); i++;
+
+	grampc_setopt_real(grampc, "MultiplierMax", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "MultiplierDampingFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "PenaltyMax", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "PenaltyMin", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "PenaltyIncreaseFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "PenaltyDecreaseFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "PenaltyIncreaseThreshold", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "AugLagUpdateGradientRelTol", numopt[numoptidx[i]]); i++;
+
+	grampc_setopt_real(grampc, "ConvergenceGradientRelTol", numopt[numoptidx[i]]); i++;
+}
+
 static void mdlInitializeSizes(SimStruct *S)
 {
-  int_T  i;                                   	/* loop variable */
+	int_T  i;                                   	/* loop variable */
 
-  typeInt Nx, Nu;
+	typeInt Nx, Nu, Np, Ng, Nh, NgT, NhT;
 
-  sysdim(&Nx,&Nu);
+	ocp_dim(&Nx, &Nu, &Np, &Ng, &Nh, &NgT, &NhT, NULL);
 
-  ssSetNumSFcnParams(S, 1);			
+	/*Parameters */
+	ssSetNumSFcnParams(S, 7);
+	/* parameter tuning not allowed during simulation */
+	for (i = 0; i < ssGetSFcnParamsCount(S); i++) {
+		ssSetSFcnParamTunable(S, i, SS_PRM_NOT_TUNABLE);
+	}
 
-  /* parameter tuning not allowed during simulation */
-  for (i=0; i<ssGetSFcnParamsCount(S); i++) {
-    ssSetSFcnParamTunable(S, i, 1);
-  }
+	/*Input ports*/
+	if (!ssSetNumInputPorts(S, 4)) return;  /* number of input ports */
+	ssSetInputPortWidth(S, 0, Nx);          /* no. of inputs at input port 0 (x0)   */
+	ssSetInputPortWidth(S, 1, 1);           /* no. of inputs at input port 1 (t0)   */
+	ssSetInputPortWidth(S, 2, Nx);          /* no. of inputs at input port 2 (xdes) */
+	ssSetInputPortWidth(S, 3, MAX(Nu, 1));  /* no. of inputs at input port 3 (udes) */
 
-  /*Input ports*/
-  if(!ssSetNumInputPorts(S, 4)) return;       	/* number of input ports */
+	for (i = 0; i < 4; i++) {
+		ssSetInputPortDirectFeedThrough(S, i, 1);   /* direct input feedthrough */
+		ssSetInputPortRequiredContiguous(S, i, 1);  /* must be contiguous to use  ssGetInputPortRealSignal*/
+		ssSetInputPortDataType(S, i, SS_TYPERNUM);
+	}
 
-  ssSetInputPortWidth(S, 0, Nx);				/* no. of inputs at input port 0 (xk)   */
-  ssSetInputPortWidth(S, 1,  1);				/* no. of inputs at input port 1 (tk)   */
-  ssSetInputPortWidth(S, 2, Nx);	        	/* no. of inputs at input port 2 (xdes) */
-  ssSetInputPortWidth(S, 3, Nu);                /* no. of inputs at input port 3 (udes) */
+	/*Output ports*/
+	if (!ssSetNumOutputPorts(S, 8)) return;  /* number of output ports                     */
+	ssSetOutputPortWidth(S, 0, Nx);          /* no. of outputs at output port 0 (xnext)    */
+	ssSetOutputPortWidth(S, 1, MAX(Nu, 1));  /* no. of outputs at output port 2 (unext)    */
+	ssSetOutputPortWidth(S, 2, MAX(Np, 1));  /* no. of outputs at output port 3 (pnext)    */
+	ssSetOutputPortWidth(S, 3, 1);           /* no. of outputs at output port 4 (Tnext)    */
+	ssSetOutputPortWidth(S, 4, 2);           /* no. of outputs at output port 5 (J)        */
+	ssSetOutputPortWidth(S, 5, 1);           /* no. of outputs at output port 6 (||cfct||) */
+	ssSetOutputPortWidth(S, 6, 1);           /* no. of outputs at output port 7 (||pen||)  */
+	ssSetOutputPortWidth(S, 7, 1);           /* no. of outputs at output port 8 (status)   */
+	/*ssSetOutputPortWidth(S, 8, 1);*/           /* no. of outputs at output port 8 (iter)     */
 
-  ssSetInputPortDirectFeedThrough(S, 0, 1);    	/* direct input feedthrough */
-  ssSetInputPortDirectFeedThrough(S, 1, 1);    	/* direct input feedthrough */
-  ssSetInputPortDirectFeedThrough(S, 2, 1);    	/* direct input feedthrough */
-  ssSetInputPortDirectFeedThrough(S, 3, 1);    	/* direct input feedthrough */
-  
-  ssSetInputPortRequiredContiguous(S, 0, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
-  ssSetInputPortRequiredContiguous(S, 1, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
-  ssSetInputPortRequiredContiguous(S, 2, 1);    /* must be contiguous to use  ssGetInputPortRealSignal*/
-  ssSetInputPortRequiredContiguous(S, 3, 1);	/* must be contiguous to use  ssGetInputPortRealSignal*/
+	for (i = 0; i < 7; i++) {
+		ssSetOutputPortDataType(S, i, SS_TYPERNUM);
+	}
+	ssSetOutputPortDataType(S, 7, SS_INT32);
 
-  /*Output ports*/
-  if(!ssSetNumOutputPorts(S, 3)) return;      	/* number of output ports                  */
-  ssSetOutputPortWidth(S, 0, Nx);     	      	/* no. of outputs at output port 0 (xnext) */
-  ssSetOutputPortWidth(S, 1, Nu);		/* no. of outputs at output port 1 (unext) */
-  ssSetOutputPortWidth(S, 2, 1);             	/* no. of outputs at output port 2 (J)     */
+	/*Other*/
+	ssSetNumSampleTimes(S, 0);    /* number of sample times         */
+	ssSetNumRWork(S, 0);          /* number of real work vectors    */
+	ssSetNumIWork(S, 0);          /* number of integer work vectors */
+	ssSetNumPWork(S, 1);          /* number of pointer work vectors */
 
-  /*Other*/
-  ssSetNumSampleTimes(S, 0);   	             	/* number of sample times         */
-  ssSetNumRWork(      S, 0);	    	        /* number of real work vectors    */
-  ssSetNumIWork(      S, 0);                	/* number of integer work vectors */
-  ssSetNumPWork(      S, 1);                	/* number of pointer work vectors */
-
-  ssSetNumModes(        S, 0);                 	/* number of modes to switch between    */
-  ssSetNumNonsampledZCs(S, 0);                 	/* number of non-sampled zero-crossings */
+	ssSetNumModes(S, 0);          /* number of modes to switch between    */
+	ssSetNumNonsampledZCs(S, 0);  /* number of non-sampled zero-crossings */
 }
 
 
@@ -106,9 +198,9 @@ static void mdlInitializeSizes(SimStruct *S)
 
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
-  mxArray *mxparam = mxGetField(ssGetSFcnParam(S,0),0,"param");
-  ssSetSampleTime(S, 0, mxGetScalar(mxGetField(mxparam,0,"dt")));
-  ssSetOffsetTime(S, 0, 0.0);
+	/* Attention: Read dt */
+	ssSetSampleTime(S, 0, -1);
+	ssSetOffsetTime(S, 0, 0.0);
 }
 
 
@@ -120,127 +212,109 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 #if defined (MDL_START)
 static void mdlStart(SimStruct *S)
 {
-  typeGRAMPC *grampc;
-  void **ptr;
-  mxArray *mxopt   = mxGetField(ssGetSFcnParam(S,0),0,"opt");
-  mxArray *mxparam = mxGetField(ssGetSFcnParam(S,0),0,"param");
-  typeChar *optvalue;
+	typeGRAMPC *grampc;
+	typeUSERPARAM *userparam;
+	size_t size_userpram;
+	typeInt *intoptidx, *numoptidx, *numparamidx, *intopt, i;
+	typeRNum *numopt, *numparam, *real_userparam;
+	void **ptr;
 
-  ptr = ssGetPWork(S);
+	const double *d_intoptidx = mxGetData(ssGetSFcnParam(S, 0));
+	const double *d_intopt = mxGetData(ssGetSFcnParam(S, 1));
+	const double *d_numoptidx = mxGetData(ssGetSFcnParam(S, 2));
+	const double *d_numopt = mxGetData(ssGetSFcnParam(S, 3));
+	const double *d_numparamidx = mxGetData(ssGetSFcnParam(S, 4));
+	const double *d_numparam = mxGetData(ssGetSFcnParam(S, 5));
+	const mxArray* const mxuserparam = ssGetSFcnParam(S, 6);
+	const double *d_userparam = mxGetPr(mxuserparam);
 
-  /* Memory allocation and initialization */
-  grampc_init(&grampc);
+	ptr = ssGetPWork(S);
 
-  /* adapt option structure */
-  grampc_setopt_int(grampc,"MaxIter",(typeInt)mxGetScalar(mxGetField(mxopt,0,"MaxIter")));
-  grampc_setopt_real(grampc, "LineSearchMax", mxGetScalar(mxGetField(mxopt, 0, "LineSearchMax")));
-  grampc_setopt_real(grampc, "LineSearchMin", mxGetScalar(mxGetField(mxopt, 0, "LineSearchMin")));
-  grampc_setopt_real(grampc, "LineSearchInit", mxGetScalar(mxGetField(mxopt, 0, "LineSearchInit")));
-  grampc_setopt_real(grampc, "IntegratorRelTol", mxGetScalar(mxGetField(mxopt, 0, "IntegratorRelTol")));
-  grampc_setopt_real(grampc, "IntegratorAbsTol", mxGetScalar(mxGetField(mxopt, 0, "IntegratorAbsTol")));
-  grampc_setopt_real(grampc, "LineSearchIntervalFactor", mxGetScalar(mxGetField(mxopt, 0, "LineSearchIntervalFactor")));
-  grampc_setopt_real(grampc, "LineSearchAdaptFactor", mxGetScalar(mxGetField(mxopt, 0, "LineSearchAdaptFactor")));
-  grampc_setopt_real(grampc, "LineSearchIntervalTol", mxGetScalar(mxGetField(mxopt, 0, "LineSearchIntervalTol")));
+	/* Memory allocation for userparam */
+	size_userpram = mxGetM(mxuserparam)*mxGetN(mxuserparam);
+	userparam = calloc(size_userpram * sizeof(typeRNum), 1);
+	real_userparam = (typeRNum*)userparam;
+	for (i = 0; i < size_userpram; i++) {
+		real_userparam[i] = (typeRNum)d_userparam[i];
+	}
 
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "ShiftControl"));	  
-  grampc_setopt_string(grampc, "ShiftControl", optvalue);
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "ScaleProblem"));	  
-  grampc_setopt_string(grampc, "ScaleProblem", optvalue);
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "CostIntegrator")); 
-  grampc_setopt_string(grampc, "CostIntegrator", optvalue);
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "Integrator"));	  
-  grampc_setopt_string(grampc, "Integrator", optvalue);
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "LineSearchType")); 
-  grampc_setopt_string(grampc, "LineSearchType", optvalue); 
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "JacobianX"));	  
-  grampc_setopt_string(grampc, "JacobianX", optvalue);
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "JacobianU"));	  
-  grampc_setopt_string(grampc, "JacobianU", optvalue); 
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "IntegralCost"));	  
-  grampc_setopt_string(grampc, "IntegralCost", optvalue); 
-  mxFree(optvalue);
-  optvalue = mxArrayToString(mxGetField(mxopt, 0, "FinalCost"));	  
-  grampc_setopt_string(grampc, "FinalCost", optvalue); 
-  mxFree(optvalue);
+	/* Memory allocation and initialization of grampc */
+	grampc_init(&grampc, userparam);
 
-  /* adapt param structure */
-  grampc_setparam_int(grampc,"Nhor",(typeInt)mxGetScalar(mxGetField(mxparam,0,"Nhor")));
-  grampc_setparam_vector(grampc,"umax",mxGetPr(mxGetField(mxparam,0,"umax")));
-  grampc_setparam_vector(grampc,"umin",mxGetPr(mxGetField(mxparam,0,"umin")));
-  grampc_setparam_vector(grampc,"xScale",mxGetPr(mxGetField(mxparam,0,"xScale")));
-  grampc_setparam_vector(grampc,"xOffset",mxGetPr(mxGetField(mxparam,0,"xOffset")));
-  grampc_setparam_vector(grampc,"uScale",mxGetPr(mxGetField(mxparam,0,"uScale")));
-  grampc_setparam_vector(grampc,"uOffset",mxGetPr(mxGetField(mxparam,0,"uOffset")));
-  grampc_setparam_vector(grampc,"xk",mxGetPr(mxGetField(mxparam,0,"xk")));
-  grampc_setparam_vector(grampc,"u0",mxGetPr(mxGetField(mxparam,0,"u0")));
-  grampc_setparam_vector(grampc,"xdes",mxGetPr(mxGetField(mxparam,0,"xdes")));
-  grampc_setparam_vector(grampc,"udes",mxGetPr(mxGetField(mxparam,0,"udes")));
-  grampc_setparam_real(grampc,"Thor",mxGetScalar(mxGetField(mxparam,0,"Thor")));
-  grampc_setparam_real(grampc,"dt",mxGetScalar(mxGetField(mxparam,0,"dt")));
-  grampc_setparam_real(grampc,"tk",mxGetScalar(mxGetField(mxparam,0,"tk")));
-  if ((typeInt)mxGetScalar(mxGetField(mxparam,0,"NpCost")) > 0) {
-    grampc_setparam_int(grampc,"NpCost",(typeInt)mxGetScalar(mxGetField(mxparam,0,"NpCost")));
-    grampc_setparam_vector(grampc,"pCost",mxGetPr(mxGetField(mxparam,0,"pCost")));
-  }
-  if ((typeInt)mxGetScalar(mxGetField(mxparam,0,"NpSys")) > 0) {
-    grampc_setparam_int(grampc,"NpSys",(typeInt)mxGetScalar(mxGetField(mxparam,0,"NpSys")));
-    grampc_setparam_vector(grampc,"pSys",mxGetPr(mxGetField(mxparam,0,"pSys")));
-  }
+	/* cast parameters and options to the correct data type */
+	CastDvec2Intvec(&intoptidx, d_intoptidx + 1, (size_t)d_intoptidx[0]);
+	CastDvec2Intvec(&numoptidx, d_numoptidx + 1, (size_t)d_numoptidx[0]);
+	CastDvec2Intvec(&numparamidx, d_numparamidx + 1, (size_t)d_numparamidx[0]);
+	CastDvec2Intvec(&intopt, d_intopt + 1, (size_t)d_intopt[0]);
+	CastDvec2Numvec(&numopt, d_numopt + 1, (size_t)d_numopt[0]);
+	CastDvec2Numvec(&numparam, d_numparam + 1, (size_t)d_numparam[0]);
 
-  /* print options */
-  grampc_printopt(grampc);
+	/* Update the params and options */
+	sdata2typeGRAMPC(grampc, intoptidx, intopt, numoptidx, numopt, numparamidx, numparam);
 
-  /* print MPC parameter */
-  grampc_printparam(grampc);
+	/* free temporary used memory */
+	free(intoptidx);
+	free(numoptidx);
+	free(numparamidx);
+	free(intopt);
+	free(numopt);
+	free(numparam);
 
-  ptr[0] = (void *)grampc;
+	/* print options and parameters */
+	grampc_printopt(grampc);
+	grampc_printparam(grampc);
+
+	ptr[0] = (void *)grampc;
 }
 #endif   /*MDL_START*/
 
 
 /***************************************************************************
- * mdlOutputs = Enthält den Code für die Berechnung  der Ausgänge          *
+ * mdlOutputs                                                              *
  ***************************************************************************/
 
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
-  /*inputs*/
-  typeRNum *xk = (typeRNum *)ssGetInputPortRealSignal(S, 0);
-  typeRNum *tk = (typeRNum *)ssGetInputPortRealSignal(S, 1);
-  typeRNum *xdes = (typeRNum *)ssGetInputPortRealSignal(S, 2);
-  typeRNum *udes = (typeRNum *)ssGetInputPortRealSignal(S, 3);
+	/* inputs */
+	ctypeRNum *x0 = (typeRNum *)ssGetInputPortRealSignal(S, 0);
+	ctypeRNum *t0 = (typeRNum *)ssGetInputPortRealSignal(S, 1);
+	ctypeRNum *xdes = (typeRNum *)ssGetInputPortRealSignal(S, 2);
+	ctypeRNum *udes = (typeRNum *)ssGetInputPortRealSignal(S, 3);
 
-  /*outputs*/
-  typeRNum *xnext  = (typeRNum *)ssGetOutputPortRealSignal(S,0);
-  typeRNum *unext  = (typeRNum *)ssGetOutputPortRealSignal(S,1);
-  typeRNum *cost   = (typeRNum *)ssGetOutputPortRealSignal(S,2);
+	/* outputs */
+	typeRNum *xnext = (typeRNum *)ssGetOutputPortRealSignal(S, 0);
+	typeRNum *unext = (typeRNum *)ssGetOutputPortRealSignal(S, 1);
+	typeRNum *pnext = (typeRNum *)ssGetOutputPortRealSignal(S, 2);
+	typeRNum *Tnext = (typeRNum *)ssGetOutputPortRealSignal(S, 3);
+	typeRNum *cost = (typeRNum *)ssGetOutputPortRealSignal(S, 4);
+	typeRNum *cfct = (typeRNum *)ssGetOutputPortRealSignal(S, 5);
+	typeRNum *pen = (typeRNum *)ssGetOutputPortRealSignal(S, 6);
+	typeInt *status = (typeInt *)ssGetOutputPortRealSignal(S, 7);
 
-  /*parameters*/
-  typeInt i;
+	/* workspace */
+	const typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S, 0);
 
-  typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S,0);
+	/* remove warning unreferenced formal parameter */
+	(void)(tid);
 
-  grampc_setparam_vector(grampc, "xk", xk);
-  grampc_setparam_real(grampc, "tk", tk[0]);
-  grampc_setparam_vector(grampc, "xdes", xdes);
-  grampc_setparam_vector(grampc, "udes", udes);
+	/* set the current quantitites */
+	grampc_setparam_real_vector(grampc, "x0", x0);
+	grampc_setparam_real(grampc, "t0", t0[0]);
+	grampc_setparam_real_vector(grampc, "xdes", xdes);
+	grampc_setparam_real_vector(grampc, "udes", udes);
 
-  grampc_run(grampc);
-	
-  for (i = 0; i <= grampc->param->Nx-1; i++) {
-    xnext[i] = grampc->sol->xnext[i];
-  }
-  for (i = 0; i <= grampc->param->Nu-1; i++) {
-    unext[i] = grampc->sol->unext[i];
-  }
-  cost[0] = grampc->sol->J[0];
+	/* run mpc */
+	grampc_run(grampc);
+
+	/* Copy the solution */
+	MatCopy(xnext, grampc->sol->xnext, 1, grampc->param->Nx);
+	MatCopy(unext, grampc->sol->unext, 1, grampc->param->Nu);
+	MatCopy(pnext, grampc->sol->pnext, 1, grampc->param->Np);
+	Tnext[0] = grampc->sol->Tnext;
+	MatCopy(cost, grampc->sol->J, 1, 2);
+	cfct[0] = grampc->sol->cfct;
+	pen[0] = grampc->sol->pen;
+	status[0] = grampc->sol->status;
 }
 
 
@@ -249,10 +323,11 @@ static void mdlOutputs(SimStruct *S, int_T tid)
  ****************************************************************************/
 static void mdlTerminate(SimStruct *S)
 {
-  typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S,0);
+	typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S, 0);
 
-  /* free allocated memory */
-  grampc_free(&grampc);
+	/* free allocated memory */
+	free(grampc->userparam);
+	grampc_free(&grampc);
 }
 
 
@@ -267,6 +342,6 @@ static void mdlTerminate(SimStruct *S)
 #endif
 
 
-/****************************************************************************
- * End of C-Code S-Function	                                            *
- ****************************************************************************/
+ /****************************************************************************
+	* End of C-Code S-Function	                                               *
+	****************************************************************************/

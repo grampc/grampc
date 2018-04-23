@@ -1,16 +1,16 @@
-/*
+/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
  *
- * This file is part of GRAMPC.
+ * GRAMPC -- A software framework for embedded nonlinear model predictive
+ * control using a gradient-based augmented Lagrangian approach
  *
- * GRAMPC - a gradient-based MPC software for real-time applications
- *
- * Copyright (C) 2014 by Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Developed at the Institute of Measurement, Control, and
- * Microtechnology, University of Ulm. All rights reserved.
+ * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Developed at the Institute of Measurement, Control, and Microtechnology,
+ * Ulm University. All rights reserved.
  *
  * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
  *
  * GRAMPC is distributed in the hope that it will be useful,
@@ -18,79 +18,112 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public 
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
  *
  */
 
-
-/*
- *
- * File: grampc_mess.h
- * Authors: Bartosz Kaepernick, Knut Graichen, Tilman Utz
- * Date: February 2014
- * Version: v1.0
- *
- * HEADER FILE
- * Error printing file for GRAMPC.
- *
- */
 
 #ifndef GRAMPC_MESS_H_
 #define GRAMPC_MESS_H_
 
 
-/* Required Headers */
+ /* Required Headers */
 #include <stdlib.h>
 #include <stdio.h>
+#include "grampc_init.h"
 
 
 /* Macro definitions */
 #define GRAMPC_ALLOC_FAILED       "Memory allocation for grampc structure failed.\n"
-#define PARAM_ALLOC_FAILED			  "Memory allocation for parameters structure failed.\n"
-#define SOL_ALLOC_FAILED			    "Memory allocation for solution structure failed.\n"
-#define RWS_ALLOC_FAILED			    "Memory allocation for rws structure failed.\n"
-#define RWS_ELEMENT_ALLOC_FAILED	"Memory allocation rws elements failed.\n"
-#define STATESCALE_VALUE_ZERO		  "At least one scaling value for states is zero.\n"
-#define CONTROLSCALE_VALUE_ZERO		"At least one scaling value for controls is zero.\n"
-#define OPT_ALLOC_FAILED			    "Memory allocation for MPC options failed.\n"
-#define INVALID_NO_ELEMENTS			"Input vector has an invalid number of elements.\n"
-#define U0_NOT_DEFINED				"Initpoint u0 not defined.\n"
-#define XK_NOT_DEFINED				"Initpoint xk not defined.\n"
-#define UDES_NOT_DEFINED			"Setpoint udes not defined.\n"
-#define XDES_NOT_DEFINED			"Setpoint xdes not defined.\n"
-#define DT_NOT_DEFINED                          "Sampling time dt is not defined.\n"  
-#define THOR_NOT_DEFINED                        "Prediction horizon Thor is not defined.\n"
-#define NPCOST_ZERO					"Invalid operation. Number of elements NpCost is zero.\n"
-#define NPSYS_ZERO					"Invalid operation. Number of elements NpSys is zero.\n"
-#define PCOST_NULL					"NpCost unequal zero but pCost is empty.\n"
-#define PSYS_NULL					"NpSys unequal zero but pSys is empty.\n"
-#define INVALID_OPTION_NAME			"Invalid option name.\n"
-#define INVALID_OPTION_VALUE		"Invalid value for option.\n"
-#define INVALID_PARAM_NAME			"Invalid parameter.\n"
-#define INVALID_PARAM_VALUE			"Invalid value for parameter.\n"
-#define INVALID_SET_OPERATION		"Invalid setting of option or parameter.\n"
-#define INVALID_NX					"Invalid number of states Nx.\n"
-#define INVALID_NU					"Invalid number of states Nu.\n"
+#define PARAM_ALLOC_FAILED        "Memory allocation for parameters structure failed.\n"
+#define OPT_ALLOC_FAILED          "Memory allocation for MPC options failed.\n"
+#define SOL_ALLOC_FAILED          "Memory allocation for solution structure failed.\n"
+#define RWS_ALLOC_FAILED          "Memory allocation for rws structure failed.\n"
+#define RWS_ELEMENT_ALLOC_FAILED  "Memory allocation rws elements failed.\n"
+#define INVALID_NO_ELEMENTS       "Input vector has an invalid number of elements.\n"
+#define DT_NOT_DEFINED            "Sampling time dt is not defined.\n"  
+#define THOR_NOT_DEFINED          "Prediction horizon Thor is not defined.\n"
+#define INVALID_OPTION_NAME       "Invalid option name.\n"
+#define INVALID_OPTION_VALUE      "Invalid value for option.\n"
+#define INVALID_OPTION_DATATYP    "Invalid datatyp of parameter. \n"
+#define INVALID_PARAM_NAME        "Invalid parameter.\n"
+#define INVALID_PARAM_VALUE       "Invalid value for parameter.\n"
+#define INVALID_PARAM_DATATYP     "Invalid datatyp of parameter. \n"
+#define INVALID_SET_OPERATION     "Invalid setting of option or parameter.\n"
+#define INVALID_NX                "Invalid number of states Nx.\n"
+#define INVALID_NU                "Invalid number of states Nu.\n"
+#define INVALID_NP                "Invalid number of parameters Np.\n"
+#define INVALID_Nh                "Invalid number of inequality constraints Nh.\n"
+#define INVALID_Ng                "Invalid number of equality constraints Ng.\n"
+#define INVALID_NgT               "Invalid number of terminal equality constraints NgT.\n"
+#define INVALID_NhT               "Invalid number of terminal inequality constraints NhT.\n"
+
+
+/* status codes */
+#define STATUS_NONE                               0
+#define STATUS_GRADIENT_CONVERGED                 1
+#define STATUS_CONSTRAINTS_CONVERGED              2
+#define STATUS_LINESEARCH_MIN                     4
+#define STATUS_LINESEARCH_MAX                     8
+#define STATUS_LINESEARCH_INIT                   16
+#define STATUS_MULTIPLIER_UPDATE                 32
+#define STATUS_MULTIPLIER_MAX                    64
+#define STATUS_PENALTY_MAX                      128
+#define STATUS_INFEASIBLE                       256
+#define STATUS_INTEGRATOR_INPUT_NOT_CONSISTENT  512
+#define STATUS_INTEGRATOR_MAXSTEPS             1024
+#define STATUS_INTEGRATOR_STEPS_TOO_SMALL      2048
+#define STATUS_INTEGRATOR_MATRIX_IS_SINGULAR   4096
+#define STATUS_INTEGRATOR_H_MIN                8192
+
+/* status levels */
+#define STATUS_LEVEL_ERROR  1
+#define STATUS_LEVEL_WARN   3
+#define STATUS_LEVEL_INFO   7
+#define STATUS_LEVEL_DEBUG 15
+
+/* status messages */
+#define STATUS_MSG_GRADIENT_CONVERGED               "ConvergenceGradientRelTol satisfied for u, p and T.\n" 
+#define STATUS_MSG_CONSTRAINTS_CONVERGED            "ConstraintsAbsTol satisfied for all constraints.\n" 
+#define STATUS_MSG_LINESEARCH_MIN                   "Line search used LineSearchMin.\n" 
+#define STATUS_MSG_LINESEARCH_MAX                   "Line search used LineSearchMax.\n" 
+#define STATUS_MSG_LINESEARCH_INIT                  "Line search used LineSearchInit.\n" 
+#define STATUS_MSG_MULTIPLIER_UPDATE                "AugLagUpdateGradientRelTol satisfied for u, p and T, updating multipliers.\n" 
+#define STATUS_MSG_MULTIPLIER_MAX                   "Lagrange multiplier reached MultiplierMax.\n" 
+#define STATUS_MSG_PENALTY_MAX                      "Penalty parameter reached PenaltyMax.\n" 
+#define STATUS_MSG_INFEASIBLE                       "Constraints not improved, problem may be infeasible.\n"
+#define STATUS_MSG_INTEGRATOR_INPUT_NOT_CONSISTENT  "Input is not consistent for integrator.\n" 
+#define STATUS_MSG_INTEGRATOR_MAXSTEPS              "Integrator needs larger Nmax.\n" 
+#define STATUS_MSG_INTEGRATOR_STEPS_TOO_SMALL       "Step size becomes too small for integrator.\n" 
+#define STATUS_MSG_INTEGRATOR_MATRIX_IS_SINGULAR    "Integration not successful - Matrix is repeatedly singular.\n" 
+#define STATUS_MSG_INTEGRATOR_H_MIN                 "Integrator ruku45 used hmin.\n" 
+
 
 #ifdef MEXCOMPILE
-#define myPrint(x,y)								mexPrintf((x),(y))
-#define printError(x)								mexErrMsgTxt((x))
-#define printErrorAddString(mess,addstring)			mexPrintf("%s: %s",(addstring),(mess)); mexErrMsgTxt(INVALID_SET_OPERATION)
-#else
-#define myPrint(x,y)								printf((x),(y))
-#define printError(x)								printf("%s",(x)); exit(EXIT_FAILURE)
-#define printErrorAddString(mess,addstring)			printf("%s: %s",(addstring),(mess)); exit(EXIT_FAILURE)
+#include "mex.h"
+#define myPrint(x,y)   mexPrintf((x),(y))
+#define printError(x)  mexErrMsgTxt((x))
+#define printErrorAddString(mess,addstring)  mexPrintf("%s: %s",(addstring),(mess)); mexErrMsgTxt(INVALID_SET_OPERATION)
+#else 
+#define myPrint(x,y)   printf((x),(y))
+#define printError(x)  printf("%s",(x)); exit(EXIT_FAILURE)
+#define printErrorAddString(mess,addstring)  printf("%s: %s",(addstring),(mess)); exit(EXIT_FAILURE)
 #endif
 
 
-/* Function definitions */
-void grampc_error(char *mess);
-void grampc_error_addstring(char *mess, char *addstring);
-void grampc_error_optname(char *optname);
-void grampc_error_optvalue(char *optname);
-void grampc_error_paramname(char *paramname);
-void grampc_error_paramvalue(char *paramname);
 
+/* Function definitions */
+void grampc_error(const char *mess);
+void grampc_error_addstring(const char *mess, const char *addstring);
+void grampc_error_optname(const char *optname);
+void grampc_error_optvalue(const char *optname);
+void grampc_error_paramname(const char *paramname);
+void grampc_error_paramvalue(const char *paramname);
+
+void print_vector(const char *prefix, ctypeRNum *vector, ctypeInt size);
+
+typeInt grampc_printstatus(ctypeInt status, ctypeInt level);
+typeInt print_singleStatus(ctypeInt status, ctypeInt statusmask, const typeChar*message);
 
 #endif /* GRAMPC_MESS_H_ */

@@ -1,11 +1,13 @@
 #
-# This file is part of GRAMPC.
+# This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
 #
-# GRAMPC - a gradient-based MPC software for real-time applications
+# GRAMPC -- A software framework for embedded nonlinear model predictive
+# control using a gradient-based augmented Lagrangian approach
 #
-# Copyright (C) 2014 by Bartosz Kaepernick, Knut Graichen, Tilman Utz
-# Developed at the Institute of Measurement, Control, and
-# Microtechnology, University of Ulm. All rights reserved.
+# Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+# Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+# Developed at the Institute of Measurement, Control, and Microtechnology,
+# Ulm University. All rights reserved.
 #
 # GRAMPC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as 
@@ -21,12 +23,11 @@
 # License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 #
 # input and output files
 #
-SRCS = main.c \
-	    probfct.c
+SRCS = main_CRANE_2D.c \
+	    probfct_CRANE_2D.c
 OUTPUT = startMPC
 
 
@@ -35,12 +36,12 @@ OUTPUT = startMPC
 #
 COMPILER    = gcc
 RM          = rm -f
+MKDIR       = mkdir -p
 OBJEXT      = o
 LIBEXT      = a
 lib         = -l
 a           = 
 PATH_PREFIX = ../..
-
 
 #
 # path of header and libs files
@@ -61,6 +62,7 @@ LIBS   = -L$(LIBS_PATH) \
 OBJS = $(SRCS:.c=.$(OBJEXT))
 
 
+
 #
 # targets
 #
@@ -68,6 +70,7 @@ all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo 'Building target: $@'
+	$(MKDIR) ./res
 	$(COMPILER) -o "$@" $(OBJS) $(HEADER) $(LIBS)
 	@echo 'Finished building: $@'
 	@echo '' 
@@ -80,6 +83,7 @@ $(OBJS): %.$(OBJEXT): %.c
 clean:
 	@echo 'Cleaning up built files:'
 	$(RM) $(OUTPUT) $(OBJS)
+	$(RM) ./res/*.txt
 	@echo ''
 
 #

@@ -1,11 +1,13 @@
 #
-# This file is part of GRAMPC.
+# This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
 #
-# GRAMPC - a gradient-based MPC software for real-time applications
+# GRAMPC -- A software framework for embedded nonlinear model predictive
+# control using a gradient-based augmented Lagrangian approach
 #
-# Copyright (C) 2014 by Bartosz Kaepernick, Knut Graichen, Tilman Utz
-# Developed at the Institute of Measurement, Control, and
-# Microtechnology, University of Ulm. All rights reserved.
+# Copyright (C) 2014-2018 by Andreas Voelz, Bartosz Kaepernick,
+# Felix Mesmer, Knut Graichen, Soenke Rhein, Tobias Englert. Developed at the 
+# Institute of Measurement, Control, and Microtechnology, Ulm University.
+# All rights reserved.
 #
 # GRAMPC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as 
@@ -26,8 +28,9 @@
 # compiler
 #
 COMPILER = gcc
-AR       = ar -r
+AR       = ar r
 RM       = rm -f
+MKDIR    = mkdir -p
 OBJEXT   = o
 LIBEXT   = a
 
@@ -56,11 +59,15 @@ GRAMPC_OBJS = \
 		$(SOURCE_PATH)/eulermod2.$(OBJEXT) \
 		$(SOURCE_PATH)/heun2.$(OBJEXT) \
 		$(SOURCE_PATH)/ruku45.$(OBJEXT) \
+		$(SOURCE_PATH)/rodas.$(OBJEXT) \
+        $(SOURCE_PATH)/trapezodial.$(OBJEXT) \
+        $(SOURCE_PATH)/simpson.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_init.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_mess.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_run.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_setopt.$(OBJEXT) \
-		$(SOURCE_PATH)/grampc_setparam.$(OBJEXT)  
+		$(SOURCE_PATH)/grampc_setparam.$(OBJEXT) \
+		$(SOURCE_PATH)/grampc_util.$(OBJEXT) 
 GRAMPC_LIB = \
 		$(LIBS_PATH)/libgrampc.$(LIBEXT)
 
@@ -72,7 +79,8 @@ all: $(GRAMPC_LIB)
 
 $(GRAMPC_LIB): $(GRAMPC_OBJS)
 			@echo 'Building library: $@'
-			$(AR) "$@" $(GRAMPC_OBJS)
+			$(MKDIR) $(LIBS_PATH)
+			$(AR) -o "$@" $(GRAMPC_OBJS)
 			@echo 'Finished building: $@'
 			@echo ''
 
