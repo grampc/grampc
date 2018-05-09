@@ -130,7 +130,6 @@ extern "C" {
 /* ----------------------
 d_sign
 ---------------------- */
-//#include "f2c.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

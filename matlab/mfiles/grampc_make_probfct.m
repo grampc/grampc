@@ -151,4 +151,6 @@ for i = 1:length(EXE)
 end
 disp('Building process successively finished.');
 
+% Updated matlab path to prevent the error "Undefined variable "CmexFiles ..."
+rehash path;
 end

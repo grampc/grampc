@@ -35,4 +35,4 @@
 #include "grampc_util.h"
 #include "probfct.h"
 
-#endif // GRAMPC_H_
+#endif

@@ -1116,7 +1116,7 @@ void linesearch_adaptive(typeRNum *alpha, ctypeInt igrad, const typeGRAMPC *gram
 			inputproj(uls, grampc);
 		}
 		else {
-			uls = u; // MatCopy(uls, u, grampc->opt->Nhor, grampc->param->Nu);
+			uls = u;
 		}
 
 		if (grampc->opt->OptimParam == INT_ON) {
@@ -1126,7 +1126,7 @@ void linesearch_adaptive(typeRNum *alpha, ctypeInt igrad, const typeGRAMPC *gram
 			paramproj(pls, grampc);
 		}
 		else {
-			pls = p;// MatCopy(pls, p, 1, grampc->param->Np);
+			pls = p;
 		}
 
 		if (grampc->opt->OptimTime == INT_ON) {
@@ -1135,7 +1135,7 @@ void linesearch_adaptive(typeRNum *alpha, ctypeInt igrad, const typeGRAMPC *gram
 			discretize_time(tls, Tls, grampc);
 		}
 		else {
-			tls = t; // MatCopy(tls, t, grampc->opt->Nhor, 1);
+			tls = t;
 		}
 
 		evaluate_sys(tls, uls, pls, grampc);
