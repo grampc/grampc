@@ -96,7 +96,7 @@ int main()
 	ctypeInt Nhor = (typeInt)40;        /* Number of steps for the system integration */
 	ctypeInt MaxGradIter = (typeInt)3;  /* Maximum number of gradient iterations */
 
-	/* Linesearch */
+	/* Line search */
 	ctypeRNum LineSearchMax = (typeRNum)1e-6;
 
 	/* Scaling Values for the states, inputs and parameters */

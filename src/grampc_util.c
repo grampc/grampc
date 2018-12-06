@@ -79,6 +79,7 @@ void resizeIntMatrix(typeInt **cs, const size_t size) {
 void resize_rwsGeneral(const typeGRAMPC *grampc) {
 	typeInt LInt = LWadjsys;
 	typeInt LIntCost = 0;
+	typeInt LConst = 0;
 
 	switch (grampc->opt->Integrator) {
 	case INT_EULER:    LInt += Leuler; break;
@@ -91,8 +92,11 @@ void resize_rwsGeneral(const typeGRAMPC *grampc) {
 	case INT_TRAPZ:   LIntCost = LIntCostTrapezoidal; break;
 	case INT_SIMPSON: LIntCost = LIntCostSimpson; break;
 	}
+	if (grampc->param->Nc > 0) {
+		LConst = LevaluateConstraints;
+	}
 
-	grampc->rws->lrwsGeneral = MAX(MAX(MAX(MAX(MAX(Lgradp, Lgradu), LgradT), LIntCost), LInt), LevaluateConstraints);
+	grampc->rws->lrwsGeneral = MAX(MAX(MAX(MAX(MAX(Lgradp, Lgradu), LgradT), LIntCost), LInt), LConst);
 	resizeNumMatrix(&grampc->rws->rwsGeneral, grampc->rws->lrwsGeneral);
 }
 
@@ -157,7 +161,7 @@ void setLWorkRodas(const typeGRAMPC *grampc)
 
 
 typeInt CastDvec2Intvec(typeInt** Intvec, const double* Numvec, const size_t size) {
-	typeInt i;
+	unsigned typeInt i;
 	*Intvec = (typeInt*)malloc(size * sizeof(typeInt));
 	if (*Intvec != NULL) {
 		for (i = 0; i < size; i++) {
@@ -169,7 +173,7 @@ typeInt CastDvec2Intvec(typeInt** Intvec, const double* Numvec, const size_t siz
 }
 
 typeInt CastDvec2Numvec(typeRNum** Realvec, const double* Numvec, const size_t size) {
-	typeInt i;
+	unsigned typeInt i;
 	*Realvec = (typeRNum*)malloc(size * sizeof(typeRNum));
 	if (*Realvec != NULL) {
 		for (i = 0; i < size; i++) {
@@ -244,29 +248,23 @@ char* LineSearchTypeInt2Str(ctypeInt INT_LineSearchType) {
 }
 
 
-void lsearch_fit2(typeRNum *kfit, typeRNum *Jfit, ctypeRNum *k, ctypeRNum *J)
+void lsearch_fit(typeRNum *kfit, typeRNum *Jfit, ctypeRNum *k, ctypeRNum *J)
 {
-	ctypeRNum k02 = k[0] * k[0];
-	ctypeRNum k12 = k[1] * k[1];
-	ctypeRNum k22 = k[2] * k[2];
-	ctypeRNum a0 = (J[2] * k[0] * (k[0] - k[1])*k[1] + k[2] * (J[0] * k[1] * (k[1] - k[2]) + \
-		J[1] * k[0] * (-k[0] + k[2]))) / ((k[0] - k[1])*(k[0] - k[2])*(k[1] - k[2]));
-	ctypeRNum a1 = (J[2] * (-k02 + k12) + J[1] * (k02 - k22) + J[0] * \
-		(-k12 + k22)) / ((k[0] - k[1])*(k[0] - k[2])*(k[1] - k[2]));
-	ctypeRNum a2 = ((J[0] - J[2]) / (k[0] - k[2]) + (-J[1] + J[2]) / (k[1] - k[2])) / (k[0] - k[1]);
+	ctypeRNum aux = (2 * J[1] - J[0] - J[2]);
+	ctypeRNum aux2 = (J[2] - 4 * J[1]);
 
-	/* minimum? */
-	if (a2 >= aEPS) {
-		kfit[0] = -a1 / (2 * a2);
-		Jfit[0] = a0 + a1 * kfit[0] + a2 * kfit[0] * kfit[0];
+	/* exists a minimum? (positive curvature) */
+	if (aux <= -aEPS) {
+		kfit[0] = k[1] + (k[1] - k[0]) / 2 * (J[2] - J[0]) / aux;
+		Jfit[0] = (J[0] * J[0] + aux2 * aux2 - 2 * J[0] * (4 * J[1] + J[2])) / (8 * aux);
 	}
 	/* smallest J */
-	if (a2 < aEPS || kfit[0] < k[0] || kfit[0] > k[2]) {
-		if (J[0] <= J[1] - JEPS && J[0] <= J[2] - JEPS) {
+	if (aux > -aEPS  || kfit[0] < k[0] || kfit[0] > k[2]) {
+		if (J[0] <= J[1] && J[0] <= J[2]) {
 			kfit[0] = k[0];
 			Jfit[0] = J[0];
 		}
-		else if (J[2] <= J[0] - JEPS && J[2] <= J[1] - JEPS) {
+		else if (J[2] <= J[0]  && J[2] <= J[1]) {
 			kfit[0] = k[2];
 			Jfit[0] = J[2];
 		}

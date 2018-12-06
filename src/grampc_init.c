@@ -208,9 +208,10 @@ void grampc_init(typeGRAMPC **grampc, typeUSERPARAM *userparam)
 	(*grampc)->opt->LineSearchMax = (typeRNum)0.75;
 	(*grampc)->opt->LineSearchMin = (typeRNum)1e-10;
 	(*grampc)->opt->LineSearchInit = (typeRNum)1e-4;
-	(*grampc)->opt->LineSearchIntervalFactor = (typeRNum)0.85;
+	(*grampc)->opt->LineSearchAdaptAbsTol = (typeRNum)1e-6;
 	(*grampc)->opt->LineSearchAdaptFactor = (typeRNum)3.0 / 2.0;
 	(*grampc)->opt->LineSearchIntervalTol = (typeRNum)1e-1;
+	(*grampc)->opt->LineSearchIntervalFactor = (typeRNum)0.85;
 
 	(*grampc)->opt->OptimControl = INT_ON;
 	(*grampc)->opt->OptimParam = INT_OFF;

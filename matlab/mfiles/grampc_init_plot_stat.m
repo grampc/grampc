@@ -167,7 +167,7 @@ if grampc.param.Nc ~= 0
     % plot cNorm
     subplot_cNorm = subplot(sprownr,spcolnr(2),spcolnr(2)+1,'Parent',figNr);
     ph_out.s7 = plot(xdata(1:decimation:end),vec.Nconstr(1:decimation:end),'Parent',subplot_cNorm);
-    title(subplot_cNorm,'Norm of constraints over horizon');
+    title(subplot_cNorm,'Norm of constraint violation over horizon');
     xlabel(subplot_cNorm,xlab);
     add_axis = [add_axis subplot_cNorm];
     
@@ -184,6 +184,14 @@ if grampc.param.Nc ~= 0
         ph_out.s9 = plot(xdata(1:decimation:end),vec.constrT(:,1:decimation:end),'Parent',subplot_Tcfct);
         title(subplot_Tcfct,'Terminal constraints');
         xlabel(subplot_Tcfct,xlab);
+%         for i = 1:grampc.param.NgT
+%                 legendcell{i} = sprintf('g_{T_{%d}}',i);
+%         end
+%         for i = 1:grampc.param.NhT
+%                 legendcell{grampc.param.NgT+i} = sprintf('h_{T_{%d}}',i);
+%         end
+%         legend(legendcell)
+        
         
         % Terminal Lagrangian multiplier
         subplot_Tmult = subplot(3,3,8,'Parent',figNr);

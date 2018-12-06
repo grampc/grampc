@@ -14,9 +14,9 @@ function grampc_update_plot_pred(grampc,ph,idx,decimation)
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer, 
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0). 
-% Developed at the Institute of Measurement, Control, and Microtechnology, 
+% Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Developed at the Institute of Measurement, Control, and Microtechnology,
 % Ulm University. All rights reserved.
 %
 % GRAMPC is free software: you can redistribute it and/or modify
@@ -64,22 +64,22 @@ if grampc.opt.LineSearchType == 0
         aopt{i} = grampc.rws.lsAdapt(4+(i-1)*8);
     end
     
-%     % Set limits of the plot
-%     xmin = a{1}(1);
-%     xmax = a{1}(end);
-%     ymin = min(j{1});
-%     ymax = max(j{1});
-%     for i = 2:grampc.opt.MaxGradIter
-%         xmin = min(xmin,a{i}(1));
-%         xmax = max(xmax,a{i}(end));
-%         ymin = min(ymin,min(jopt{i},min(j{i})));
-%         ymax = max(ymax,max(j{i}));
-%     end
-%     if ~(isnan(xmin) || isnan(xmax) || isnan(ymin) || isnan(ymax)) && ymax ~= ymin && xmax ~= xmin
-%         subplot_ls = get(ph.s4a(1),'Parent');
-%         xlim(subplot_ls,[xmin-abs(xmax-xmin)*0.1 xmax+abs(xmax-xmin)*0.1]);
-%         ylim(subplot_ls,[ymin-abs(ymax-ymin)*0.1 ymax+abs(ymax-ymin)*0.1]);
-%     end
+    %     % Set limits of the plot
+    %     xmin = a{1}(1);
+    %     xmax = a{1}(end);
+    %     ymin = min(j{1});
+    %     ymax = max(j{1});
+    %     for i = 2:grampc.opt.MaxGradIter
+    %         xmin = min(xmin,a{i}(1));
+    %         xmax = max(xmax,a{i}(end));
+    %         ymin = min(ymin,min(jopt{i},min(j{i})));
+    %         ymax = max(ymax,max(j{i}));
+    %     end
+    %     if ~(isnan(xmin) || isnan(xmax) || isnan(ymin) || isnan(ymax)) && ymax ~= ymin && xmax ~= xmin
+    %         subplot_ls = get(ph.s4a(1),'Parent');
+    %         xlim(subplot_ls,[xmin-abs(xmax-xmin)*0.1 xmax+abs(xmax-xmin)*0.1]);
+    %         ylim(subplot_ls,[ymin-abs(ymax-ymin)*0.1 ymax+abs(ymax-ymin)*0.1]);
+    %     end
     
     % Update the handles
     for i = 1:grampc.opt.MaxGradIter
@@ -89,57 +89,117 @@ if grampc.opt.LineSearchType == 0
     end
 end
 
-    % Update handles
-    % plot states and adj. states
-    for i = idx.States
-        set(ph.s1(i),'YData',grampc.rws.x(i,1:decimation:end))
-        set(ph.s1(i),'XData',grampc.rws.t(1:decimation:end))
+% Update handles
+% plot states and adj. states
+for i = idx.States
+    set(ph.s1(i),'YData',grampc.rws.x(i,1:decimation:end))
+    set(ph.s1(i),'XData',grampc.rws.t(1:decimation:end))
+    
+    set(ph.s2(i),'YData',grampc.rws.adj(i,1:decimation:end))
+    set(ph.s2(i),'XData',grampc.rws.t(1:decimation:end))
+end
+adapt_ylim(grampc.rws.x(idx.States,:),ph.s1);
+adapt_ylim(grampc.rws.adj(idx.States,:),ph.s2);
+
+
+% plot controls
+for i = idx.Controls
+    set(ph.s3(i),'YData',grampc.rws.u(i,1:decimation:end))
+    set(ph.s3(i),'XData',grampc.rws.t(1:decimation:end))
+end
+adapt_ylim(grampc.rws.u(idx.Controls,:),ph.s3);
+
+
+
+if ~isempty(idx.Constraints)
+    
+    % General constraints
+    if ~isempty(idx.gConstraints)
+        % Evaluate the constraints over horizon
+        ipred = 1:decimation:grampc.opt.Nhor;
+        constr = zeros(grampc.param.Ng+grampc.param.Nh,length(ipred));
+        if grampc.opt.ScaleProblem == 1
+            xpred = grampc.rws.x.*repmat(grampc.opt.xScale(:),1,grampc.opt.Nhor)+repmat(grampc.opt.xOffset(:),1,grampc.opt.Nhor);
+            upred = grampc.rws.u.*repmat(grampc.opt.uScale(:),1,grampc.opt.Nhor)+repmat(grampc.opt.uOffset(:),1,grampc.opt.Nhor);
+            if ~isempty(grampc.rws.p)
+                ppred = grampc.rws.p'.*grampc.opt.pScale+grampc.opt.pOffset;
+            else
+                ppred = grampc.rws.p;
+            end
+        else
+            xpred = grampc.rws.x;
+            upred = grampc.rws.u;
+            ppred = grampc.rws.p;
+        end
+        for i = ipred
+            constr(:,i) = CmexFiles.grampc_ghfct_Cmex(grampc.rws.t(i), xpred(:,i), upred(:,i), ppred, grampc.userparam);
+        end
         
-        set(ph.s2(i),'YData',grampc.rws.adj(i,1:decimation:end))
-        set(ph.s2(i),'XData',grampc.rws.t(1:decimation:end))
-    end
-    % plot controls
-    for i = idx.Controls
-        set(ph.s3(i),'YData',grampc.rws.u(i,1:decimation:end))
-        set(ph.s3(i),'XData',grampc.rws.t(1:decimation:end))
+        for i = idx.gConstraints
+            % Constraints
+            set(ph.s5a(i),'YData',constr(i,:))
+            set(ph.s5a(i),'XData',grampc.rws.t(1:decimation:end))
+            % mult
+            set(ph.s6a(i),'YData',grampc.rws.mult(i,1:decimation:end))
+            set(ph.s6a(i),'XData',grampc.rws.t(1:decimation:end))
+            % pen
+            set(ph.s7a(i),'YData',grampc.rws.pen(i,1:decimation:end))
+            set(ph.s7a(i),'XData',grampc.rws.t(1:decimation:end))
+        end
+    else
+        constr = 0;
     end
     
-    for i = idx.gConstraints
-        % Constraints
-        if i <= grampc.param.Ng
-            set(ph.s5a(i),'YData',grampc.rws.cfct(i,1:decimation:end))
-        else
-            set(ph.s5a(i),'YData',max(grampc.rws.cfct(i,1:decimation:end),0))
-        end
-        set(ph.s5a(i),'XData',grampc.rws.t(1:decimation:end))
-        % mult
-        set(ph.s6a(i),'YData',grampc.rws.mult(i,1:decimation:end))
-        set(ph.s6a(i),'XData',grampc.rws.t(1:decimation:end))
-        % pen
-        set(ph.s7a(i),'YData',grampc.rws.pen(i,1:decimation:end))
-        set(ph.s7a(i),'XData',grampc.rws.t(1:decimation:end))
-    end
-   
     % Terminal constraints
-    for i = idx.TConstraints
-        % Constraints
-        if i <= grampc.param.Ng+grampc.param.Nh+grampc.param.NgT
-            set(ph.s5b(i-idx.TConstraints(1)+1),'YData',grampc.rws.cfct(i,end))
+    if ~isempty(idx.TConstraints)
+        
+        % Evaluate terminal constraints
+        if grampc.opt.ScaleProblem == 1
+            xend = grampc.rws.x(:,end)*grampc.opt.xScale+grampc.opt.xOffset;
+            if ~isempty(grampc.rws.p)
+                ppred = grampc.rws.p*grampc.opt.pScale+grampc.opt.pOffset;
+            else
+                ppred = grampc.rws.p;
+            end
         else
-            set(ph.s5b(i-idx.TConstraints(1)+1),'YData',max(grampc.rws.cfct(i,end),0))
+            xend = grampc.rws.x(:,end);
+            ppred = grampc.rws.p;
         end
-        set(ph.s5b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
-        % mult
-        set(ph.s6b(i-idx.TConstraints(1)+1),'YData',grampc.rws.mult(i,end))
-        set(ph.s6b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
-        % pen
-        set(ph.s7b(i-idx.TConstraints(1)+1),'YData',grampc.rws.pen(i,end))
-        set(ph.s7b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
+        Tconstr = CmexFiles.grampc_gThTfct_Cmex(grampc.rws.t(end), xend, ppred, grampc.userparam);
+        
+        for i = idx.TConstraints
+            % Constraints
+            set(ph.s5b(i-idx.TConstraints(1)+1),'YData',Tconstr(i-idx.TConstraints(1)+1))
+            set(ph.s5b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
+            % mult
+            set(ph.s6b(i-idx.TConstraints(1)+1),'YData',grampc.rws.mult(i,end))
+            set(ph.s6b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
+            % pen
+            set(ph.s7b(i-idx.TConstraints(1)+1),'YData',grampc.rws.pen(i,end))
+            set(ph.s7b(i-idx.TConstraints(1)+1),'XData',grampc.rws.t(end))
+        end
+    else
+        Tconstr = 0;
     end
+    ymax = max([max(max(constr(idx.gConstraints,:))),max(Tconstr(idx.TConstraints-double(grampc.param.Ng+grampc.param.Nh))),0]);
+    ymin = min([min(min(constr(idx.gConstraints,:))),min(Tconstr(idx.TConstraints-double(grampc.param.Ng+grampc.param.Nh))),0]);
+
     
-    if(grampc.opt.OptimTime == 1)
-        xlim(get(ph.s1(1),'Parent'),[grampc.rws.t(1),grampc.rws.t(end)])
+    if(isfield(ph,'s6a'))
+        adapt_ylim([ymax ymin],ph.s5a);
+        adapt_ylim(grampc.rws.mult(idx.Constraints,:),ph.s6a);
+        adapt_ylim(grampc.rws.pen(idx.Constraints,:),ph.s7a);
+    else
+        adapt_ylim([ymax ymin],ph.s5b);
+        adapt_ylim(grampc.rws.mult(idx.Constraints,:),ph.s6b);
+        adapt_ylim(grampc.rws.pen(idx.Constraints,:),ph.s7b);
     end
+end
+
+
+if(grampc.opt.OptimTime == 1)
+    xlim(get(ph.s1(1),'Parent'),[grampc.rws.t(1),grampc.rws.t(end)])
+end
 end
 
 function [alpha,J] = cost_approximation(lsAdapt)
@@ -148,9 +208,10 @@ function [alpha,J] = cost_approximation(lsAdapt)
 j = lsAdapt(5:7);
 a = lsAdapt(1:3);
 
-c0 = (j(3)*a(1)*(a(1)-a(2))*a(2)+a(3)*(j(1)*a(2)*(a(2)-a(3))+j(2)*a(1)*(-a(1)+a(3))))/((a(1)-a(2))*(a(1)-a(3))*(a(2)-a(3)));
-c1 = (j(3)*(-(a(1)*a(1))+(a(2)*a(2)))+j(2)*((a(1)*a(1))-(a(3)*a(3)))+j(1)*(-(a(2)*a(2))+(a(3)*a(3))))/((a(1)-a(2))*(a(1)-a(3))*(a(2)-a(3)));
-c2 = ((j(1)-j(3))/(a(1)-a(3))+(-j(2)+j(3))/(a(2)-a(3)))/(a(1)-a(2));
+d = a(3)-a(2);
+c2 = (j(1)-2*j(2)+j(3))/(2*d*d);
+c1 = (d*(-j(1) + j(3)) - 2*(j(1) - 2*j(2) + j(3))*a(2))/(2*d*d);
+c0 = (2*d*d*j(2) + d*(j(1) - j(3))*a(2) + (j(1) - 2*j(2) + j(3))*a(2)*a(2))/(2*d*d);
 
 alpha = linspace(a(1),a(3),19);
 J     = c2.*alpha.^2 + c1.*alpha + c0;

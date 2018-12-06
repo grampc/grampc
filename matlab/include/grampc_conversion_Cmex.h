@@ -209,9 +209,10 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	cAddNumScalar(&opt->LineSearchMax, "LineSearchMax", mxopt);
 	cAddNumScalar(&opt->LineSearchMin, "LineSearchMin", mxopt);
 	cAddNumScalar(&opt->LineSearchInit, "LineSearchInit", mxopt);
-	cAddNumScalar(&opt->LineSearchIntervalFactor, "LineSearchIntervalFactor", mxopt);
+	cAddNumScalar(&opt->LineSearchAdaptAbsTol, "LineSearchAdaptAbsTol", mxopt);
 	cAddNumScalar(&opt->LineSearchAdaptFactor, "LineSearchAdaptFactor", mxopt);
 	cAddNumScalar(&opt->LineSearchIntervalTol, "LineSearchIntervalTol", mxopt);
+	cAddNumScalar(&opt->LineSearchIntervalFactor, "LineSearchIntervalFactor", mxopt);
 
 	cAddIntScalar(&opt->OptimControl, "OptimControl", mxopt);
 	cAddIntScalar(&opt->OptimParam, "OptimParam", mxopt);
@@ -377,9 +378,10 @@ void typeGRAMPC2mx(mxArray *plhs[], const typeGRAMPC*grampc, mxArray *mxuserpara
 	mxAddNumMatrix(mxoptstruct, "LineSearchMax", &grampc->opt->LineSearchMax, 1, 1);
 	mxAddNumMatrix(mxoptstruct, "LineSearchMin", &grampc->opt->LineSearchMin, 1, 1);
 	mxAddNumMatrix(mxoptstruct, "LineSearchInit", &grampc->opt->LineSearchInit, 1, 1);
-	mxAddNumMatrix(mxoptstruct, "LineSearchIntervalFactor", &grampc->opt->LineSearchIntervalFactor, 1, 1);
+	mxAddNumMatrix(mxoptstruct, "LineSearchAdaptAbsTol", &grampc->opt->LineSearchAdaptAbsTol, 1, 1);
 	mxAddNumMatrix(mxoptstruct, "LineSearchAdaptFactor", &grampc->opt->LineSearchAdaptFactor, 1, 1);
 	mxAddNumMatrix(mxoptstruct, "LineSearchIntervalTol", &grampc->opt->LineSearchIntervalTol, 1, 1);
+	mxAddNumMatrix(mxoptstruct, "LineSearchIntervalFactor", &grampc->opt->LineSearchIntervalFactor, 1, 1);
 
 	mxAddIntMatrix(mxoptstruct, "OptimControl", &grampc->opt->OptimControl, 1, 1);
 	mxAddIntMatrix(mxoptstruct, "OptimParam", &grampc->opt->OptimParam, 1, 1);

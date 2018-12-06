@@ -61,26 +61,7 @@ clf(figNr)
 
 % If there are constraints two plot rows are needed
 if ~isempty(idx.Constraints)
-    % Constraints
-    subplot_cfct = subplot(2,3,4,'Parent',figNr);
-    ph_out.s4 = plot(vec.t(1:decimation:end),vec.constr(idx.Constraints,(1:decimation:end)),'Parent',subplot_cfct);
-    title(subplot_cfct,'Constraints');
-    xlabel(subplot_cfct,'Time');
-    
-    % mult
-    subplot_mult = subplot(2,3,5,'Parent',figNr);
-    ph_out.s5 = plot(vec.t(1:decimation:end),vec.mult(idx.Constraints,(1:decimation:end)),'Parent',subplot_mult);
-    title(subplot_mult,'Lagrange multipliers');
-    xlabel(subplot_mult,'Time');
-    
-    % pen
-    subplot_pen = subplot(2,3,6,'Parent',figNr);
-    ph_out.s6 = plot(vec.t(1:decimation:end),vec.pen(idx.Constraints,(1:decimation:end)),'Parent',subplot_pen);
-    title(subplot_pen,'Penalty parameters');
-    xlabel(subplot_pen,'Time');
     sprownr = 2;
-    
-    add_axis = [subplot_cfct,subplot_mult,subplot_pen];
 else
     add_axis = [];
     sprownr = 1;
@@ -103,6 +84,30 @@ subplot_Controls = subplot(sprownr,3,3,'Parent',figNr);
 ph_out.s3 = plot(vec.t(1:decimation:end),vec.u(idx.Controls,(1:decimation:end)),'Parent',subplot_Controls);
 title(subplot_Controls,'Controls');
 xlabel(subplot_Controls,'Time');
+
+if ~isempty(idx.Constraints)
+    % Constraints
+    subplot_cfct = subplot(2,3,4,'Parent',figNr);
+    plot(vec.t([1 end]),[0 0],'k--','Parent',subplot_cfct),hold on
+    ph_out.s4 = plot(vec.t(1:decimation:end),vec.constr(idx.Constraints,(1:decimation:end)),'Parent',subplot_cfct);
+    hold off
+    title(subplot_cfct,'Constraints');
+    xlabel(subplot_cfct,'Time');
+    
+    % mult
+    subplot_mult = subplot(2,3,5,'Parent',figNr);
+    ph_out.s5 = plot(vec.t(1:decimation:end),vec.mult(idx.Constraints,(1:decimation:end)),'Parent',subplot_mult);
+    title(subplot_mult,'Lagrange multipliers');
+    xlabel(subplot_mult,'Time');
+    
+    % pen
+    subplot_pen = subplot(2,3,6,'Parent',figNr);
+    ph_out.s6 = plot(vec.t(1:decimation:end),vec.pen(idx.Constraints,(1:decimation:end)),'Parent',subplot_pen);
+    title(subplot_pen,'Penalty parameters');
+    xlabel(subplot_pen,'Time');
+    
+    add_axis = [subplot_cfct,subplot_mult,subplot_pen];
+end
 
 
 linkaxes([subplot_States,subplot_adjStates,subplot_Controls,add_axis],'x')

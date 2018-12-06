@@ -120,7 +120,7 @@ void grampc_setparam_real_vector(const typeGRAMPC *grampc, const typeChar *param
 
 void grampc_printparam(const typeGRAMPC *grampc)
 {
-	myPrint("%s", "-- MPC PARAMETERS --\n");
+	myPrint("%s", "-- GRAMPC PARAMETERS --\n");
 	myPrint("     Nx: %d\n", grampc->param->Nx);
 	myPrint("     Nu: %d\n", grampc->param->Nu);
 	myPrint("     Np: %d\n", grampc->param->Np);

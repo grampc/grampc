@@ -62,7 +62,7 @@ void check_ControlLimits(const typeGRAMPC* grampc);
 char* IntegratorInt2Str(ctypeInt INT_Integrator);
 char* LineSearchTypeInt2Str(ctypeInt INT_LineSearchType);
 
-void lsearch_fit2(typeRNum *kfit, typeRNum *Jfit, ctypeRNum *k, ctypeRNum *J);
+void lsearch_fit(typeRNum *kfit, typeRNum *Jfit, ctypeRNum *k, ctypeRNum *J);
 void interplin(typeRNum *varint, ctypeRNum *tvec, ctypeRNum *varvec, ctypeRNum tint,
 	ctypeInt Nvar, ctypeInt Nvec, ctypeInt searchdir);
 

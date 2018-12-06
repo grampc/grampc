@@ -115,7 +115,7 @@ int main(void)
 
 	ctypeInt FlagsRodas[8] = { IFCN, IDFX, IJAC, IMAS, MLJAC, MUJAC, MLMAS, MUMAS };
 
-	/* Linesearch */
+	/* Line search */
 	ctypeRNum LineSearchMax = 2.0;
 	ctypeRNum LineSearchInit = 2e-2;
 

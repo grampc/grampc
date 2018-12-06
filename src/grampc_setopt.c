@@ -87,10 +87,9 @@ void grampc_setopt_real(const typeGRAMPC *grampc, const typeChar *optName, ctype
 		setNumOpt(&grampc->opt->LineSearchInit, optName, optValue, 0.0, INF, COMPARE_EXCLUSIVE);
 		init_rws_linesearch(grampc);
 	}
-	/* LineSearchIntervalFactor */
-	else if (!strcmp(optName, "LineSearchIntervalFactor")) {
-		setNumOpt(&grampc->opt->LineSearchIntervalFactor, optName, optValue, 0.0, 1.0, COMPARE_EXCLUSIVE);
-		init_rws_linesearch(grampc);
+	/* LineSearchAdaptAbsTol */
+	else if (!strcmp(optName, "LineSearchAdaptAbsTol")) {
+		setNumOpt(&grampc->opt->LineSearchAdaptAbsTol, optName, optValue, 0, INF, COMPARE_INCLUSIVE);
 	}
 	/* LineSearchAdaptFactor */
 	else if (!strcmp(optName, "LineSearchAdaptFactor")) {
@@ -98,7 +97,12 @@ void grampc_setopt_real(const typeGRAMPC *grampc, const typeChar *optName, ctype
 	}
 	/* LineSearchIntervalTol */
 	else if (!strcmp(optName, "LineSearchIntervalTol")) {
-		setNumOpt(&grampc->opt->LineSearchIntervalTol, optName, optValue, 0.0, 1.0, COMPARE_EXCLUSIVE);
+		setNumOpt(&grampc->opt->LineSearchIntervalTol, optName, optValue, 0.0, 0.5, COMPARE_EXCLUSIVE);
+	}
+	/* LineSearchIntervalFactor */
+	else if (!strcmp(optName, "LineSearchIntervalFactor")) {
+		setNumOpt(&grampc->opt->LineSearchIntervalFactor, optName, optValue, 0.0, 1.0, COMPARE_EXCLUSIVE);
+		init_rws_linesearch(grampc);
 	}
 	/* OptimParamLineSearchFactor */
 	else if (!strcmp(optName, "OptimParamLineSearchFactor")) {
@@ -428,7 +432,7 @@ void grampc_setopt_int_vector(const typeGRAMPC *grampc, const typeChar *optName,
 
 void grampc_printopt(const typeGRAMPC *grampc)
 {
-	myPrint("%s", "-- MPC OPTIONS --\n");
+	myPrint("%s", "-- GRAMPC OPTIONS --\n");
 	myPrint("                         Nhor: %d\n", grampc->opt->Nhor);
 	myPrint("                  MaxGradIter: %d\n", grampc->opt->MaxGradIter);
 	myPrint("                  MaxMultIter: %d\n", grampc->opt->MaxMultIter);
@@ -450,9 +454,9 @@ void grampc_printopt(const typeGRAMPC *grampc)
 		myPrint("                         IFCN: %d\n", grampc->opt->FlagsRodas[0]);
 		myPrint("                         IDFX: %d\n", grampc->opt->FlagsRodas[1]);
 		myPrint("                         IJAC: %d\n", grampc->opt->FlagsRodas[2]);
+		myPrint("                         IMAS: %d\n", grampc->opt->FlagsRodas[3]);
 		myPrint("                        MLJAC: %d\n", grampc->opt->FlagsRodas[4]);
 		myPrint("                        MUJAC: %d\n", grampc->opt->FlagsRodas[5]);
-		myPrint("                         IMAS: %d\n", grampc->opt->FlagsRodas[3]);
 		myPrint("                        MLMAS: %d\n", grampc->opt->FlagsRodas[6]);
 		myPrint("                        MUMAS: %d\n", grampc->opt->FlagsRodas[7]);
 	}

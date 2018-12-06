@@ -107,7 +107,7 @@ int main()
 	/* System integration */
 	const char* Integrator = "euler";
 
-	/* Linesearch */
+	/* Line search */
 	ctypeRNum LineSearchMax = 1e2;
 
 	/* Input and or parameter optimization  */

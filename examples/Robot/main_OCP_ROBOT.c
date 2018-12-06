@@ -104,7 +104,7 @@ int main(void)
 	ctypeInt MaxMultIter = 1;     /* Maximum number of augmented Lagrangian iterations */
 	const char* ShiftControl = "off";
 
-	/* Linesearch */
+	/* Line search */
 	ctypeRNum LineSearchMax = 2;
 	const char* LineSearchExpAutoFallback = "off";
 

@@ -53,10 +53,10 @@ void grampc_run(const typeGRAMPC *grampc)
 
 	/* Validate necessary parameters */
 	if (grampc->param->dt <= 0.0) {
-		grampc_error(DT_NOT_DEFINED);
+		grampc_error(DT_NOT_VALID);
 	}
 	if (grampc->param->Thor < grampc->param->dt) {
-		grampc_error(THOR_NOT_DEFINED);
+		grampc_error(THOR_NOT_VALID);
 	}
 
 	/* Initial condition */
@@ -242,6 +242,7 @@ void grampc_run(const typeGRAMPC *grampc)
 void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBoolean evaljac, const typeBoolean updatemultiplier, const typeGRAMPC *grampc)
 {
 	typeInt i;
+    typeInt N;
 
 	ctypeRNum *x_ = NULL;
 	ctypeRNum *u_ = NULL;
@@ -256,10 +257,16 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 	typeRNum *dcdt = &grampc->rws->dcdt;
 	typeRNum *thresholds = NULL;
 	typeRNum *cScale = NULL;
-	typeBoolean converged_grad;
+	typeBoolean converged_grad = 0;
 
-	typeRNum *c = grampc->rws->rwsGeneral; /* size:  Nc+ Max(Nx,Nu) */
-	typeRNum *jacmult = c + grampc->param->Nc;
+	typeRNum *c = grampc->rws->rwsGeneral; /* size:  Nc+ 2*(Nx+Nu+Np) */
+	typeRNum *dgdxvec = c + grampc->param->Nc;
+	typeRNum *dhdxvec = dgdxvec + grampc->param->Nx;
+	typeRNum *dgdpvec = dhdxvec + grampc->param->Nx;
+	typeRNum *dhdpvec = dgdpvec + grampc->param->Np;
+	typeRNum *dgduvec = dhdpvec + grampc->param->Np;
+	typeRNum *dhduvec = dgduvec + grampc->param->Nu;
+	typeRNum dgTdT, dhTdT;
 
 	/* return if no constraints are defined */
 	if (grampc->param->Nc == 0) {
@@ -270,6 +277,7 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 	MatSetScalar(grampc->rws->dcdx, 0, grampc->opt->Nhor + 1, grampc->param->Nx);
 	MatSetScalar(grampc->rws->dcdu, 0, grampc->opt->Nhor, grampc->param->Nu);
 	MatSetScalar(grampc->rws->dcdp, 0, grampc->opt->Nhor + 1, grampc->param->Np);
+	MatSetScalar(dgdxvec, 0, 1, 2 * (grampc->param->Nx + grampc->param->Np + grampc->param->Nu));
 
 	/* Multiplier update depends on the convergence of the subproblem */
 	if (updatemultiplier) {
@@ -286,7 +294,15 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 
 	/* loop over the prediction horizon */
 	if ((grampc->param->Ng + grampc->param->Nh > 0) && ((grampc->opt->EqualityConstraints == INT_ON) || (grampc->opt->InequalityConstraints == INT_ON))) {
-		for (i = 0; i < grampc->opt->Nhor; i++)
+        /* if there are terminal constraints, the integral constraints are not evaluated for the last point */
+        if (grampc->param->NgT + grampc->param->NhT > 0) {
+            N = grampc->opt->Nhor - 1;
+        }
+        /* if there are no terminal constraints, the integral constraints are evaluated for all points */
+        else {
+            N = grampc->opt->Nhor;
+        }
+        for (i = 0; i < N; i++)
 		{
 			mult = grampc->rws->mult + i * grampc->param->Nc;
 			pen = grampc->rws->pen + i * grampc->param->Nc;
@@ -329,17 +345,17 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 						scale_constraints(c, cScale, grampc->param->Ng);
 					}
 
-					dgdx_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-					MatAdd(dcdx, dcdx, jacmult, 1, grampc->param->Nx);
+					dgdx_vec(dgdxvec, t[i], x_, u_, p_, c, grampc->userparam);
+					MatAdd(dcdx, dcdx, dgdxvec, 1, grampc->param->Nx);
 
 					if (grampc->opt->OptimControl == INT_ON) {
-						dgdu_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-						MatAdd(dcdu, dcdu, jacmult, 1, grampc->param->Nu);
+						dgdu_vec(dgduvec, t[i], x_, u_, p_, c, grampc->userparam);
+						MatAdd(dcdu, dcdu, dgduvec, 1, grampc->param->Nu);
 					}
 
 					if (grampc->opt->OptimParam == INT_ON) {
-						dgdp_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-						MatAdd(dcdp, dcdp, jacmult, 1, grampc->param->Np);
+						dgdp_vec(dgdpvec, t[i], x_, u_, p_, c, grampc->userparam);
+						MatAdd(dcdp, dcdp, dgdpvec, 1, grampc->param->Np);
 					}
 				}
 			}
@@ -373,17 +389,17 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 						scale_constraints(c, cScale, grampc->param->Nh);
 					}
 
-					dhdx_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-					MatAdd(dcdx, dcdx, jacmult, 1, grampc->param->Nx);
+					dhdx_vec(dhdxvec, t[i], x_, u_, p_, c, grampc->userparam);
+					MatAdd(dcdx, dcdx, dhdxvec, 1, grampc->param->Nx);
 
 					if (grampc->opt->OptimControl == INT_ON) {
-						dhdu_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-						MatAdd(dcdu, dcdu, jacmult, 1, grampc->param->Nu);
+						dhdu_vec(dhduvec, t[i], x_, u_, p_, c, grampc->userparam);
+						MatAdd(dcdu, dcdu, dhduvec, 1, grampc->param->Nu);
 					}
 
 					if (grampc->opt->OptimParam == INT_ON) {
-						dhdp_vec(jacmult, t[i], x_, u_, p_, c, grampc->userparam);
-						MatAdd(dcdp, dcdp, jacmult, 1, grampc->param->Np);
+						dhdp_vec(dhdpvec, t[i], x_, u_, p_, c, grampc->userparam);
+						MatAdd(dcdp, dcdp, dhdpvec, 1, grampc->param->Np);
 					}
 				}
 			}
@@ -391,104 +407,112 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 	}
 
 	/* Terminal Constraints */
-	i = grampc->opt->Nhor - 1;
-	mult = grampc->rws->mult + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
-	pen = grampc->rws->pen + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
-	cfct = grampc->rws->cfct + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
-	cfctprev = grampc->rws->cfctprev + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
-	/* dcdx for Terminal constraint must be different from dcdx for integral constraints */
-	dcdx = grampc->rws->dcdx + grampc->opt->Nhor * grampc->param->Nx;
-	/* dcdp for Terminal constraint must be different from dcdp for integral constraints */
-	dcdp = grampc->rws->dcdp + grampc->opt->Nhor * grampc->param->Np;
-	/* dcdt for Terminal constraint must be different from dcdt for integral constraints */
-	*dcdt = 0;
-	thresholds = grampc->rws->cfctAbsTol + grampc->param->Ng + grampc->param->Nh;
-	cScale = grampc->opt->cScale + grampc->param->Ng + grampc->param->Nh;
+	if ((grampc->param->NgT + grampc->param->NhT > 0) && ((grampc->opt->TerminalEqualityConstraints == INT_ON) || (grampc->opt->TerminalInequalityConstraints == INT_ON)) ){
 
-	/* Unscaling */
-	if (grampc->opt->ScaleProblem == INT_ON) {
-		ASSIGN_X(x_, grampc->rws->x + i * grampc->param->Nx, grampc);
-	}
-	else {
-		x_ = grampc->rws->x + i * grampc->param->Nx;
-	}
+		i = grampc->opt->Nhor - 1;
+		mult = grampc->rws->mult + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
+		pen = grampc->rws->pen + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
+		cfct = grampc->rws->cfct + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
+		cfctprev = grampc->rws->cfctprev + i * grampc->param->Nc + grampc->param->Ng + grampc->param->Nh;
+		/* dcdx for Terminal constraint must be different from dcdx for integral constraints */
+		dcdx = grampc->rws->dcdx + grampc->opt->Nhor * grampc->param->Nx;
+		/* dcdp for Terminal constraint must be different from dcdp for integral constraints */
+		dcdp = grampc->rws->dcdp + grampc->opt->Nhor * grampc->param->Np;
+		/* dcdt for Terminal constraint must be different from dcdt for integral constraints */
+		*dcdt = 0;
+		thresholds = grampc->rws->cfctAbsTol + grampc->param->Ng + grampc->param->Nh;
+		cScale = grampc->opt->cScale + grampc->param->Ng + grampc->param->Nh;
 
-	/* TERMINAL EQUALITY CONSTRAINTS *******************************************/
-	if (grampc->param->NgT > 0 && grampc->opt->TerminalEqualityConstraints == INT_ON) {
+		/* Init constraint jacobians */;
+		MatSetScalar(dgdxvec, 0, 1, 2 * (grampc->param->Nx + grampc->param->Np));
+		dgTdT = 0;
+		dhTdT = 0;
 
-		/* Evaluate constraints */
-		gTfct(cfct, t[i], x_, p_, grampc->userparam);
+		/* Unscaling */
 		if (grampc->opt->ScaleProblem == INT_ON) {
-			scale_constraints(cfct, cScale, grampc->param->NgT);
+			ASSIGN_X(x_, grampc->rws->x + i * grampc->param->Nx, grampc);
+		}
+		else {
+			x_ = grampc->rws->x + i * grampc->param->Nx;
 		}
 
-		/* Update multipliers */
-		if (updatemultiplier) {
-			update_multiplier_eqc(mult, pen, cfct, cfctprev, thresholds, grampc->param->NgT, converged_grad, grampc);
-		}
+		/* TERMINAL EQUALITY CONSTRAINTS *******************************************/
+		if (grampc->param->NgT > 0 && grampc->opt->TerminalEqualityConstraints == INT_ON) {
 
-		/* Evaluate jacobians */
-		if (evaljac) {
-			compute_jacobian_multiplier(c, mult, pen, cfct, grampc->param->NgT);
+			/* Evaluate constraints */
+			gTfct(cfct, t[i], x_, p_, grampc->userparam);
 			if (grampc->opt->ScaleProblem == INT_ON) {
-				scale_constraints(c, cScale, grampc->param->NgT);
+				scale_constraints(cfct, cScale, grampc->param->NgT);
 			}
 
-			dgTdx_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-			MatAdd(dcdx, dcdx, jacmult, 1, grampc->param->Nx);
-
-			if (grampc->opt->OptimParam == INT_ON) {
-				dgTdp_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-				MatAdd(dcdp, dcdp, jacmult, 1, grampc->param->Np);
+			/* Update multipliers */
+			if (updatemultiplier) {
+				update_multiplier_eqc(mult, pen, cfct, cfctprev, thresholds, grampc->param->NgT, converged_grad, grampc);
 			}
 
-			if (grampc->opt->OptimTime == INT_ON) {
-				dgTdT_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-				MatAdd(dcdt, dcdt, jacmult, 1, 1);
+			/* Evaluate jacobians */
+			if (evaljac) {
+				compute_jacobian_multiplier(c, mult, pen, cfct, grampc->param->NgT);
+				if (grampc->opt->ScaleProblem == INT_ON) {
+					scale_constraints(c, cScale, grampc->param->NgT);
+				}
+
+				dgTdx_vec(dgdxvec, t[i], x_, p_, c, grampc->userparam);
+				MatAdd(dcdx, dcdx, dgdxvec, 1, grampc->param->Nx);
+
+				if (grampc->opt->OptimParam == INT_ON) {
+					dgTdp_vec(dgdpvec, t[i], x_, p_, c, grampc->userparam);
+					MatAdd(dcdp, dcdp, dgdpvec, 1, grampc->param->Np);
+				}
+
+				if (grampc->opt->OptimTime == INT_ON) {
+					dgTdT_vec(&dgTdT, t[i], x_, p_, c, grampc->userparam);
+					*dcdt = *dcdt + dgTdT;
+				}
 			}
 		}
-	}
 
-	mult = mult + grampc->param->NgT;
-	pen = pen + grampc->param->NgT;
-	cfct = cfct + grampc->param->NgT;
-	cfctprev = cfctprev + grampc->param->NgT;
-	thresholds = thresholds + grampc->param->NgT;
-	cScale = cScale + grampc->param->NgT;
+		mult = mult + grampc->param->NgT;
+		pen = pen + grampc->param->NgT;
+		cfct = cfct + grampc->param->NgT;
+		cfctprev = cfctprev + grampc->param->NgT;
+		thresholds = thresholds + grampc->param->NgT;
+		cScale = cScale + grampc->param->NgT;
 
-	/* TERMINAL INEQUALITY CONSTRAINTS *****************************************/
-	if (grampc->param->NhT > 0 && grampc->opt->TerminalInequalityConstraints == INT_ON) {
+		/* TERMINAL INEQUALITY CONSTRAINTS *****************************************/
+		if (grampc->param->NhT > 0 && grampc->opt->TerminalInequalityConstraints == INT_ON) {
 
-		/* Evaluate constraints */
-		hTfct(cfct, t[i], x_, p_, grampc->userparam);
-		if (grampc->opt->ScaleProblem == INT_ON) {
-			scale_constraints(cfct, cScale, grampc->param->NhT);
-		}
-		update_cfct_for_ieqc(mult, pen, cfct, grampc->param->NhT);
-
-		/* Update multipliers */
-		if (updatemultiplier) {
-			update_multiplier_ieqc(mult, pen, cfct, cfctprev, thresholds, grampc->param->NhT, converged_grad, grampc);
-		}
-
-		/* Evaluate jacobians */
-		if (evaljac) {
-			compute_jacobian_multiplier(c, mult, pen, cfct, grampc->param->NhT);
+			/* Evaluate constraints */
+			hTfct(cfct, t[i], x_, p_, grampc->userparam);
 			if (grampc->opt->ScaleProblem == INT_ON) {
-				scale_constraints(c, cScale, grampc->param->NhT);
+				scale_constraints(cfct, cScale, grampc->param->NhT);
+			}
+			update_cfct_for_ieqc(mult, pen, cfct, grampc->param->NhT);
+
+			/* Update multipliers */
+			if (updatemultiplier) {
+				update_multiplier_ieqc(mult, pen, cfct, cfctprev, thresholds, grampc->param->NhT, converged_grad, grampc);
 			}
 
-			dhTdx_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-			MatAdd(dcdx, dcdx, jacmult, 1, grampc->param->Nx);
+			/* Evaluate jacobians */
+			if (evaljac) {
+				compute_jacobian_multiplier(c, mult, pen, cfct, grampc->param->NhT);
+				if (grampc->opt->ScaleProblem == INT_ON) {
+					scale_constraints(c, cScale, grampc->param->NhT);
+				}
 
-			if (grampc->opt->OptimParam == INT_ON) {
-				dhTdp_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-				MatAdd(dcdp, dcdp, jacmult, 1, grampc->param->Np);
-			}
+				dhTdx_vec(dhdxvec, t[i], x_, p_, c, grampc->userparam);
+				MatAdd(dcdx, dcdx, dhdxvec, 1, grampc->param->Nx);
 
-			if (grampc->opt->OptimTime == INT_ON) {
-				dhTdT_vec(jacmult, t[i], x_, p_, c, grampc->userparam);
-				MatAdd(dcdt, dcdt, jacmult, 1, 1);
+				if (grampc->opt->OptimParam == INT_ON) {
+					dhTdp_vec(dhdpvec, t[i], x_, p_, c, grampc->userparam);
+					MatAdd(dcdp, dcdp, dhdpvec, 1, grampc->param->Np);
+				}
+
+				if (grampc->opt->OptimTime == INT_ON) {
+					dhTdT_vec(&dhTdT, t[i], x_, p_, c, grampc->userparam);
+					*dcdt = *dcdt + dhTdT;
+				}
 			}
 		}
 	}
@@ -1085,24 +1109,26 @@ void linesearch_adaptive(typeRNum *alpha, ctypeInt igrad, const typeGRAMPC *gram
 	typeRNum *lsAdapt = grampc->rws->lsAdapt + grampc->opt->MaxGradIter*NLS_adapt;
 
 	/* Adapt interval */
-	if (lsAdapt[NALS] >= lsAdapt[0] + (1 - grampc->opt->LineSearchIntervalTol)*(lsAdapt[NALS - 1] - lsAdapt[0])) {
-		if (lsAdapt[NALS - 1] <= grampc->opt->LineSearchMax) {
-			for (ils = 0; ils < NALS; ils++) {
-				lsAdapt[ils] = lsAdapt[ils] * grampc->opt->LineSearchAdaptFactor;
+	if (ABS(lsAdapt[NALS + 1] - lsAdapt[NALS + 3]) > grampc->opt->LineSearchAdaptAbsTol) {
+		if (lsAdapt[NALS] >= lsAdapt[0] + (1 - grampc->opt->LineSearchIntervalTol)*(lsAdapt[NALS - 1] - lsAdapt[0])) {
+			if (lsAdapt[NALS - 1] <= grampc->opt->LineSearchMax) {
+				for (ils = 0; ils < NALS; ils++) {
+					lsAdapt[ils] = lsAdapt[ils] * grampc->opt->LineSearchAdaptFactor;
+				}
+			}
+			else {
+				grampc->sol->status |= STATUS_LINESEARCH_MAX;
 			}
 		}
-		else {
-			grampc->sol->status |= STATUS_LINESEARCH_MAX;
-		}
-	}
-	else if (lsAdapt[NALS] <= lsAdapt[0] + grampc->opt->LineSearchIntervalTol*(lsAdapt[NALS - 1] - lsAdapt[0])) {
-		if (lsAdapt[0] >= grampc->opt->LineSearchMin) {
-			for (ils = 0; ils < NALS; ils++) {
-				lsAdapt[ils] = lsAdapt[ils] / grampc->opt->LineSearchAdaptFactor;
+		else if (lsAdapt[NALS] <= lsAdapt[0] + grampc->opt->LineSearchIntervalTol*(lsAdapt[NALS - 1] - lsAdapt[0])) {
+			if (lsAdapt[0] >= grampc->opt->LineSearchMin) {
+				for (ils = 0; ils < NALS; ils++) {
+					lsAdapt[ils] = lsAdapt[ils] / grampc->opt->LineSearchAdaptFactor;
+				}
 			}
-		}
-		else {
-			grampc->sol->status |= STATUS_LINESEARCH_MIN;
+			else {
+				grampc->sol->status |= STATUS_LINESEARCH_MIN;
+			}
 		}
 	}
 
@@ -1145,12 +1171,14 @@ void linesearch_adaptive(typeRNum *alpha, ctypeInt igrad, const typeGRAMPC *gram
 	}
 
 	/* Determine optimal step size by curve fitting */
-	lsearch_fit2(lsAdapt + NALS, lsAdapt + 2 * NALS + 1, lsAdapt, lsAdapt + NALS + 1);
+	lsearch_fit(lsAdapt + NALS, lsAdapt + 2 * NALS + 1, lsAdapt, lsAdapt + NALS + 1);
 	*alpha = lsAdapt[NALS];
 
+	/* Save history */
 	for (ils = 0; ils < 2 * (NALS + 1); ils++) {
 		grampc->rws->lsAdapt[ils + igrad * NLS_adapt] = lsAdapt[ils];
 	}
+
 }
 
 void linesearch_explicit(typeRNum *alpha, const typeGRAMPC *grampc)

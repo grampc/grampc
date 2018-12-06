@@ -110,7 +110,6 @@
 
 /* Parameter for adaptive line search fitting */
 #define aEPS  1e-5
-#define JEPS  1e-6
 
 /* Definition of new datatypes */
 typedef struct
@@ -169,9 +168,11 @@ typedef struct
 	typeRNum LineSearchMax;
 	typeRNum LineSearchMin;
 	typeRNum LineSearchInit;
-	typeRNum LineSearchIntervalFactor;
+	typeRNum LineSearchAdaptAbsTol;
 	typeRNum LineSearchAdaptFactor;
 	typeRNum LineSearchIntervalTol;
+	typeRNum LineSearchIntervalFactor;
+	
 
 	typeInt  OptimControl;
 	typeInt  OptimParam;
@@ -313,7 +314,7 @@ typedef void(*typeInVfctPtr)(typeRNum *s, ctypeRNum *t, ctypeRNum *x, ctypeRNum 
 #define Lgradu (2*grampc->param->Nu)
 #define Lgradp (3*grampc->param->Np)
 #define LgradT (grampc->param->Nx)
-#define LevaluateConstraints (grampc->param->Nc+MAX(grampc->param->Nu,grampc->param->Nx))
+#define LevaluateConstraints (grampc->param->Nc+2*(grampc->param->Nx+grampc->param->Np+grampc->param->Nu))
 
 /* Definition of functions */
 void init_rws_time(const typeGRAMPC *grampc);

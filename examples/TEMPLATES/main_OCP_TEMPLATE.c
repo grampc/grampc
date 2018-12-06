@@ -118,9 +118,9 @@ int main()
 	ctypeRNum IntegratorAbsTol = (typeRNum)1e-8;
 	ctypeRNum IntegratorMinStepSize = EPS;
 	ctypeInt  IntegratorMaxSteps = (typeInt)1e8;
-	ctypeRNum FlagsRodas[8] = { 0, 0, 0, NX, NX, 0, NX, NX };
+	ctypeInt FlagsRodas[8] = { 0, 0, 0, NX, NX, 0, NX, NX };
 
-	/* Linesearch */
+	/* Line search */
 	const char* LineSearchType = "explicit2";
 	const char* LineSearchExpAutoFallback = "on";
 	ctypeRNum LineSearchMax = (typeRNum)0.75;
@@ -215,7 +215,7 @@ int main()
 	grampc_setopt_real(grampc, "IntegratorAbsTol", IntegratorAbsTol);
 	grampc_setopt_real(grampc, "IntegratorMinStepSize", IntegratorMinStepSize);
 	grampc_setopt_int(grampc, "IntegratorMaxSteps", IntegratorMaxSteps);
-	grampc_setopt_real_vector(grampc, "FlagsRodas", FlagsRodas);
+	grampc_setopt_int_vector(grampc, "FlagsRodas", FlagsRodas);
 
 	grampc_setopt_string(grampc, "LineSearchType", LineSearchType);
 	grampc_setopt_string(grampc, "LineSearchExpAutoFallback", LineSearchExpAutoFallback);

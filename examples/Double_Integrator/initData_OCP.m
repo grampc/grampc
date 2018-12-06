@@ -66,6 +66,7 @@ user.opt.LineSearchMax = 1e2;
 
 % Input and or parameter optimization 
 user.opt.OptimTime = 'on';
+user.opt.OptimTimeLineSearchFactor = 1.75;
 
 % Penalties
 user.opt.PenaltyMin = 1e1;

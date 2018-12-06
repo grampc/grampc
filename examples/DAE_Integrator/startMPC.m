@@ -1,5 +1,5 @@
 function [vec,grampc,figNr] = startMPC(figNr,compile,varargin)
-% This function runs the nonlinear chain example. It compiles the c-Code,
+% This function runs the TEMPLATE problem. It compiles the c-Code,
 % initializes the grampc struct, runs the simulation and plots the results.
 %
 % Input arguments are:
@@ -50,9 +50,7 @@ end
 grampc_root_path = '../../';
 addpath([grampc_root_path 'matlab/mfiles']);
 % name of problem function
-% ATTENTION: you need to compile again after changing the chain dimension.
-N = 8; % Number of chain elements
-probfct = ['probfct_NLCHAIN_' num2str(N,'%d') '.c'];
+probfct = 'probfct_DAE_Integrator.c';
 
 % plot predicted trajectories
 PLOT_PRED = 1;
@@ -61,17 +59,13 @@ PLOT_TRAJ = 1;
 % plot optimization statistics
 PLOT_STAT = 1;
 % update plots after N steps
-PLOT_STEPS = 100;
+PLOT_STEPS = 5;
 % pause after each plot
 PLOT_PAUSE = 0;
 
-% plot motion of nonlinear chain
-PLOT_MOVE = 0;
-PLOT_MOVE_STEPS = 12;
-
 % Options for the reference simulation
-odeopt =  [];%odeset('RelTol',1e-6,'AbsTol',1e-8);
-
+M = [1,0,0;0,1,0;0,0,0];
+odeopt = odeset('Mass',M);
 
 %% Compilation
 % compile toolbox
@@ -85,8 +79,8 @@ end
 
 
 %% Initialization
-% init GRAMPC and print options and parameters
-[grampc,Tsim] = initData(N);
+% init GRAMPC, estimate option PenaltyMin and print options and parameters
+[grampc,Tsim] = initData;
 CmexFiles.grampc_printopt_Cmex(grampc);
 CmexFiles.grampc_printparam_Cmex(grampc);
 
@@ -111,8 +105,14 @@ end
 %% MPC loop
 i = 1;
 while 1
-    % set current time and current state
-    grampc = CmexFiles.grampc_setparam_Cmex(grampc,'t0',vec.t(i));
+    
+    if (1.0 == vec.t(i))
+        grampc = CmexFiles.grampc_setparam_Cmex(grampc,'xdes',[0.5, 0.5, 1.0]);
+    elseif (2.0 == vec.t(i))
+        grampc = CmexFiles.grampc_setparam_Cmex(grampc,'xdes',[1.0, 0.0, 1.0]);
+    end
+    
+    % set current current state
     grampc = CmexFiles.grampc_setparam_Cmex(grampc,'x0',vec.x(:,i));
     
     % run MPC and save results
@@ -126,13 +126,17 @@ while 1
     end
     
     % check for end of simulation
-    if i+1 > length(vec.t)
+    if i+1 > length(vec.t) || vec.t(i+1) >Tsim
         break;
     end
     
     % simulate system
-    [~,xtemp] = ode45(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 double(grampc.param.dt)],vec.x(:,i),odeopt,vec.u(:,i),vec.p(:,i),grampc.userparam);
+    [~,xtemp] = ode23t(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 double(grampc.param.dt)],vec.x(:,i),odeopt,vec.u(:,i),vec.p(:,i),grampc.userparam);
     vec.x(:,i+1) = xtemp(end,:);
+        
+    % evaluate time-dependent constraints 
+    % to obtain h(x,u,p) instead of max(0,h(x,u,p))
+    vec.constr(:,i) = CmexFiles.grampc_ghfct_Cmex(vec.t(i), vec.x(:,i), vec.u(:,i), vec.p(:,i), grampc.userparam);
     
     % update iteration counter
     i = i + 1;
@@ -153,62 +157,4 @@ while 1
             pause;
         end
     end
-end
-
-
-%% Additional code
-if PLOT_MOVE == 1
-    figure(figNr)
-    figNr = figNr+1;
-    subplot(5,1,4)
-    plot(vec.t, vec.u(1,:));
-    hold on;
-    plot(vec.t, vec.u(2,:));
-    plot(vec.t, vec.u(3,:));
-    title('controls');
-    subplot(5,1,5)
-    temp_vNorm = zeros(1,length(vec.t));
-    for ii = 1:length(vec.t)
-        temp_vNorm(ii) = norm(vec.x(N*3+1:end,ii));
-    end
-    plot(vec.t, temp_vNorm);
-    for ii = 1:PLOT_MOVE_STEPS:length(vec.t) - 1
-        x1 = [0; vec.x(1:3:(N*3-2),ii)];
-        x2 = [0; vec.x(1:3:(N*3-2),ii+1)];
-        y1 = [0; vec.x(2:3:(N*3-1),ii)];
-        y2 = [0; vec.x(2:3:(N*3-1),ii+1)];
-        z1 = [0; vec.x(3:3:(N*3),ii)];
-        z2 = [0; vec.x(3:3:(N*3),ii+1)];
-        
-        
-        for jj = 0:2:9
-            
-            dx = x1 + jj * 0.1 * (x2 - x1);
-            dy = y1 + jj * 0.1 * (y2 - y1);
-            dz = z1 + jj * 0.1 * (z2 - z1);
-            dux = vec.u(1,ii+1); % vec.u(1,ii) + jj * 0.1 * (vec.u(1,ii+1) - vec.u(1,ii));
-            duy = vec.u(2,ii+1); % vec.u(2,ii) + jj * 0.1 * (vec.u(2,ii+1) - vec.u(2,ii));
-            duz = vec.u(3,ii+1); % vec.u(3,ii) + jj * 0.1 * (vec.u(3,ii+1) - vec.u(3,ii));
-            subplot(5,1,[1,2,3])
-            hold off
-            plot3(dx, dy, dz)
-            grid on
-            hold on
-            plot3(dx, dy, dz, 'x', 'LineWidth',10)
-            plot3([dx(end), dx(end) + 1.0 * dux],...
-                [dy(end), dy(end) + 1.0 * duy],...
-                [dz(end), dz(end) + 1.0 * duz], 'LineWidth', 3);
-            plot3([dx(end), dx(end) + 1.0 * dux],...
-                [dy(end), dy(end) + 1.0 * duy],...
-                [dz(end), dz(end) + 1.0 * duz], 'o', 'LineWidth', 6);
-            xlim([-20, 20])
-            ylim([-20, 20])
-            zlim([-30, 3])
-            
-            title(['time = ', num2str(vec.t(ii)), ', cur. ||v|| = ', num2str(norm(vec.x(N*3+1:end,ii)))]);
-            
-            drawnow
-        end
-    end
-end
 end

@@ -81,9 +81,10 @@ user.opt.LineSearchExpAutoFallback = 'on';
 user.opt.LineSearchMax = 0.75;
 user.opt.LineSearchMin = 1e-10;
 user.opt.LineSearchInit = 1e-4;
-user.opt.LineSearchIntervalFactor = 0.85;
+user.opt.LineSearchAdaptAbsTol = 1e-6;
 user.opt.LineSearchAdaptFactor = 3.0/ 2.0;
 user.opt.LineSearchIntervalTol = 1e-1;
+user.opt.LineSearchIntervalFactor = 0.85;
 
 % Input and or parameter optimization 
 user.opt.OptimControl = 'on';

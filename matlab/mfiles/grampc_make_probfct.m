@@ -127,9 +127,10 @@ end
 try
     disp('Building probfct ...');
     eval(['mex -c ', probfct,' -I',CHEADERPATH,VERBOSE,DEBUG]);
-    if ~strcmp('probfct.c',probfct)
-        movefile([probfct(1:end-1),OBJEXT],[RESPATH '/probfct.',OBJEXT]);
-    end
+    % remove the path at the beginning of the file name, if present
+    probfctfilename = strsplit(probfct,'/');
+    probfctfilename = strsplit(probfctfilename{end},'\');
+    movefile([probfctfilename{end}(1:end-1),OBJEXT],[RESPATH '/probfct.',OBJEXT]);
 catch e
     disp([probfct,': Invalid problem function.']);
     rethrow(e)

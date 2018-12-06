@@ -96,7 +96,7 @@ int main()
 
 	/* Input and or parameter optimization  */
 	const char* OptimTime = "on";
-	ctypeRNum OptimTimeLineSearchFactor = 0.5;
+	ctypeRNum OptimTimeLineSearchFactor = 0.35;
 
 	/* Constraints tolerances */
 	ctypeRNum ConstraintsAbsTol[NC] = { 1e-3, 1e-3 };

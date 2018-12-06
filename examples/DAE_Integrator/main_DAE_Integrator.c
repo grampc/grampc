@@ -27,10 +27,9 @@
 #include "grampc.h"
 #include <time.h>
 
-#define NX	
-#define NU	
-#define NC	
-#define NP	
+#define NX	3
+#define NU	2
+#define NC	1
 
 #define PRINTRES
 
@@ -63,7 +62,7 @@ int main()
 {
 	typeGRAMPC *grampc;
 	typeInt iMPC, MaxSimIter, i;
-	ctypeRNum Tsim = 20.0;
+	ctypeRNum Tsim = 2.9;
 
 #ifdef PRINTRES
 	FILE *file_x, *file_u, *file_p, *file_T, *file_J, *file_Ncfct, *file_Npen, *file_iter, *file_status, *file_t;
@@ -75,108 +74,53 @@ int main()
 
 	/********* Parameter definition *********/
 	/* Initial values and setpoints of the states, inputs, parameters, penalties and Lagrangian mmultipliers, setpoints for the states and inputs */
-	ctypeRNum x0[NX] = {	};
-	ctypeRNum xdes[NX] = { };
+  ctypeRNum x0[NX]   = { 1.0, 0.0, 1.0 };
+  ctypeRNum xdes[NX] = { 0.0, 1.0, 1.0 };
+	ctypeRNum xdes2[NX] = { 0.5, 0.5, 1.0 };
 
 	/* Initial values, setpoints and limits of the inputs */
-	ctypeRNum u0[NU] = { };
-	ctypeRNum udes[NU] = {	};
-	ctypeRNum umax[NU] = {	};
-	ctypeRNum umin[NU] = {	};
-
-	/* Initial values and limits of the parameters */
-	ctypeRNum p0[NP] = {	};
-	ctypeRNum pmax[NP] = {	};
-	ctypeRNum pmin[NP] = {	};
+  ctypeRNum u0[NU]   = { -2.0, 2.0 };
+  ctypeRNum udes[NU] = { 0.0, 0.0 };
+  ctypeRNum umax[NU] = { 2.0, 2.0 };
+  ctypeRNum umin[NU] = { -2.0, -2.0 };
 
 	/* Time variables */
-	ctypeRNum Thor = -10;	/* Prediction horizon */
-	ctypeRNum Tmax = (typeRNum)1e8;
-	ctypeRNum Tmin = (typeRNum)1e-8;
+	ctypeRNum Thor = 0.4;	/* Prediction horizon */
 
-	ctypeRNum dt = (typeRNum)-1;  /* Sampling time */
+	ctypeRNum dt = (typeRNum)0.01;  /* Sampling time */
 	typeRNum t = (typeRNum)0.0;   /* time at the current sampling step */
 
 	/********* Option definition *********/
 	/* Basic algorithmic options */
 	ctypeInt Nhor = (typeInt)30;        /* Number of steps for the system integration */
-	ctypeInt MaxGradIter = (typeInt)2;  /* Maximum number of gradient iterations */
-	ctypeInt MaxMultIter = (typeInt)1;  /* Maximum number of augmented Lagrangian iterations */
-	const char* ShiftControl = "on";
+	ctypeInt MaxGradIter = (typeInt)10;  /* Maximum number of gradient iterations */
+	ctypeInt MaxMultIter = (typeInt)3;  /* Maximum number of augmented Lagrangian iterations */
 
 	/* Cost integration */
 	const char* IntegralCost = "on";
-	const char* TerminalCost = "on";
-	const char* IntegratorCost = "trapezodial";
+	const char* TerminalCost = "off";
 
 	/* System integration */
-	const char* Integrator = "heun";
-	ctypeRNum IntegratorRelTol = (typeRNum)1e-6;
-	ctypeRNum IntegratorAbsTol = (typeRNum)1e-8;
-	ctypeRNum IntegratorMinStepSize = EPS;
-	ctypeInt  IntegratorMaxSteps = (typeInt)1e8;
-	ctypeInt FlagsRodas[8] = { 0, 0, 0, NX, NX, 0, NX, NX };
+	const char* Integrator = "rodas";
+	ctypeRNum IntegratorRelTol = (typeRNum)1e-4;
+	ctypeRNum IntegratorAbsTol = (typeRNum)1e-5;
+	ctypeInt FlagsRodas[8] = { 0, 0, 0, 1, NX, NX, 0, 0 };
 
 	/* Line search */
-	const char* LineSearchType = "explicit2";
-	const char* LineSearchExpAutoFallback = "on";
-	ctypeRNum LineSearchMax = (typeRNum)0.75;
-	ctypeRNum LineSearchMin = (typeRNum)1e-10;
-	ctypeRNum LineSearchInit = (typeRNum)1e-4;
-	ctypeRNum LineSearchAdaptAbsTol = (typeRNum)1e-6;
-	ctypeRNum LineSearchAdaptFactor = (typeRNum)3.0 / 2.0;
-	ctypeRNum LineSearchIntervalTol = (typeRNum)1e-1;
-	ctypeRNum LineSearchIntervalFactor = (typeRNum)0.85;
-
-	/* Input and or parameter optimization	*/
-	const char* OptimControl = "on";
-	const char* OptimParam = "off";
-	ctypeRNum OptimParamLineSearchFactor = (typeRNum)1.0;
-	const char* OptimTime = "on";
-	ctypeRNum OptimTimeLineSearchFactor = (typeRNum)1.0;
-
-	/* Scaling Values for the states, inputs and parameters */
-	const char* ScaleProblem = "off";
-	ctypeRNum xScale[NX] = { 1 };
-	ctypeRNum xOffset[NX] = { 0 };
-	ctypeRNum uScale[NU] = { 1 };
-	ctypeRNum uOffset[NU] = { 0 };
-	ctypeRNum pScale[NP] = { 1 };
-	ctypeRNum pOffset[NP] = { 0 };
-	ctypeRNum TScale = (typeRNum)1.0;
-	ctypeRNum TOffset = (typeRNum)0.0;
-	ctypeRNum JScale = (typeRNum)1.0;
-	ctypeRNum cScale[NC] = { 1 };
+	ctypeRNum LineSearchMax = (typeRNum)1e-1;
 
 	/* Tye of constraints' consideration */
-	const char* EqualityConstraints = "on";
-	const char* InequalityConstraints = "on";
-	const char* TerminalEqualityConstraints = "on";
-	const char* TerminalInequalityConstraints = "on";
-	const char* ConstraintsHandling = "auglag";
 	ctypeRNum ConstraintsAbsTol[NC] = { 1e-4 };
 
 	/* Multipliers & penalties */
-	ctypeRNum MultiplierMax = (typeRNum) 1e6;
-	ctypeRNum MultiplierDampingFactor = 0;
-	ctypeRNum PenaltyMax = (typeRNum)1e6;
-	ctypeRNum PenaltyMin = (typeRNum)1e0;
-	ctypeRNum PenaltyIncreaseFactor = (typeRNum)1.05;
-	ctypeRNum PenaltyDecreaseFactor = (typeRNum)0.95;
-	ctypeRNum PenaltyIncreaseThreshold = (typeRNum)1.0;
-	ctypeRNum AugLagUpdateGradientRelTol = (typeRNum)1e-2;
-
-	/* Convergences tests */
-	const char* ConvergenceCheck = "off";
-	ctypeRNum ConvergenceGradientRelTol = (typeRNum)1e-6;
+	ctypeRNum PenaltyIncreaseFactor = (typeRNum)1.1;
 
 	/********* userparam *********/
-	typeRNum pCost[4] = { 0, 0, 0, 0 };
+	typeRNum pCost[3] = { 500, 0, 1 };
 	typeUSERPARAM *userparam = pCost;
 
 	/********* grampc init *********/
 	grampc_init(&grampc, userparam);
-
 
 	/********* set parameters *********/
 	grampc_setparam_real_vector(grampc, "x0", x0);
@@ -187,14 +131,7 @@ int main()
 	grampc_setparam_real_vector(grampc, "umax", umax);
 	grampc_setparam_real_vector(grampc, "umin", umin);
 
-	grampc_setparam_real_vector(grampc, "p0", p0);
-	grampc_setparam_real_vector(grampc, "pmax", pmax);
-	grampc_setparam_real_vector(grampc, "pmin", pmin);
-
 	grampc_setparam_real(grampc, "Thor", Thor);
-	grampc_setparam_real(grampc, "Tmax", Tmax);
-	grampc_setparam_real(grampc, "Tmin", Tmin);
-
 	grampc_setparam_real(grampc, "dt", dt);
 	grampc_setparam_real(grampc, "t0", t);
 
@@ -202,64 +139,22 @@ int main()
 	grampc_setopt_int(grampc, "Nhor", Nhor);
 	grampc_setopt_int(grampc, "MaxGradIter", MaxGradIter);
 	grampc_setopt_int(grampc, "MaxMultIter", MaxMultIter);
-	grampc_setopt_string(grampc, "ShiftControl", ShiftControl);
 
 	grampc_setopt_string(grampc, "IntegralCost", IntegralCost);
 	grampc_setopt_string(grampc, "TerminalCost", TerminalCost);
-	grampc_setopt_string(grampc, "IntegratorCost", IntegratorCost);
 
 	grampc_setopt_string(grampc, "Integrator", Integrator);
 	grampc_setopt_real(grampc, "IntegratorRelTol", IntegratorRelTol);
 	grampc_setopt_real(grampc, "IntegratorAbsTol", IntegratorAbsTol);
-	grampc_setopt_real(grampc, "IntegratorMinStepSize", IntegratorMinStepSize);
-	grampc_setopt_int(grampc, "IntegratorMaxSteps", IntegratorMaxSteps);
 	grampc_setopt_int_vector(grampc, "FlagsRodas", FlagsRodas);
 
-	grampc_setopt_string(grampc, "LineSearchType", LineSearchType);
-	grampc_setopt_string(grampc, "LineSearchExpAutoFallback", LineSearchExpAutoFallback);
 	grampc_setopt_real(grampc, "LineSearchMax", LineSearchMax);
-	grampc_setopt_real(grampc, "LineSearchMin", LineSearchMin);
-	grampc_setopt_real(grampc, "LineSearchInit", LineSearchInit);
-	grampc_setopt_real(grampc, "LineSearchIntervalFactor", LineSearchIntervalFactor);
-	grampc_setopt_real(grampc, "LineSearchAdaptFactor", LineSearchAdaptFactor);
-	grampc_setopt_real(grampc, "LineSearchIntervalTol", LineSearchIntervalTol);
 
-	grampc_setopt_string(grampc, "OptimControl", OptimControl);
-	grampc_setopt_string(grampc, "OptimParam", OptimParam);
-	grampc_setopt_real(grampc, "OptimParamLineSearchFactor", OptimParamLineSearchFactor);
-	grampc_setopt_string(grampc, "OptimTime", OptimTime);
-	grampc_setopt_real(grampc, "OptimTimeLineSearchFactor", OptimTimeLineSearchFactor);
-
-	grampc_setopt_string(grampc, "ScaleProblem", ScaleProblem);
-	grampc_setopt_real_vector(grampc, "xScale", xScale);
-	grampc_setopt_real_vector(grampc, "xOffset", xOffset);
-	grampc_setopt_real_vector(grampc, "uScale", uScale);
-	grampc_setopt_real_vector(grampc, "uOffset", uOffset);
-	grampc_setopt_real_vector(grampc, "pScale", pScale);
-	grampc_setopt_real_vector(grampc, "pOffset", pOffset);
-	grampc_setopt_real(grampc, "TScale", TScale);
-	grampc_setopt_real(grampc, "TOffset", TOffset);
-	grampc_setopt_real(grampc, "JScale", JScale);
-	grampc_setopt_real_vector(grampc, "cScale", cScale);
-
-	grampc_setopt_string(grampc, "EqualityConstraints", EqualityConstraints);
-	grampc_setopt_string(grampc, "InequalityConstraints", InequalityConstraints);
-	grampc_setopt_string(grampc, "TerminalEqualityConstraints", TerminalEqualityConstraints);
-	grampc_setopt_string(grampc, "TerminalInequalityConstraints", TerminalInequalityConstraints);
-	grampc_setopt_string(grampc, "ConstraintsHandling", ConstraintsHandling);
 	grampc_setopt_real_vector(grampc, "ConstraintsAbsTol", ConstraintsAbsTol);
-
-	grampc_setopt_real(grampc, "MultiplierMax", MultiplierMax);
-	grampc_setopt_real(grampc, "MultiplierDampingFactor", MultiplierDampingFactor);
-	grampc_setopt_real(grampc, "PenaltyMax", PenaltyMax);
-	grampc_setopt_real(grampc, "PenaltyMin", PenaltyMin);
 	grampc_setopt_real(grampc, "PenaltyIncreaseFactor", PenaltyIncreaseFactor);
-	grampc_setopt_real(grampc, "PenaltyDecreaseFactor", PenaltyDecreaseFactor);
-	grampc_setopt_real(grampc, "PenaltyIncreaseThreshold", PenaltyIncreaseThreshold);
-	grampc_setopt_real(grampc, "AugLagUpdateGradientRelTol", AugLagUpdateGradientRelTol);
 
-	grampc_setopt_string(grampc, "ConvergenceCheck", ConvergenceCheck);
-	grampc_setopt_real(grampc, "ConvergenceGradientRelTol", ConvergenceGradientRelTol);
+	/********* estimate and set PenaltyMin *********/
+	grampc_estim_penmin(grampc, 1);
 
 #ifdef PRINTRES
 	openFile(&file_x, "res/xvec.txt");
@@ -285,6 +180,14 @@ int main()
 
 	printf("MPC running ...\n");
 	for (iMPC = 0; iMPC <= MaxSimIter; iMPC++) {
+
+		if (2.0 <= t) {
+			grampc_setparam_real_vector(grampc, "xdes", x0);
+		}
+		else if (1.0 <= t) {
+			grampc_setparam_real_vector(grampc, "xdes", xdes2);
+		}
+		
 		tic = clock();
 		grampc_run(grampc);
 		grampc_setparam_real_vector(grampc, "x0", grampc->sol->xnext);

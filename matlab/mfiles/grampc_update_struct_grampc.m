@@ -47,11 +47,7 @@ end
 for i = 1:length(param_fields)
     if ~isempty(user.param.(param_fields{i}))
         user.param.(param_fields{i}) = double(user.param.(param_fields{i}));
-        try
         grampc = CmexFiles.grampc_setparam_Cmex(grampc,param_fields{i},user.param.(param_fields{i}));
-        catch
-           i=10; 
-        end
     end
 end
 for i = 1:length(opt_fields)

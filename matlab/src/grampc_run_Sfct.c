@@ -105,9 +105,11 @@ void sdata2typeGRAMPC(const typeGRAMPC *grampc, ctypeInt *intoptidx, ctypeInt *i
 	grampc_setopt_real(grampc, "LineSearchMax", numopt[numoptidx[i]]); i++;
 	grampc_setopt_real(grampc, "LineSearchMin", numopt[numoptidx[i]]); i++;
 	grampc_setopt_real(grampc, "LineSearchInit", numopt[numoptidx[i]]); i++;
-	grampc_setopt_real(grampc, "LineSearchIntervalFactor", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchAdaptAbsTol", numopt[numoptidx[i]]); i++;
 	grampc_setopt_real(grampc, "LineSearchAdaptFactor", numopt[numoptidx[i]]); i++;
 	grampc_setopt_real(grampc, "LineSearchIntervalTol", numopt[numoptidx[i]]); i++;
+	grampc_setopt_real(grampc, "LineSearchIntervalFactor", numopt[numoptidx[i]]); i++;
+
 	grampc_setopt_real(grampc, "OptimParamLineSearchFactor", numopt[numoptidx[i]]); i++;
 	grampc_setopt_real(grampc, "OptimTimeLineSearchFactor", numopt[numoptidx[i]]); i++;
 

@@ -113,9 +113,9 @@ if grampc.opt.LineSearchType == 0
     
     hold(subplot_ls,'on')
     for i = 1:grampc.opt.MaxGradIter
-        ph_out.s4a(i) = plot(1:19,nan*(1:19),'b-','Parent',subplot_ls);
-        ph_out.s4b(i) = plot(1:3,nan*(1:3),'Marker','.','MarkerSize',17,'MarkerEdgeColor','b','LineStyle','none','Parent',subplot_ls);
-        ph_out.s4c(i) = plot(1,nan,'Marker','.','MarkerSize',15,'MarkerEdgeColor','r','Parent',subplot_ls);
+        ph_out.s4a(i) = plot(1:19,nan*(1:19),'Color',[0 0.4470 0.7410],'Parent',subplot_ls);
+        ph_out.s4b(i) = plot(1:3,nan*(1:3),'Marker','.','MarkerSize',17,'MarkerEdgeColor',[0 0.4470 0.7410],'LineStyle','none','Parent',subplot_ls);
+        ph_out.s4c(i) = plot(1,nan,'Marker','.','MarkerSize',15,'MarkerEdgeColor',[0.8500 0.3250 0.0980],'Parent',subplot_ls);
     end
     hold(subplot_ls,'off')
 end
@@ -123,6 +123,7 @@ end
 % Constraints
 if ~isempty(idx.Constraints)
     subplot_cfct = subplot(2,3,4,'Parent',figNr);
+    plot(grampc.rws.t([1 end]),[0 0],'k--','Parent',subplot_cfct), hold on
     if ~isempty(idx.gConstraints)
         ph_out.s5a = plot(grampc.rws.t(1:decimation:end),[grampc.rws.cfct(1:grampc.param.Ng,1:decimation:end);max(grampc.rws.cfct(grampc.param.Ng + (1:grampc.param.Nh),1:decimation:end),0)],'Parent',subplot_cfct);
     end
@@ -131,13 +132,22 @@ if ~isempty(idx.Constraints)
         ph_out.s5b = plot(grampc.rws.t(end),[grampc.rws.cfct(grampc.param.Ng + grampc.param.Nh + (1:grampc.param.NgT),end);max(grampc.rws.cfct(grampc.param.Ng + grampc.param.Nh + grampc.param.NgT + (1:grampc.param.NhT),end),0)],'o','Parent',subplot_cfct);
         hold off,
     end
+    hold off
     title(subplot_cfct,'Predicted constraints');
     xlabel(subplot_cfct,'Time');
-    legendcell = cell(length(idx.Constraints),1);
-    for i = 1:length(idx.Constraints)
-        legendcell{i} = sprintf('c_{%d}',idx.Constraints(i));
-    end
-    legend(legendcell)
+%     legendcell = cell(length(idx.Constraints),1);
+%     for i = 1:length(idx.Constraints)
+%         if idx.Constraints(i) <= grampc.param.Ng
+%             legendcell{i} = sprintf('g_{%d}',idx.Constraints(i));
+%         elseif idx.Constraints(i) <= grampc.param.Ng+grampc.param.Nh
+%             legendcell{i} = sprintf('h_{%d}',idx.Constraints(i)-grampc.param.Ng);
+%         elseif idx.Constraints(i) <= grampc.param.Ng+grampc.param.Nh+grampc.param.NgT
+%             legendcell{i} = sprintf('g_{T_{%d}}',idx.Constraints(i)-grampc.param.Ng-grampc.param.Nh);
+%         else
+%             legendcell{i} = sprintf('h_{T_{%d}}',idx.Constraints(i)-grampc.param.Ng-grampc.param.Nh-grampc.param.NgT);
+%         end
+%     end
+%     legend(legendcell)
     
     % mult
     subplot_mult      = subplot(2,3,5,'Parent',figNr);

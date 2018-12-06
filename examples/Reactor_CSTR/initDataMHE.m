@@ -39,11 +39,6 @@ userMPC.param.udes  = [5.0,-1190.0];
 userMPC.param.umax  = [35.0,0.0];
 userMPC.param.umin  = [3.0,-9000.0];
 
-% Initial values and limits of the parameters
-userMPC.param.p0      = [0,0,0,0];
-userMPC.param.pmax  = [0,0,0,0];
-userMPC.param.pmin  = [0,0,0,0];
-
 % Time variables
 userMPC.param.Thor  = 1200.0/3600;     % Prediction horizon
 
