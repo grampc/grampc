@@ -1,0 +1,15 @@
+Changes in version 2.2 of GRAMPC:
+-------------------------------------------------------------------------------
+
+Major changes:
+- Switch from GNU Lesser General Public License (LGPL) to BSD-3-Clause License, see LICENSE.txt
+- Support for fixed-size arrays instead of dynamic memory allocation, see Section 5.1.5 in documentation
+- Added userparam as additional input to Simulink models
+- Function for estimation of PenaltyMin is exposed in C++ interface
+
+Minor changes:
+- Bugfix: Consider scaling for calculating terminal constraints in grampc_update_plot_pred.m
+- Bugfix: Computation of augmented cost function correctly adds equality constraints
+- Bugfix: Removed wrong flag "-o" from "ar" commands and added "-rcs" flags, which fixes problems on Windows and MacOS
+- Bugfix: Provide two output arguments to calls of grampc_estim_penmin_Cmex as expected by the function
+- Bugfix: OCP solution with startOCP does not abort after one iteration if convergence check is deactivated

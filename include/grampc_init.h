@@ -3,23 +3,11 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
@@ -35,86 +23,14 @@
 #include <math.h>
 #include <string.h>
 
-/* Constants for definitions below */
-#define USE_DOUBLE 0
-#define USE_FLOAT  1
+#include "grampc_macro.h"
+#include "grampc_fixedsize.h"
 
-/* type independent min, max, abs operations */
-#ifndef MAX
-#define	MAX(a,b)  ((a) > (b) ? (a) : (b))
-#endif /* max */
-#ifndef MIN
-#define	MIN(a,b)  ((a) > (b) ? (b) : (a))
-#endif /* min */
-#ifndef ABS
-#define	ABS(a)    ((a) >= 0 ? (a) : -(a))
-#endif /* min */
 
-/* Some definitions */
-#define USE_typeRNum   USE_DOUBLE /* USE_FLOAT */
-#define typeInt        int
-#define typeLInt       int      /* for rodas */
-#define typeLogical    long int /* for rodas */
-#define typeBoolean    int
-#define typeChar       char
-#define typeUSERPARAM  void
-#define INF    (typeRNum)1e20
-#define FWINT  1
-#define BWINT -1
-#define NALS   3
-#define NELS   4
-
-#if USE_typeRNum == USE_FLOAT
-#define mxtypeRNum_CLASS  mxSINGLE_CLASS
-#define typeRNum          float
-#define SS_TYPERNUM       SS_SINGLE
-#define EPS               1.1e-8f
-#define SQRT(x)           sqrtf(x)
-#define POW(x,y)          powf(x,y)
-#else
-#define mxtypeRNum_CLASS  mxDOUBLE_CLASS
-#define typeRNum          double
-#define SS_TYPERNUM       SS_DOUBLE
-#define EPS               2.2e-16
-#define SQRT(x)           sqrt(x)
-#define POW(x,y)          pow(x,y)
-#endif
-
-#define mxtypeInt_CLASS  mxINT32_CLASS
-
-#define ctypeInt   const int
-#define ctypeRNum  const typeRNum
-
-/* encoding of the options */
-#define INT_OFF         0
-#define INT_ON          1
-
-#define INT_UNIFORM     0
-#define INT_NONUNIFORM  1
-
-#define INT_EULER       0
-#define INT_MODEULER    1
-#define INT_HEUN        2
-#define INT_RODAS       3
-#define INT_RUKU45      4
-
-#define INT_TRAPZ       0
-#define INT_SIMPSON     1
-
-#define INT_ADAPTIVELS  0
-#define INT_EXPLS1      1
-#define INT_EXPLS2      2
-
-#define INT_EXTPEN      0
-#define INT_AUGLAG      1
-
-/* Parameter for adaptive line search fitting */
-#define aEPS  1e-5
-
-/* Definition of new datatypes */
+/* Definition of typeGRAMPCparam containing all problem-specific parameters */
 typedef struct
 {
-	typeInt Nx;
+    typeInt Nx;
 	typeInt Nu;
 	typeInt Np;
 	typeInt Ng;
@@ -123,17 +39,35 @@ typedef struct
 	typeInt NhT;
 	typeInt Nc;
 
+#if defined(FIXEDSIZE) && (NX > 0)
+    typeRNum x0[NX];
+    typeRNum xdes[NX];
+#else
 	typeRNum *x0;
 	typeRNum *xdes;
+#endif
 
+#if defined(FIXEDSIZE) && (NU > 0)
+    typeRNum u0[NU];
+    typeRNum udes[NU];
+    typeRNum umax[NU];
+    typeRNum umin[NU];
+#else
 	typeRNum *u0;
 	typeRNum *udes;
 	typeRNum *umax;
 	typeRNum *umin;
+#endif
 
+#if defined(FIXEDSIZE) && (NP > 0)
+    typeRNum p0[NP];
+    typeRNum pmax[NP];
+    typeRNum pmin[NP];
+#else
 	typeRNum *p0;
 	typeRNum *pmax;
 	typeRNum *pmin;
+#endif
 
 	typeRNum Thor;
 	typeRNum Tmax;
@@ -143,6 +77,8 @@ typedef struct
 	typeRNum t0;
 } typeGRAMPCparam;
 
+
+/* Definition of typeGRAMPCopt containing all algorithm-related options */
 typedef struct
 {
 	typeInt Nhor;
@@ -161,7 +97,7 @@ typedef struct
 	typeRNum IntegratorAbsTol;
 	typeRNum IntegratorMinStepSize;
 	typeInt  IntegratorMaxSteps;
-	typeInt  *FlagsRodas;
+    typeInt  FlagsRodas[8];
 
 	typeInt  LineSearchType;
 	typeInt  LineSearchExpAutoFallback;
@@ -173,7 +109,6 @@ typedef struct
 	typeRNum LineSearchIntervalTol;
 	typeRNum LineSearchIntervalFactor;
 	
-
 	typeInt  OptimControl;
 	typeInt  OptimParam;
 	typeRNum OptimParamLineSearchFactor;
@@ -181,23 +116,46 @@ typedef struct
 	typeRNum OptimTimeLineSearchFactor;
 
 	typeInt  ScaleProblem;
+#if defined(FIXEDSIZE) && (NX > 0)
+    typeRNum xScale[NX];
+    typeRNum xOffset[NX];
+#else
 	typeRNum *xScale;
 	typeRNum *xOffset;
+#endif
+#if defined(FIXEDSIZE) && (NU > 0)
+    typeRNum uScale[NU];
+    typeRNum uOffset[NU];
+#else
 	typeRNum *uScale;
 	typeRNum *uOffset;
+#endif
+#if defined(FIXEDSIZE) && (NP > 0)
+    typeRNum pScale[NP];
+    typeRNum pOffset[NP];
+#else
 	typeRNum *pScale;
 	typeRNum *pOffset;
+#endif
 	typeRNum TScale;
 	typeRNum TOffset;
 	typeRNum JScale;
+#if defined(FIXEDSIZE) && (NC > 0)
+    typeRNum cScale[NC];
+#else
 	typeRNum *cScale;
+#endif
 
 	typeInt  EqualityConstraints;
 	typeInt  InequalityConstraints;
 	typeInt  TerminalEqualityConstraints;
 	typeInt  TerminalInequalityConstraints;
 	typeInt  ConstraintsHandling;
+#if defined(FIXEDSIZE) && (NC > 0)
+    typeRNum ConstraintsAbsTol[NC];
+#else
 	typeRNum *ConstraintsAbsTol;
+#endif
 
 	typeRNum MultiplierMax;
 	typeRNum MultiplierDampingFactor;
@@ -210,83 +168,158 @@ typedef struct
 
 	typeInt  ConvergenceCheck;
 	typeRNum ConvergenceGradientRelTol;
-
 } typeGRAMPCopt;
 
+
+/* Definition of typeGRAMPCsol containing the (public) solution data */
 typedef struct
 {
+#if defined(FIXEDSIZE) && (NX > 0)
+    typeRNum xnext[NX];
+#else
 	typeRNum *xnext;
-	typeRNum *unext;
+#endif
+#if defined(FIXEDSIZE) && (NU > 0)
+    typeRNum unext[NU];
+#else
+    typeRNum *unext;
+#endif
+#if defined(FIXEDSIZE) && (NP > 0)
+    typeRNum pnext[NP];
+#else
 	typeRNum *pnext;
+#endif
 	typeRNum Tnext;
-	typeRNum *J;
+    typeRNum J[2];
 	typeRNum cfct;
 	typeRNum pen;
+#if defined(FIXEDSIZE) && (MAXMULTITER > 0)
+    typeInt iter[MAXMULTITER];
+#else
 	typeInt  *iter;
+#endif
 	typeInt  status;
 } typeGRAMPCsol;
 
+
+/* Definition of typeGRAMPCrws containing the (private) workspace data */
 typedef struct
 {
+#if defined(FIXEDSIZE) && (NHOR > 0)
+    typeRNum t[NHOR];
+    typeRNum tls[NHOR];
+#else
 	typeRNum *t;
 	typeRNum *tls;
+#endif
 
-	/* Nx  */
+#if defined(FIXEDSIZE) && (NX > 0)
+    typeRNum x[NX*NHOR];
+    typeRNum adj[NX*NHOR];
+    typeRNum dcdx[NX*(NHOR+1)];
+#else
 	typeRNum *x;
 	typeRNum *adj;
 	typeRNum *dcdx;
+#endif
 
-	/* Nu  */
-	typeRNum *u;
-	typeRNum *uls;
-	typeRNum *uprev;
-	typeRNum *gradu;
-	typeRNum *graduprev;
-	typeRNum *dcdu;
+#if defined(FIXEDSIZE) && (NU > 0)
+    typeRNum u[NU*NHOR];
+    typeRNum uls[NU*NHOR];
+    typeRNum uprev[NU*NHOR];
+    typeRNum gradu[NU*NHOR];
+    typeRNum graduprev[NU*(NHOR)];
+    typeRNum dcdu[NU*(NHOR+1)];
+#else
+    typeRNum *u;
+    typeRNum *uls;
+    typeRNum *uprev;
+    typeRNum *gradu;
+    typeRNum *graduprev;
+    typeRNum *dcdu;
+#endif
 
-	/* Np */
-	typeRNum *p;
-	typeRNum *pls;
-	typeRNum *pprev;
-	typeRNum *gradp;
-	typeRNum *gradpprev;
-	typeRNum *dcdp;
+#if defined(FIXEDSIZE) && (NP > 0)
+    typeRNum p[NP];
+    typeRNum pls[NP];
+    typeRNum pprev[NP];
+    typeRNum gradp[NP];
+    typeRNum gradpprev[NP];
+    typeRNum dcdp[NP*(NHOR+1)];
+#else
+    typeRNum *p;
+    typeRNum *pls;
+    typeRNum *pprev;
+    typeRNum *gradp;
+    typeRNum *gradpprev;
+    typeRNum *dcdp;
+#endif
 
-	/* 1 */
 	typeRNum T;
 	typeRNum Tprev;
 	typeRNum gradT;
 	typeRNum gradTprev;
 	typeRNum dcdt;
 
-	/* Nc  */
-	typeRNum *mult;
-	typeRNum *pen;
-	typeRNum *cfct;
-	typeRNum *cfctprev;
-	typeRNum *cfctAbsTol;
+#if defined(FIXEDSIZE) && (NC > 0)
+    typeRNum mult[NC*NHOR];
+    typeRNum pen[NC*NHOR];
+    typeRNum cfct[NC*NHOR];
+    typeRNum cfctprev[NC*NHOR];
+    typeRNum cfctAbsTol[NC];
+#else
+    typeRNum *mult;
+    typeRNum *pen;
+    typeRNum *cfct;
+    typeRNum *cfctprev;
+    typeRNum *cfctAbsTol;
+#endif
 
+#if defined(FIXEDSIZE) && (SIZE_LSADAPTIVE > 0)
+    typeRNum lsAdapt[SIZE_LSADAPTIVE];
+#else
 	typeRNum *lsAdapt;
+#endif
+#if defined(FIXEDSIZE) && (SIZE_LSEXPLICIT > 0)
+    typeRNum lsExplicit[SIZE_LSEXPLICIT];
+#else
 	typeRNum *lsExplicit;
+#endif
+#if defined(FIXEDSIZE) && (SIZE_RWSSCALE > 0)
+    typeRNum rwsScale[SIZE_RWSSCALE];
+#else
 	typeRNum *rwsScale;
+#endif
 	typeInt  lrwsGeneral;
+#if defined(FIXEDSIZE) && (SIZE_RWSGENERAL > 0)
+    typeRNum rwsGeneral[SIZE_RWSGENERAL];
+#else
 	typeRNum *rwsGeneral;
+#endif
 
-	/* rodas*/
 	typeInt  lworkRodas;
-	typeInt  liworkRodas;
+    typeInt  liworkRodas;
+#if defined(FIXEDSIZE) && (INTEGRATOR == INT_RODAS)
+    typeRNum rparRodas[SIZE_RPARRODAS];
+    typeInt iparRodas[SIZE_IPARRODAS];
+    typeRNum workRodas[SIZE_RWORKRODAS];
+    typeInt iworkRodas[SIZE_IWORKRODAS];
+#else
 	typeRNum *rparRodas;
 	typeInt  *iparRodas;
 	typeRNum *workRodas;
-	typeInt  *iworkRodas;
+    typeInt  *iworkRodas;
+#endif
 } typeGRAMPCrws;
 
+
+/* Defintition of typeGRAMPC containing the structs above and the userparameters */
 typedef struct
 {
 	typeGRAMPCparam *param;
 	typeGRAMPCopt *opt;
 	typeGRAMPCsol *sol;
-	typeGRAMPCrws *rws;
+    typeGRAMPCrws *rws;
 	typeUSERPARAM *userparam;
 } typeGRAMPC;
 
@@ -300,8 +333,7 @@ typedef void(*typeIntffctPtr)(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRN
 typedef void(*typeInVfctPtr)(typeRNum *s, ctypeRNum *t, ctypeRNum *x, ctypeRNum *u,
 	ctypeRNum *p, const typeGRAMPC *grampc);
 
-
-/* lrwsGeneral */
+/* Utility macros for computing size of lrwsGeneral */
 #define LWadjsys (grampc->param->Nx)
 #define Leuler (grampc->param->Nx)
 #define Lmodeuler (5*grampc->param->Nx+grampc->param->Nu+grampc->param->Nc)
@@ -325,5 +357,5 @@ void init_rws_multipliers(const typeGRAMPC *grampc);
 void init_rws_constraints(const typeGRAMPC *grampc);
 
 void grampc_init(typeGRAMPC **grampc, typeUSERPARAM *userparam);
-void grampc_free(typeGRAMPC **grampc);
+
 #endif /* GRAMPC_INIT_H_ */

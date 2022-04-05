@@ -3,23 +3,11 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
@@ -59,7 +47,7 @@ void printIntVector2File(FILE *file, ctypeInt *const val, ctypeInt size) {
 
 int main()
 {
-	typeGRAMPC *grampc;
+    TYPE_GRAMPC_POINTER(grampc)
 	typeInt iMPC, MaxSimIter, i;
 	ctypeRNum Tsim = 0.1;
 
@@ -105,8 +93,8 @@ int main()
 	typeRNum pSys[17] = { 3.5,0.0175,0.0175,0.17,3,9e-4,4e-4,0,560 * 560 / 3,100, 8.0,200.0,0.0,0,0.001,0.001 };
 	typeUSERPARAM *userparam = pSys;
 
-	/********* grampc init *********/
-	grampc_init(&grampc, userparam);
+    /********* grampc init *********/
+    grampc_init(&grampc, userparam);
 
 
 	/********* set parameters *********/
@@ -123,16 +111,15 @@ int main()
 	grampc_setparam_real(grampc, "dt", dt);
 	grampc_setparam_real(grampc, "t0", t);
 
-	/********* Option definition *********/
-	grampc_setopt_int(grampc, "Nhor", Nhor);
-	grampc_setopt_int(grampc, "MaxGradIter", MaxGradIter);
-	grampc_setopt_int(grampc, "MaxMultIter", MaxMultIter);
-
+    /********* Option definition *********/
+    grampc_setopt_int(grampc, "Nhor", Nhor);
+    grampc_setopt_int(grampc, "MaxGradIter", MaxGradIter);
+    grampc_setopt_int(grampc, "MaxMultIter", MaxMultIter);
 	grampc_setopt_string(grampc, "TerminalCost", TerminalCost);
 	grampc_setopt_real_vector(grampc, "ConstraintsAbsTol", ConstraintsAbsTol);
 
 	/********* estimate and set PenaltyMin *********/
-	grampc_estim_penmin(grampc, 1);
+    grampc_estim_penmin(grampc, 1);
 
 #ifdef PRINTRES
 	openFile(&file_x, "res/xvec.txt");

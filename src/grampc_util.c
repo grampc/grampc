@@ -3,186 +3,17 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
 
 #include "grampc_util.h"
-
-void createNumMatrix(typeRNum **cs, const size_t size) {
-	if (size == 0) {
-		*cs = NULL;
-	}
-	else {
-		*cs = (typeRNum *)calloc(size, sizeof(typeRNum));
-		if (*cs == NULL) {
-			grampc_error(PARAM_ALLOC_FAILED);
-		}
-	}
-}
-
-void createIntMatrix(typeInt **cs, const size_t size) {
-	if (size == 0) {
-		*cs = NULL;
-	}
-	else {
-		*cs = (typeInt *)calloc(size, sizeof(typeInt));
-		if (*cs == NULL) {
-			grampc_error(PARAM_ALLOC_FAILED);
-		}
-	}
-}
-
-void resizeNumMatrix(typeRNum **cs, const size_t size) {
-	free(*cs);
-	if (size == 0) {
-		*cs = NULL;
-	}
-	else {
-		*cs = (typeRNum *)calloc(size, sizeof(typeRNum));
-		if (*cs == NULL) {
-			grampc_error(RWS_ELEMENT_ALLOC_FAILED);
-		}
-	}
-}
-
-void resizeIntMatrix(typeInt **cs, const size_t size) {
-	free(*cs);
-	if (size == 0) {
-		*cs = NULL;
-	}
-	else {
-		*cs = (typeInt *)calloc(size, sizeof(typeInt));
-		if (*cs == NULL) {
-			grampc_error(SOL_ALLOC_FAILED);
-		}
-	}
-}
-
-void resize_rwsGeneral(const typeGRAMPC *grampc) {
-	typeInt LInt = LWadjsys;
-	typeInt LIntCost = 0;
-	typeInt LConst = 0;
-
-	switch (grampc->opt->Integrator) {
-	case INT_EULER:    LInt += Leuler; break;
-	case INT_MODEULER: LInt += Lmodeuler; break;
-	case INT_HEUN:     LInt += Lheun; break;
-	case INT_RODAS:		 LInt += Lrodas; break;
-	case INT_RUKU45:   LInt += Lruku45; break;
-	}
-	switch (grampc->opt->IntegratorCost) {
-	case INT_TRAPZ:   LIntCost = LIntCostTrapezoidal; break;
-	case INT_SIMPSON: LIntCost = LIntCostSimpson; break;
-	}
-	if (grampc->param->Nc > 0) {
-		LConst = LevaluateConstraints;
-	}
-
-	grampc->rws->lrwsGeneral = MAX(MAX(MAX(MAX(MAX(Lgradp, Lgradu), LgradT), LIntCost), LInt), LConst);
-	resizeNumMatrix(&grampc->rws->rwsGeneral, grampc->rws->lrwsGeneral);
-}
-
-void resize_rwsRodas(const typeGRAMPC *grampc) {
-	if (grampc->opt->Integrator == INT_RODAS) {
-		resizeNumMatrix(&grampc->rws->rparRodas, grampc->param->Nx*grampc->opt->Nhor);
-		resizeIntMatrix(&grampc->rws->iparRodas, 20);
-		resizeNumMatrix(&grampc->rws->workRodas, grampc->rws->lworkRodas);
-		resizeIntMatrix(&grampc->rws->iworkRodas, grampc->rws->liworkRodas);
-	}
-	else {
-		resizeNumMatrix(&grampc->rws->rparRodas, 0);
-		resizeIntMatrix(&grampc->rws->iparRodas, 0);
-		resizeNumMatrix(&grampc->rws->workRodas, 0);
-		resizeIntMatrix(&grampc->rws->iworkRodas, 0);
-	}
-}
-
-
-void setLWorkRodas(const typeGRAMPC *grampc)
-{
-	typeInt LJAC, LMAS, LE1;												/* length of rodas work space*/
-																									/* ctypeInt IFCN = grampc->opt->FlagsRodas[0];*/			/* 0 --> right hand side independent of time t */
-																									/* ctypeInt IDFX = grampc->opt->FlagsRodas[1];*/			/* 0 --> DF/DX is numerically computed */
-																									/* typeInt IJAC = grampc->opt->FlagsRodas[2];*/			/* 1(0) -> analytical (numerical) jacobian (partial derivatives of right hand side w.r.t. state) */
-	ctypeInt MLJAC = grampc->opt->FlagsRodas[4];		/* no. of lower diagonals of jacobian */
-	ctypeInt MUJAC = grampc->opt->FlagsRodas[5];		/* no. of upper diagonals of jacobian */
-
-	typeInt IMAS = grampc->opt->FlagsRodas[3];			/* 1 --> mass matrix is supplied */
-	ctypeInt MLMAS = grampc->opt->FlagsRodas[6];		/* no. of lower diagonals of mass matrix */
-	ctypeInt MUMAS = grampc->opt->FlagsRodas[7];		/* no. of upper diagonals of mass matrix */
-
-	if (MLJAC < grampc->param->Nx)
-	{
-		LJAC = MLJAC + MUJAC + 1;
-		LE1 = 2 * MLJAC + MUJAC + 1;
-	}
-	else
-	{
-		LJAC = grampc->param->Nx;
-		LE1 = grampc->param->Nx;
-	}
-
-	if (IMAS == 0)
-	{
-		LMAS = 0;
-	}
-	else
-	{
-		if (MLMAS == grampc->param->Nx)
-		{
-			LMAS = grampc->param->Nx;
-		}
-		else
-		{
-			LMAS = MLMAS + MUMAS + 1;
-		}
-	}
-	grampc->rws->lworkRodas = grampc->param->Nx*(LJAC + LMAS + LE1 + 14) + 20;
-	resizeNumMatrix(&grampc->rws->workRodas, grampc->rws->lworkRodas);
-}
-
-
-typeInt CastDvec2Intvec(typeInt** Intvec, const double* Numvec, const size_t size) {
-	unsigned typeInt i;
-	*Intvec = (typeInt*)malloc(size * sizeof(typeInt));
-	if (*Intvec != NULL) {
-		for (i = 0; i < size; i++) {
-			(*Intvec)[i] = (typeInt)Numvec[i];
-		}
-		return 1;
-	}
-	return -1;
-}
-
-typeInt CastDvec2Numvec(typeRNum** Realvec, const double* Numvec, const size_t size) {
-	unsigned typeInt i;
-	*Realvec = (typeRNum*)malloc(size * sizeof(typeRNum));
-	if (*Realvec != NULL) {
-		for (i = 0; i < size; i++) {
-			(*Realvec)[i] = (typeRNum)Numvec[i];
-		}
-		return 1;
-	}
-	return -1;
-}
+#include "grampc_alloc.h"
 
 
 void discretize_time(typeRNum *tvec, typeRNum T, const typeGRAMPC *grampc)
@@ -482,13 +313,19 @@ void MatDiffNorm(typeRNum *norm, ctypeRNum *A, ctypeRNum *B, ctypeInt n1, ctypeI
 }
 
 typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
-	typeRNum *Constraints, *xT_, *x_, *u_, *p_, h;
+    typeRNum *xT_, *x_, *u_, *p_, h;
 	typeRNum PenaltyMin_constr = grampc->opt->PenaltyMin;
 	typeRNum PenaltyMin_tol = grampc->opt->PenaltyMin;
 	typeRNum PenaltyMin = grampc->opt->PenaltyMin;
 	typeRNum NormTol = 0;
 	typeRNum NormConstraints = 0;
 	typeInt i, j, MaxGradIter, MaxMultIter, Status;
+
+#if defined(FIXEDSIZE) && (NC > 0)
+    typeRNum Constraints[NC] = {};
+#else
+    typeRNum *Constraints = NULL;
+#endif
 
 	/* run grampc if flag is set to determine J and the trajectories */
 	if (rungrampc) {
@@ -504,6 +341,11 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 		grampc_run(grampc);
 	}
 
+#ifndef FIXEDSIZE
+    /* allocate memory for constraint evaluation */
+    createNumMatrix(&Constraints, grampc->param->Nc);
+#endif
+
 	/* assign parameters and final states */
 	if (grampc->opt->ScaleProblem == INT_ON) {
 		ASSIGN_P(p_, grampc->rws->p, grampc);
@@ -513,8 +355,6 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 		p_ = grampc->rws->p;
 		xT_ = grampc->rws->x + grampc->param->Nx*(grampc->opt->Nhor - 1);
 	}
-
-	createNumMatrix(&Constraints, grampc->param->Nc);
 
 	/* evaluate and integrate the general constraints */
 	for (i = 0; i < grampc->opt->Nhor; i++) {
@@ -567,7 +407,11 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 	if (NormConstraints > 0) {
 		PenaltyMin_constr = 2 * ABS(grampc->sol->J[0]) / NormConstraints;
 	}
+
+#ifndef FIXEDSIZE
+    /* free memory for constraint evaluation */
 	free(Constraints);
+#endif
 
 	/* set the constraint tolerances in relation to the costs */
 	for (i = 0; i < grampc->param->Nc; i++) {
@@ -610,10 +454,8 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 		grampc->sol->Tnext = 0;
 		MatSetScalar(grampc->sol->J, 0, 2, 1);
 		grampc->sol->cfct = 0;
-		grampc->sol->pen = 0;
-		for (i = 0; i < grampc->opt->MaxMultIter; i++) {
-			grampc->sol->iter[i] = 0;
-		}
+        grampc->sol->pen = 0;
+        memset(grampc->sol->iter, 0, grampc->opt->MaxMultIter);
 		grampc->sol->status = 0;
 
 		/* reset rws structure */
@@ -642,17 +484,14 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 		MatSetScalar(grampc->rws->cfct, 0, grampc->opt->Nhor, grampc->param->Nc);
 		MatSetScalar(grampc->rws->cfctprev, 0, grampc->opt->Nhor, grampc->param->Nc);
 
-		MatSetScalar(grampc->rws->rwsScale, 0, 2 * (grampc->param->Nx + grampc->param->Nu + grampc->param->Np), 1);
+        MatSetScalar(grampc->rws->rwsScale, 0, 2 * (grampc->param->Nx + grampc->param->Nu + grampc->param->Np), 1);
 
 		/* Initialization */
 		init_rws_time(grampc);
 		init_rws_controls(grampc);
 		init_rws_parameters(grampc);
 		init_rws_multipliers(grampc);
-		init_rws_linesearch(grampc);
-
-		resize_rwsRodas(grampc);
-		resize_rwsGeneral(grampc);
+        init_rws_linesearch(grampc);
 	}
 	return Status;
 }

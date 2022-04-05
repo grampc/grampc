@@ -9,23 +9,11 @@ function [grampc,Tsim,grampc_sdata] = initData_OCP()
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0). 
-% Developed at the Institute of Measurement, Control, and Microtechnology,
-% Ulm University. All rights reserved.
+% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
+% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% All rights reserved.
 %
-% GRAMPC is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as 
-% published by the Free Software Foundation, either version 3 of 
-% the License, or (at your option) any later version.
-%
-% GRAMPC is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-% GNU Lesser General Public License for more details.
-%
-% You should have received a copy of the GNU Lesser General Public 
-% License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
+% GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 %
 
 
@@ -61,7 +49,7 @@ user.opt.AugLagUpdateGradientRelTol = 1;
 
 % Convergence test
 user.opt.ConstraintsAbsTol = 1e-4 * [ones(1,3), ones(1,6)];
-user.opt.ConvergenceCheck = 'on';
+user.opt.ConvergenceCheck = 'off';
 user.opt.ConvergenceGradientRelTol = 1e-6;
 
 % Penalties
@@ -86,7 +74,7 @@ grampc = CmexFiles.grampc_init_Cmex(userparam);
 grampc = grampc_update_struct_grampc(grampc,user);
 
 %% Estimate and set PenaltyMin
-% grampc = CmexFiles.grampc_estim_penmin_Cmex(grampc,1);
+% [grampc, ~] = CmexFiles.grampc_estim_penmin_Cmex(grampc,1);
 
 %% Simulation time
 if nargout>1

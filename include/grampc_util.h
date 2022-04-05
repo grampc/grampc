@@ -3,23 +3,11 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
@@ -43,17 +31,6 @@
 #define ASSIGN_ADJ(adj_,adj,grampc) unscale_adjoints(PTR_SCALE_ADJ, adj, grampc); adj_ = PTR_SCALE_ADJ;
 #define ASSIGN_U(u_,u,grampc)       unscale_controls(PTR_SCALE_U, u, grampc); u_ = PTR_SCALE_U;
 #define ASSIGN_P(p_,p,grampc)       unscale_parameters(PTR_SCALE_P, p, grampc); p_ = PTR_SCALE_P;
-
-void createNumMatrix(typeRNum **cs, const size_t size);
-void createIntMatrix(typeInt **cs, const size_t size);
-void resizeNumMatrix(typeRNum **cs, const size_t size);
-void resizeIntMatrix(typeInt **cs, const size_t size);
-void resize_rwsGeneral(const typeGRAMPC *grampc);
-void resize_rwsRodas(const typeGRAMPC *grampc);
-void setLWorkRodas(const typeGRAMPC *grampc);
-
-typeInt CastDvec2Intvec(typeInt** Intvec, const double* Numvec, const size_t size);
-typeInt CastDvec2Numvec(typeRNum** Realvec, const double* Numvec, const size_t size);
 
 void discretize_time(typeRNum *tvec, typeRNum T, const typeGRAMPC *grampc);
 

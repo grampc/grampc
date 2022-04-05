@@ -3,23 +3,11 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  *
  *
@@ -140,32 +128,28 @@ void lfct(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
 {
 	typeRNum* pSys = (typeRNum*)userparam;
 	typeRNum* pCost = &pSys[14];
-	typeRNum* pMeas = &pSys[20];
+	typeRNum* pMeas = &pSys[16];
 	typeInt index = (int)floor(t / 2.777777777777778e-04 + 0.00001);
 	typeRNum meas1 = pMeas[2 * index];
 	typeRNum meas2 = pMeas[1 + 2 * index];
 
-	out[0] = pCost[0] * POW2(p[0]) +
-		pCost[1] * POW2(p[1]) +
-		pCost[2] * POW2(p[2]) +
-		pCost[3] * POW2(p[3]) +
-		pCost[4] * POW2((p[2] + x[2] - meas1)) +
-		pCost[5] * POW2((p[3] + x[3] - meas2));
+	out[0] = pCost[0] * POW2((p[2] + x[2] - meas1)) +
+			 pCost[1] * POW2((p[3] + x[3] - meas2));
 }
 /** Gradient dl/dx **/
 void dldx(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *xdes, ctypeRNum *udes, typeUSERPARAM *userparam)
 {
 	typeRNum* pSys = (typeRNum*)userparam;
 	typeRNum* pCost = &pSys[14];
-	typeRNum* pMeas = &pSys[20];
+	typeRNum* pMeas = &pSys[16];
 	typeInt index = (int)floor(t / 2.777777777777778e-04 + 0.00001);
 	typeRNum meas1 = pMeas[2 * index];
 	typeRNum meas2 = pMeas[1 + 2 * index];
 
 	out[0] = 0.0;
 	out[1] = 0.0;
-	out[2] = 2.0 * pCost[4] * (p[2] + x[2] - meas1);
-	out[3] = 2.0 * pCost[5] * (p[3] + x[3] - meas2);
+	out[2] = 2.0 * pCost[1] * (p[2] + x[2] - meas1);
+	out[3] = 2.0 * pCost[0] * (p[3] + x[3] - meas2);
 }
 
 
@@ -178,7 +162,7 @@ void dldp(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
 {
 	typeRNum* pSys = (typeRNum*)userparam;
 	typeRNum* pCost = &pSys[14];
-	typeRNum* pMeas = &pSys[20];
+	typeRNum* pMeas = &pSys[16];
 	typeInt index = (int)floor(t / 2.777777777777778e-04 + 0.00001);
 	if (10 == index)
 	{
@@ -187,10 +171,10 @@ void dldp(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
 	typeRNum meas1 = pMeas[2 * index];
 	typeRNum meas2 = pMeas[1 + 2 * index];
 
-	out[0] = 2 * pCost[0] * p[0];
-	out[1] = 2 * pCost[1] * p[1];
-	out[2] = 2 * pCost[2] * p[2] + 2.0 * pCost[4] * (p[2] + x[2] - meas1);
-	out[3] = 2 * pCost[3] * p[3] + 2.0 * pCost[5] * (p[3] + x[3] - meas2);
+	out[0] = 0.0;
+	out[1] = 0.0;
+	out[2] = 2.0 * pCost[0] * (p[2] + x[2] - meas1);
+	out[3] = 2.0 * pCost[1] * (p[3] + x[3] - meas2);
 }
 
 

@@ -1,25 +1,13 @@
 /* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
-*
-* GRAMPC -- A software framework for embedded nonlinear model predictive
-* control using a gradient-based augmented Lagrangian approach
-*
-* Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
-* Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
-* Developed at the Institute of Measurement, Control, and Microtechnology,
-* Ulm University. All rights reserved.
-*
-* GRAMPC is free software: you can redistribute it and/or modify
-* it under the terms of the GNU Lesser General Public License as
-* published by the Free Software Foundation, either version 3 of
-* the License, or (at your option) any later version.
-*
-* GRAMPC is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ *
+ * GRAMPC -- A software framework for embedded nonlinear model predictive
+ * control using a gradient-based augmented Lagrangian approach
+ *
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * All rights reserved.
+ *
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 *
 */
 
@@ -27,7 +15,7 @@
 #define GRAMPC_CONVERSION_CMEX_H_
 
 #include "grampc_util.h"
-#include "grampc_init.h"
+#include "grampc_alloc.h"
 #include "grampc_mess.h"
 
 #ifndef S_FUNCTION_NAME /* function not compatible with simulink coder */
@@ -202,7 +190,7 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	cAddNumScalar(&opt->IntegratorAbsTol, "IntegratorAbsTol", mxopt);
 	cAddNumScalar(&opt->IntegratorMinStepSize, "IntegratorMinStepSize", mxopt);
 	cAddIntScalar(&opt->IntegratorMaxSteps, "IntegratorMaxSteps", mxopt);
-	cAddIntMatrix(&opt->FlagsRodas, "FlagsRodas", mxopt);
+	/*cAddIntMatrix(&opt->FlagsRodas, "FlagsRodas", mxopt);*/
 
 	cAddIntScalar(&opt->LineSearchType, "LineSearchType", mxopt);
 	cAddIntScalar(&opt->LineSearchExpAutoFallback, "LineSearchExpAutoFallback", mxopt);
@@ -256,7 +244,7 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	cAddNumMatrix(&sol->unext, "unext", mxsol);
 	cAddNumMatrix(&sol->pnext, "pnext", mxsol);
 	cAddNumScalar(&sol->Tnext, "Tnext", mxsol);
-	cAddNumMatrix(&sol->J, "J", mxsol);
+	/*cAddNumMatrix(&sol->J, "J", mxsol);*/
 	cAddNumScalar(&sol->cfct, "cfct", mxsol);
 	cAddNumScalar(&sol->pen, "pen", mxsol);
 	cAddIntScalar(&sol->status, "status", mxsol);

@@ -4,23 +4,11 @@
 # GRAMPC -- A software framework for embedded nonlinear model predictive
 # control using a gradient-based augmented Lagrangian approach
 #
-# Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+# Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
 # Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
-# Developed at the Institute of Measurement, Control, and Microtechnology,
-# Ulm University. All rights reserved.
+# All rights reserved.
 #
-# GRAMPC is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as 
-# published by the Free Software Foundation, either version 3 of 
-# the License, or (at your option) any later version.
-#
-# GRAMPC is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public 
-# License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
+# GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 #
 
 
@@ -28,7 +16,7 @@
 # input and output files
 #
 SRCS = main_QUADROTOR.c \
-	    probfct_QUADROTOR.c
+		probfct_QUADROTOR.c
 OUTPUT = startMPC
 
 
@@ -41,12 +29,11 @@ MKDIR       = mkdir -p
 OBJEXT      = o
 LIBEXT      = a
 lib         = -l
-a           = 
 PATH_PREFIX = ../..
 
 
 #
-# path of header and libs files
+# path of header and lib files
 #
 HEADER_PATH = $(PATH_PREFIX)/include
 LIBS_PATH   = $(PATH_PREFIX)/libs
@@ -55,37 +42,69 @@ LIBS_PATH   = $(PATH_PREFIX)/libs
 #
 # flags and settings
 #
-HEADER = -I$(HEADER_PATH)
+HEADER = -I$(HEADER_PATH) -I$(CURDIR)
 CFLAGS = -O3 -Wall
 LIBS   = -L$(LIBS_PATH) \
-		 $(lib)m \
-	 	 $(lib)grampc$(a)
+		 $(lib)grampc$(a) \
+		 $(lib)m
 
 
 OBJS = $(SRCS:.c=.$(OBJEXT))
 
 
 #
+# compile fixed-size model
+#
+ifeq ($(FIXEDSIZE), 1)
+	OUTPUT := $(OUTPUT)_fixedsize
+	CFLAGS += -DFIXEDSIZE
+	LIBS = -L./ \
+		   $(lib)grampc_fixedsize \
+		   $(lib)m
+	export PROBLEM_PATH=$(CURDIR)
+endif
+
+
+#
 # targets
 #
-all: $(OUTPUT) 
+all: grampc_all $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
 	@echo 'Building target: $@'
 	$(MKDIR) ./res
 	$(COMPILER) -o "$@" $(OBJS) $(HEADER) $(LIBS)
+	$(RM) $(OBJS)
 	@echo 'Finished building: $@'
-	@echo '' 
+	@echo ''
 
 $(OBJS): %.$(OBJEXT): %.c
 	@echo 'Building file: $@'
 	$(COMPILER) -o "$@" "$<" $(CFLAGS) $(HEADER) -c
-	@echo '' 
+	@echo ''
 
-clean:
+clean: grampc_clean
 	@echo 'Cleaning up built files:'
 	$(RM) $(OUTPUT) $(OBJS)
 	@echo ''
+
+
+#
+# additional targets in fixed-size mode
+#
+grampc_all:
+ifeq ($(FIXEDSIZE), 1)
+	@echo 'Building GRAMPC'
+	$(MAKE) -C $(PATH_PREFIX) all
+	@echo ''
+endif
+
+grampc_clean:
+ifeq ($(FIXEDSIZE), 1)
+	@echo 'Cleaning GRAMPC'
+	$(MAKE) -C $(PATH_PREFIX) clean
+	@echo ''
+endif
 
 #
 # end of make

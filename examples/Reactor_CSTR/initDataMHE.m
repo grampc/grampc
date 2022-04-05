@@ -9,23 +9,11 @@ function [grampcMPC,grampcMHE,Tsim] = initDataMHE()
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0). 
-% Developed at the Institute of Measurement, Control, and Microtechnology,
-% Ulm University. All rights reserved.
+% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
+% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% All rights reserved.
 %
-% GRAMPC is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as 
-% published by the Free Software Foundation, either version 3 of 
-% the License, or (at your option) any later version.
-%
-% GRAMPC is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-% GNU Lesser General Public License for more details.
-%
-% You should have received a copy of the GNU Lesser General Public 
-% License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
+% GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 %
 
 %% Parameter definition MPC
@@ -117,8 +105,7 @@ userMHE.opt.pOffset = [500.0,500.0,50.0,50.0];
 pCost  = [0.2,1.0,0.5,0.2,...
   0.2,1.0,0.5,0.2,...
   0.5,5.0e-3]*1e-1;
-pCost2  = [[1,1,1,1]*0e-6,...
-           [1,1]*1e-1];
+pCost2  = [1,1]*1e-1;
 pSys   = [1.287e12,...
   9.043e6,...
   9758.3,...

@@ -14,23 +14,11 @@ function grampc_update_plot_pred(grampc,ph,idx,decimation)
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
 % Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
-% Developed at the Institute of Measurement, Control, and Microtechnology,
-% Ulm University. All rights reserved.
+% All rights reserved.
 %
-% GRAMPC is free software: you can redistribute it and/or modify
-% it under the terms of the GNU Lesser General Public License as
-% published by the Free Software Foundation, either version 3 of
-% the License, or (at your option) any later version.
-%
-% GRAMPC is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-% GNU Lesser General Public License for more details.
-%
-% You should have received a copy of the GNU Lesser General Public
-% License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>.
+% GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 
 % Check input arguments
 if nargin < 3 || isempty(idx)
@@ -155,9 +143,9 @@ if ~isempty(idx.Constraints)
         
         % Evaluate terminal constraints
         if grampc.opt.ScaleProblem == 1
-            xend = grampc.rws.x(:,end)*grampc.opt.xScale+grampc.opt.xOffset;
+            xend = grampc.rws.x(:,end).*grampc.opt.xScale+grampc.opt.xOffset;
             if ~isempty(grampc.rws.p)
-                ppred = grampc.rws.p*grampc.opt.pScale+grampc.opt.pOffset;
+                ppred = grampc.rws.p.*grampc.opt.pScale+grampc.opt.pOffset;
             else
                 ppred = grampc.rws.p;
             end

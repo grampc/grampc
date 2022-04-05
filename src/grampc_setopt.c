@@ -3,28 +3,17 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
 
 #include "grampc_setopt.h"
+#include "grampc_alloc.h"
 
 #define COMPARE_INCLUSIVE 1
 #define COMPARE_EXCLUSIVE 0
@@ -173,18 +162,29 @@ void grampc_setopt_int(const typeGRAMPC *grampc, const typeChar *optName, ctypeI
 {
 	/* MaxGradIter */
 	if (!strcmp(optName, "MaxGradIter")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		setIntOpt(&grampc->opt->MaxGradIter, optName, optValue);
 		/* Reallocaton of lsAdapt */
 		resizeNumMatrix(&grampc->rws->lsAdapt, 2 * (NALS + 1)*(1 + grampc->opt->MaxGradIter));
 		init_rws_linesearch(grampc);
+#endif
 	}
 	/* MaxMultIter */
 	else if (!strcmp(optName, "MaxMultIter")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		setIntOpt(&grampc->opt->MaxMultIter, optName, optValue);
 		/* Reallocation of iter */
 		resizeIntMatrix(&grampc->sol->iter, grampc->opt->MaxMultIter);
+#endif
 	}
 	else if (!strcmp(optName, "Nhor")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		if (optValue > 1) {
 			grampc->opt->Nhor = optValue;
 		}
@@ -219,6 +219,7 @@ void grampc_setopt_int(const typeGRAMPC *grampc, const typeChar *optName, ctypeI
 		init_rws_controls(grampc);
 		init_rws_multipliers(grampc);
 		resize_rwsRodas(grampc);
+#endif
 	}
 	else if (!strcmp(optName, "IntegratorMaxSteps")) {
 		setIntOpt(&grampc->opt->IntegratorMaxSteps, optName, optValue);
@@ -258,6 +259,9 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 	}
 	/* IntegratorCost */
 	else if (!strcmp(optName, "IntegratorCost")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		if (!strcmp(optValue, "trapezodial")) {
 			grampc->opt->IntegratorCost = INT_TRAPZ;
 		}
@@ -268,9 +272,13 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 			grampc_error_addstring(INVALID_OPTION_VALUE, optName);
 		}
 		resize_rwsGeneral(grampc);
+#endif
 	}
 	/* Integrator type */
 	else if (!strcmp(optName, "Integrator")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		if (!strcmp(optValue, "euler")) {
 			grampc->opt->Integrator = INT_EULER;
 		}
@@ -291,9 +299,13 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 		}
 		resize_rwsGeneral(grampc);
 		resize_rwsRodas(grampc);
+#endif
 	}
 	/* LineSearchType */
 	else if (!strcmp(optName, "LineSearchType")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		if (!strcmp(optValue, "adaptive")) {
 			grampc->opt->LineSearchType = INT_ADAPTIVELS;
 		}
@@ -306,7 +318,9 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 		else {
 			grampc_error_addstring(INVALID_OPTION_VALUE, optName);
 		}
+        resize_rwsLinesearch(grampc);
 		init_rws_linesearch(grampc);
+#endif
 	}
 	/* LineSearchExpAutoFallback */
 	else if (!strcmp(optName, "LineSearchExpAutoFallback")) {
@@ -421,8 +435,12 @@ void grampc_setopt_int_vector(const typeGRAMPC *grampc, const typeChar *optName,
 {
 	/* FlagsRodas */
 	if (!strcmp(optName, "FlagsRodas")) {
+#ifdef FIXEDSIZE
+        grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
+#else
 		memcpy(grampc->opt->FlagsRodas, optValue, 8 * sizeof(*grampc->opt->FlagsRodas));
 		setLWorkRodas(grampc);
+#endif
 	}
 	/* Undefined optName */
 	else {
@@ -465,10 +483,11 @@ void grampc_printopt(const typeGRAMPC *grampc)
 	myPrint("    LineSearchExpAutoFallback: %s\n", grampc->opt->LineSearchExpAutoFallback == INT_ON ? "on" : "off");
 	myPrint("                LineSearchMax: %.2e\n", grampc->opt->LineSearchMax);
 	myPrint("                LineSearchMin: %.2e\n", grampc->opt->LineSearchMin);
-	myPrint("               LineSearchInit: %.2e\n", grampc->opt->LineSearchInit);
-	myPrint("     LineSearchIntervalFactor: %.3f\n", grampc->opt->LineSearchIntervalFactor);
+    myPrint("               LineSearchInit: %.2e\n", grampc->opt->LineSearchInit);
+    myPrint("        LineSearchAdaptAbsTol: %.3f\n", grampc->opt->LineSearchAdaptAbsTol);
 	myPrint("        LineSearchAdaptFactor: %.3f\n", grampc->opt->LineSearchAdaptFactor);
 	myPrint("        LineSearchIntervalTol: %.3f\n", grampc->opt->LineSearchIntervalTol);
+    myPrint("     LineSearchIntervalFactor: %.3f\n", grampc->opt->LineSearchIntervalFactor);
 
 	myPrint("                 OptimControl: %s\n", grampc->opt->OptimControl == INT_ON ? "on" : "off");
 	myPrint("                   OptimParam: %s\n", grampc->opt->OptimParam == INT_ON ? "on" : "off");

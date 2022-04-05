@@ -3,23 +3,11 @@
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright (C) 2014-2018 by Tobias Englert, Knut Graichen, Felix Mesmer,
+ * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
  * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * Developed at the Institute of Measurement, Control, and Microtechnology,
- * Ulm University. All rights reserved.
+ * All rights reserved.
  *
- * GRAMPC is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * GRAMPC is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with GRAMPC. If not, see <http://www.gnu.org/licenses/>
+ * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
 
@@ -147,20 +135,21 @@ static void mdlInitializeSizes(SimStruct *S)
 	ocp_dim(&Nx, &Nu, &Np, &Ng, &Nh, &NgT, &NhT, NULL);
 
 	/*Parameters */
-	ssSetNumSFcnParams(S, 7);
+	ssSetNumSFcnParams(S, 6);
 	/* parameter tuning not allowed during simulation */
 	for (i = 0; i < ssGetSFcnParamsCount(S); i++) {
 		ssSetSFcnParamTunable(S, i, SS_PRM_NOT_TUNABLE);
 	}
 
 	/*Input ports*/
-	if (!ssSetNumInputPorts(S, 4)) return;  /* number of input ports */
-	ssSetInputPortWidth(S, 0, Nx);          /* no. of inputs at input port 0 (x0)   */
-	ssSetInputPortWidth(S, 1, 1);           /* no. of inputs at input port 1 (t0)   */
-	ssSetInputPortWidth(S, 2, Nx);          /* no. of inputs at input port 2 (xdes) */
-	ssSetInputPortWidth(S, 3, MAX(Nu, 1));  /* no. of inputs at input port 3 (udes) */
+	if (!ssSetNumInputPorts(S, 5)) return;        /* number of input ports */
+	ssSetInputPortWidth(S, 0, Nx);                /* no. of inputs at input port 0 (x0)        */
+	ssSetInputPortWidth(S, 1, 1);                 /* no. of inputs at input port 1 (t0)        */
+	ssSetInputPortWidth(S, 2, Nx);                /* no. of inputs at input port 2 (xdes)      */
+	ssSetInputPortWidth(S, 3, MAX(Nu, 1));        /* no. of inputs at input port 3 (udes)      */
+	ssSetInputPortWidth(S, 4, DYNAMICALLY_SIZED); /* no. of inputs at input port 4 (userparam) */
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 5; i++) {
 		ssSetInputPortDirectFeedThrough(S, i, 1);   /* direct input feedthrough */
 		ssSetInputPortRequiredContiguous(S, i, 1);  /* must be contiguous to use  ssGetInputPortRealSignal*/
 		ssSetInputPortDataType(S, i, SS_TYPERNUM);
@@ -192,6 +181,39 @@ static void mdlInitializeSizes(SimStruct *S)
 	ssSetNumModes(S, 0);          /* number of modes to switch between    */
 	ssSetNumNonsampledZCs(S, 0);  /* number of non-sampled zero-crossings */
 }
+
+
+
+#if defined(MATLAB_MEX_FILE)
+#define MDL_SET_INPUT_PORT_WIDTH
+static void mdlSetInputPortWidth(SimStruct *S, int_T port, int_T inputPortWidth)
+{
+	if ((ssGetInputPortWidth(S, port) != DYNAMICALLY_SIZED) && (ssGetInputPortWidth(S, port) != inputPortWidth))
+	{
+		ssSetErrorStatus(S, "something wrong");
+		return;
+	}
+	ssSetInputPortWidth(S, port, inputPortWidth);
+}
+
+#define MDL_SET_OUTPUT_PORT_WIDTH
+static void mdlSetOutputPortWidth(SimStruct *S, int_T port, int_T outputPortWidth)
+{
+	/* We have no dynamic outputs */
+}
+
+#define MDL_SET_DEFAULT_PORT_DIMENSION_INFO
+static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
+{
+	ssSetInputPortWidth(S, 4, 1); /* default to one */
+}
+
+#define MDL_SET_WORK_WIDTHS
+static void mdlSetWorkWidths(SimStruct *S)
+{
+	/* We have no states */
+}
+#endif
 
 
 /***************************************************************************
@@ -227,13 +249,12 @@ static void mdlStart(SimStruct *S)
 	const double *d_numopt = mxGetData(ssGetSFcnParam(S, 3));
 	const double *d_numparamidx = mxGetData(ssGetSFcnParam(S, 4));
 	const double *d_numparam = mxGetData(ssGetSFcnParam(S, 5));
-	const mxArray* const mxuserparam = ssGetSFcnParam(S, 6);
-	const double *d_userparam = mxGetPr(mxuserparam);
 
 	ptr = ssGetPWork(S);
 
-	/* Memory allocation for userparam */
-	size_userpram = mxGetM(mxuserparam)*mxGetN(mxuserparam);
+	/* Memory allocation for userparam, use size of input port */
+	const typeRNum *d_userparam = (typeRNum *)ssGetInputPortRealSignal(S, 4);
+	size_userpram = ssGetInputPortWidth(S, 4);
 	userparam = calloc(size_userpram * sizeof(typeRNum), 1);
 	real_userparam = (typeRNum*)userparam;
 	for (i = 0; i < size_userpram; i++) {
@@ -277,6 +298,8 @@ static void mdlStart(SimStruct *S)
 
 static void mdlOutputs(SimStruct *S, int_T tid)
 {
+	int_T  i;
+
 	/* inputs */
 	ctypeRNum *x0 = (typeRNum *)ssGetInputPortRealSignal(S, 0);
 	ctypeRNum *t0 = (typeRNum *)ssGetInputPortRealSignal(S, 1);
@@ -304,6 +327,15 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 	grampc_setparam_real(grampc, "t0", t0[0]);
 	grampc_setparam_real_vector(grampc, "xdes", xdes);
 	grampc_setparam_real_vector(grampc, "udes", udes);
+	
+	/* update userparm */
+	typeUSERPARAM *userparam = grampc->userparam;
+	const typeRNum *d_userparam = (typeRNum *)ssGetInputPortRealSignal(S, 4);
+	size_t size_userpram = ssGetInputPortWidth(S, 4);
+	typeRNum *loc_userparam = (typeRNum *)userparam;
+	for (i = 0; i < size_userpram; i++) {
+		loc_userparam[i] = (typeRNum)d_userparam[i];
+	}
 
 	/* run mpc */
 	grampc_run(grampc);
