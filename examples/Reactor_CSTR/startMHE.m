@@ -156,7 +156,7 @@ while 1
     grampcMHE.userparam(end-2*grampcMHE.opt.Nhor+1:end) = xMeas_array;
     % set values of last MHE-Nhor controls or use initial values 
     if i > 10
-        grampcMHE.rws.u = (vec.u(:,i-9:i) - repmat(grampcMHE.opt.uOffset,1,10))./repmat(grampcMHE.opt.uScale,1,10);
+        grampcMHE.rws.u = (vec.u(:,i-10:i) - repmat(grampcMHE.opt.uOffset,1,11))./repmat(grampcMHE.opt.uScale,1,11);
     else
         grampcMHE.rws.u(:,10-i+1:10) = (vec.u(:,1:i) - repmat(grampcMHE.opt.uOffset,1,i))./repmat(grampcMHE.opt.uScale,1,i);
     end    
@@ -207,7 +207,7 @@ while 1
             plot(vec.t(1:PLOT_STEPS:i), vec.xEst(3,1:PLOT_STEPS:i)', 'r')
             plot(vec.t(1:PLOT_STEPS:i), vec.x(3,1:PLOT_STEPS:i)', 'b')
             xlim([0, Tsim]);
-            ylabel('Reactor temperature T [°C]');
+            ylabel('Reactor temperature T [Â°C]');
             subplot(3,2,4)
             plot(vec.t(1:PLOT_STEPS:i), vec.xMeas(2,1:PLOT_STEPS:i)','x')
             hold on
@@ -215,7 +215,7 @@ while 1
             plot(vec.t(1:PLOT_STEPS:i), vec.x(4,1:PLOT_STEPS:i)', 'b')
             legend('Measured state','Estimated state','Simulated state','Location','NorthEast');
             xlim([0, Tsim]);
-            ylabel('Cooling temperature T_C [°C]');
+            ylabel('Cooling temperature T_C [Â°C]');
             subplot(3,2,5)
             plot(vec.t(1:PLOT_STEPS:i), vec.u(1,1:PLOT_STEPS:i)', 'b')
             ylabel('Normalized flow rate u_1 [h^{-1}]');
