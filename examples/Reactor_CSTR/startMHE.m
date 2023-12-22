@@ -155,10 +155,10 @@ while 1
     xMeas_array = [xMeas_array(3:end), xMeas_temp];
     grampcMHE.userparam(end-2*grampcMHE.opt.Nhor+1:end) = xMeas_array;
     % set values of last MHE-Nhor controls or use initial values 
-    if i > 10
-        grampcMHE.rws.u = (vec.u(:,i-10:i) - repmat(grampcMHE.opt.uOffset,1,11))./repmat(grampcMHE.opt.uScale,1,11);
+    if i > grampcMHE.opt.Nhor - 1
+        grampcMHE.rws.u = (vec.u(:,i-grampcMHE.opt.Nhor-1:i) - repmat(grampcMHE.opt.uOffset,1,grampcMHE.opt.Nhor))./repmat(grampcMHE.opt.uScale,1,grampcMHE.opt.Nhor);
     else
-        grampcMHE.rws.u(:,10-i+1:10) = (vec.u(:,1:i) - repmat(grampcMHE.opt.uOffset,1,i))./repmat(grampcMHE.opt.uScale,1,i);
+        grampcMHE.rws.u(:,grampcMHE.opt.Nhor-i:grampcMHE.opt.Nhor-1) = (vec.u(:,1:i) - repmat(grampcMHE.opt.uOffset,1,i))./repmat(grampcMHE.opt.uScale,1,i);
     end    
     % run MHE and save results
     [grampcMHE,vec.CPUtimeMHE(i)] = CmexFiles.grampc_run_Cmex_MHE(grampcMHE);
