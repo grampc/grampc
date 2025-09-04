@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -313,7 +314,7 @@ typedef struct
 } typeGRAMPCrws;
 
 
-/* Defintition of typeGRAMPC containing the structs above and the userparameters */
+/* Definition of typeGRAMPC containing the structs above and the userparameters */
 typedef struct
 {
 	typeGRAMPCparam *param;
@@ -324,20 +325,22 @@ typedef struct
 } typeGRAMPC;
 
 
-/* Function pointer defintions */
-typedef void(*typeffctPtr)(typeRNum *s, ctypeRNum *y, ctypeRNum *t, ctypeRNum *x,
-	ctypeRNum *u, ctypeRNum *p_, ctypeRNum *dcdx, const typeGRAMPC *grampc);
-typedef void(*typeIntffctPtr)(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t,
-	ctypeRNum *x, ctypeRNum *u, ctypeRNum *p_, const typeGRAMPC *grampc, const typeffctPtr pfct);
-
-typedef void(*typeInVfctPtr)(typeRNum *s, ctypeRNum *t, ctypeRNum *x, ctypeRNum *u,
-	ctypeRNum *p, const typeGRAMPC *grampc);
+/* Function signature for integrand of system dynamics and adjoint dynamics */
+typedef void(*typeSysPtr)(typeRNum *s, ctypeRNum *y, ctypeRNum *t,
+	ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *dcdx, const typeGRAMPC *grampc);
+/* Function signature for integrator of system dynamics and adjoint dynamics */
+typedef void(*typeSysIntegratorPtr)(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t,
+	ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *dcdx, const typeGRAMPC *grampc, const typeSysPtr pfct);
+/* Function signature for integrator of cost functional */
+typedef void(*typeCostIntegratorPtr)(typeRNum *s, ctypeRNum *t,
+	ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC *grampc);
 
 /* Utility macros for computing size of lrwsGeneral */
 #define LWadjsys (grampc->param->Nx)
-#define Leuler (grampc->param->Nx)
-#define Lmodeuler (5*grampc->param->Nx+grampc->param->Nu+grampc->param->Nc)
-#define Lheun (3*grampc->param->Nx)
+#define Lerk1 (grampc->param->Nx)
+#define Lerk2 (3*grampc->param->Nx)
+#define Lerk3 (6*grampc->param->Nx+grampc->param->Nu)
+#define Lerk4 (7*grampc->param->Nx+grampc->param->Nu)
 #define Lruku45 (18*grampc->param->Nx+grampc->param->Nu)
 #define Lrodas (2*grampc->param->Nx+grampc->param->Nu)
 

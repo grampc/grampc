@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -16,16 +17,6 @@
 #define GRAMPC_RUN_H_
 
 #include "grampc_init.h"
-#include "grampc_mess.h"
-#include "grampc_util.h"
-#include "probfct.h"
-#include "euler1.h"
-#include "eulermod2.h"
-#include "heun2.h"
-#include "rodas.h"
-#include "ruku45.h"
-#include "trapezodial.h"
-#include "simpson.h"
 
 
  /* main function, run MaxGradIter gradient and MaxMultIter multiplier iterations */
@@ -96,7 +87,7 @@ typeBoolean convergence_test_constraints(ctypeRNum *abs_tol, const typeGRAMPC *g
 
 /* shifts trajectory by the sampling time */
 void shiftTrajectory(typeRNum* trajectory, ctypeInt Nhor, ctypeInt Nvar, ctypeInt Nshiftrows, ctypeRNum dt, ctypeRNum*t);
-/* shortens trajectories from the vetor t to the vector linspace(0,t[Nhor-1]-dt,Nhor) */
+/* shortens trajectories from the vector t to the vector linspace(0,t[Nhor-1]-dt,Nhor) */
 void shortenTrajectory(typeRNum *trajectory, ctypeInt Nhor, ctypeInt Nrows, ctypeInt Nshortenrows, ctypeRNum dt, ctypeRNum *t);
 
 #endif /* GRAMPC_RUN_H_ */

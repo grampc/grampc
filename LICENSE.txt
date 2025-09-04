@@ -1,4 +1,6 @@
-Copyright 2014-2019 Tobias Englert, Knut Graichen, Felix Mesmer, Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0)
+Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

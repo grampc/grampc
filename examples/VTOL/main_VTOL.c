@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -13,7 +14,7 @@
 
 
 #include "grampc.h"
-#include <time.h>
+#include "timing.h"
 
 #define PRINTRES
 
@@ -32,16 +33,16 @@ void openFile(FILE **file, const char *name) {
 void printNumVector2File(FILE *file, ctypeRNum *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%.5f ,", val[i]);
+		fprintf(file, "%.5f, ", val[i]);
 	}
-	fprintf(file, "%.5f;\n", val[size - 1]); /* new line */
+	fprintf(file, "%.5f\n", val[size - 1]); /* new line */
 }
 void printIntVector2File(FILE *file, ctypeInt *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%d ,", val[i]);
+		fprintf(file, "%d, ", val[i]);
 	}
-	fprintf(file, "%d;\n", val[size - 1]); /* new line */
+	fprintf(file, "%d\n", val[size - 1]); /* new line */
 }
 #endif
 
@@ -55,7 +56,7 @@ int main(void)
 	FILE *file_x, *file_u, *file_p, *file_T, *file_J, *file_Ncfct, *file_Npen, *file_iter, *file_status, *file_t;
 #endif
 
-	clock_t tic, toc;
+	typeTime tic, toc;
 	typeRNum *CPUtimeVec;
 	typeRNum CPUtime = 0;
 	typeRNum rwsReferenceIntegration[2 * NX];
@@ -109,16 +110,16 @@ int main(void)
 	grampc_setopt_int(grampc, "Nhor", Nhor);
 
 #ifdef PRINTRES
-	openFile(&file_x, "res/xvec.txt");
-	openFile(&file_u, "res/uvec.txt");
-	openFile(&file_p, "res/pvec.txt");
-	openFile(&file_T, "res/Thorvec.txt");
-	openFile(&file_J, "res/Jvec.txt");
-	openFile(&file_Ncfct, "res/Ncfctvec.txt");
-	openFile(&file_Npen, "res/Npenvec.txt");
-	openFile(&file_iter, "res/itervec.txt");
-	openFile(&file_status, "res/status.txt");
-	openFile(&file_t, "res/tvec.txt");
+	openFile(&file_x, "xvec.txt");
+	openFile(&file_u, "uvec.txt");
+	openFile(&file_p, "pvec.txt");
+	openFile(&file_T, "Thorvec.txt");
+	openFile(&file_J, "Jvec.txt");
+	openFile(&file_Ncfct, "Ncfctvec.txt");
+	openFile(&file_Npen, "Npenvec.txt");
+	openFile(&file_iter, "itervec.txt");
+	openFile(&file_status, "status.txt");
+	openFile(&file_t, "tvec.txt");
 #endif
 
 	grampc_printopt(grampc);
@@ -136,10 +137,10 @@ int main(void)
 	printf("MPC running ...\n");
 	for (iMPC = 0; iMPC <= MaxSimIter; iMPC++) {
 		/* run grampc */
-		tic = clock();
+		timer_now(&tic);
 		grampc_run(grampc);
-		toc = clock();
-		CPUtimeVec[iMPC] = (typeRNum)((toc - tic) * 1000 / CLOCKS_PER_SEC);
+		timer_now(&toc);
+		CPUtimeVec[iMPC] = timer_diff_ms(&tic, &toc);
 
 		/* check solver status */
 		if (grampc->sol->status > 0) {
@@ -149,11 +150,11 @@ int main(void)
 		}
 
 		/* reference integration of the system via heun scheme since grampc->sol->xnext is only an interpolated value */
-		ffct(rwsReferenceIntegration, t, grampc->param->x0, grampc->sol->unext, grampc->sol->pnext, grampc->userparam);
+		ffct(rwsReferenceIntegration, t, grampc->param->x0, grampc->sol->unext, grampc->sol->pnext, grampc->param, grampc->userparam);
 		for (i = 0; i < NX; i++) {
 			grampc->sol->xnext[i] = grampc->param->x0[i] + dt * rwsReferenceIntegration[i];
 		}
-		ffct(rwsReferenceIntegration + NX, t + dt, grampc->sol->xnext, grampc->sol->unext, grampc->sol->pnext, grampc->userparam);
+		ffct(rwsReferenceIntegration + NX, t + dt, grampc->sol->xnext, grampc->sol->unext, grampc->sol->pnext, grampc->param, grampc->userparam);
 		for (i = 0; i < NX; i++) {
 			grampc->sol->xnext[i] = grampc->param->x0[i] + dt * (rwsReferenceIntegration[i] + rwsReferenceIntegration[i + NX]) / 2;
 		}
@@ -190,8 +191,9 @@ int main(void)
 #endif
 
 	for (i = 0; i <= MaxSimIter; i++) {
-		CPUtime = CPUtime + CPUtimeVec[i] / (MaxSimIter + 1);
+		CPUtime = CPUtime + CPUtimeVec[i];
 	}
+	CPUtime = CPUtime / (MaxSimIter + 1);
 
 	grampc_free(&grampc);
 	free(CPUtimeVec);

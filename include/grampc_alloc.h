@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -36,6 +37,10 @@ typeInt CastDvec2Numvec(typeRNum** Realvec, const double* Numvec, const size_t s
 
 void grampc_alloc_structs(typeGRAMPC **grampc, typeUSERPARAM *userparam);
 void grampc_alloc_fields(typeGRAMPC **grampc, typeUSERPARAM *userparam);
+void grampc_free_param(typeGRAMPCparam **param);
+void grampc_free_opt(typeGRAMPCopt **opt);
+void grampc_free_sol(typeGRAMPCsol **sol);
+void grampc_free_rws(typeGRAMPCrws **rws);
 void grampc_free(typeGRAMPC **grampc);
 
 #endif /* GRAMPC_ALLOC_H */

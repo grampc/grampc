@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -13,7 +14,7 @@
 
 
 #include "grampc.h"
-#include <time.h>
+#include "timing.h"
 
 #define NX	6
 #define NU	6
@@ -37,16 +38,16 @@ void openFile(FILE **file, const char *name) {
 void printNumVector2File(FILE *file, ctypeRNum *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%.9f ,", val[i]);
+		fprintf(file, "%.9f, ", val[i]);
 	}
-	fprintf(file, "%.9f;\n", val[size - 1]); /* new line */
+	fprintf(file, "%.9f\n", val[size - 1]); /* new line */
 }
 void printIntVector2File(FILE *file, ctypeInt *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%d ,", val[i]);
+		fprintf(file, "%d, ", val[i]);
 	}
-	fprintf(file, "%d;\n", val[size - 1]); /* new line */
+	fprintf(file, "%d\n", val[size - 1]); /* new line */
 }
 #endif
 
@@ -64,7 +65,7 @@ int main(void)
 		*file_iter, *file_status, *file_t, *file_veciter;
 #endif
 
-	clock_t tic, toc;
+	typeTime tic, toc;
 	typeRNum *CPUtimeVec;
 	typeRNum CPUtime = 0;
 
@@ -186,10 +187,10 @@ int main(void)
 	printf("OCP running ...\n");
 	for (iOCP = 0; iOCP <= MaxMultSimIter; iOCP++) {
 		/* run grampc */
-		tic = clock();
+		timer_now(&tic);
 		grampc_run(grampc);
-		toc = clock();
-		CPUtimeVec[iOCP] = (typeRNum)((toc - tic) * 1000 / CLOCKS_PER_SEC);
+		timer_now(&toc);
+		CPUtimeVec[iOCP] = timer_diff_ms(&tic, &toc);
 
 		/* run convergence test */
 		if (grampc->opt->ConvergenceCheck == INT_ON) {
@@ -257,7 +258,7 @@ int main(void)
 	grampc_free(&grampc);
 	free(CPUtimeVec);
 
-	printf("OCP finished. Average computation time: %.3f ms.\n", CPUtime);
+	printf("OCP finished. Computation time: %.3f ms.\n", CPUtime);
 
 	return 0;
 }

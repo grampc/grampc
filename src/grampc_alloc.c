@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -90,15 +91,18 @@ void resize_rwsGeneral(const typeGRAMPC *grampc) {
     typeInt LConst = 0;
 
     switch (grampc->opt->Integrator) {
-    case INT_EULER:    LInt += Leuler; break;
-    case INT_MODEULER: LInt += Lmodeuler; break;
-    case INT_HEUN:     LInt += Lheun; break;
-    case INT_RODAS:		 LInt += Lrodas; break;
+    case INT_SYSDISC:  LInt += Lerk1; break;
+    case INT_ERK1:     LInt += Lerk1; break;
+    case INT_ERK2:     LInt += Lerk2; break;
+    case INT_ERK3:     LInt += Lerk3; break;
+    case INT_ERK4:     LInt += Lerk4; break;
     case INT_RUKU45:   LInt += Lruku45; break;
+    case INT_RODAS:	   LInt += Lrodas; break;
     }
     switch (grampc->opt->IntegratorCost) {
-    case INT_TRAPZ:   LIntCost = LIntCostTrapezoidal; break;
-    case INT_SIMPSON: LIntCost = LIntCostSimpson; break;
+    case INT_COSTDISC: LIntCost = LIntCostTrapezoidal; break;
+    case INT_TRAPZ:    LIntCost = LIntCostTrapezoidal; break;
+    case INT_SIMPSON:  LIntCost = LIntCostSimpson; break;
     }
     if (grampc->param->Nc > 0) {
         LConst = LevaluateConstraints;
@@ -305,68 +309,87 @@ void grampc_alloc_fields(typeGRAMPC **grampc, typeUSERPARAM *userparam)
     createNumMatrix(&(*grampc)->rws->rwsScale, 2 * ((*grampc)->param->Nx + (*grampc)->param->Nu + (*grampc)->param->Np));
 }
 
+void grampc_free_param(typeGRAMPCparam **param)
+{
+    free((*param)->x0);
+    free((*param)->xdes);
+    free((*param)->u0);
+    free((*param)->udes);
+    free((*param)->umax);
+    free((*param)->umin);
+    free((*param)->p0);
+    free((*param)->pmax);
+    free((*param)->pmin);
+
+    free(*param);
+}
+
+void grampc_free_opt(typeGRAMPCopt **opt)
+{
+    free((*opt)->xScale);
+    free((*opt)->xOffset);
+    free((*opt)->uScale);
+    free((*opt)->uOffset);
+    free((*opt)->pScale);
+    free((*opt)->pOffset);
+    free((*opt)->cScale);
+    free((*opt)->ConstraintsAbsTol);
+
+    free(*opt);
+}
+
+void grampc_free_sol(typeGRAMPCsol **sol)
+{
+    free((*sol)->xnext);
+    free((*sol)->unext);
+    free((*sol)->pnext);
+    free((*sol)->iter);
+
+    free(*sol);
+}
+
+void grampc_free_rws(typeGRAMPCrws **rws)
+{
+    free((*rws)->t);
+    free((*rws)->tls);
+    free((*rws)->x);
+    free((*rws)->adj);
+    free((*rws)->dcdx);
+    free((*rws)->u);
+    free((*rws)->uls);
+    free((*rws)->uprev);
+    free((*rws)->gradu);
+    free((*rws)->graduprev);
+    free((*rws)->dcdu);
+    free((*rws)->p);
+    free((*rws)->pls);
+    free((*rws)->pprev);
+    free((*rws)->gradp);
+    free((*rws)->gradpprev);
+    free((*rws)->dcdp);
+    free((*rws)->mult);
+    free((*rws)->pen);
+    free((*rws)->cfct);
+    free((*rws)->cfctprev);
+    free((*rws)->cfctAbsTol);
+    free((*rws)->lsAdapt);
+    free((*rws)->lsExplicit);
+    free((*rws)->rwsScale);
+    free((*rws)->rwsGeneral);
+    free((*rws)->rparRodas);
+    free((*rws)->iparRodas);
+    free((*rws)->workRodas);
+    free((*rws)->iworkRodas);
+
+    free(*rws);
+}
 
 void grampc_free(typeGRAMPC **grampc)
 {
-    free((*grampc)->param->x0);
-    free((*grampc)->param->xdes);
-    free((*grampc)->param->u0);
-    free((*grampc)->param->udes);
-    free((*grampc)->param->umax);
-    free((*grampc)->param->umin);
-    free((*grampc)->param->p0);
-    free((*grampc)->param->pmax);
-    free((*grampc)->param->pmin);
-
-    free((*grampc)->opt->xScale);
-    free((*grampc)->opt->xOffset);
-    free((*grampc)->opt->uScale);
-    free((*grampc)->opt->uOffset);
-    free((*grampc)->opt->pScale);
-    free((*grampc)->opt->pOffset);
-    free((*grampc)->opt->cScale);
-    free((*grampc)->opt->ConstraintsAbsTol);
-
-    free((*grampc)->sol->xnext);
-    free((*grampc)->sol->unext);
-    free((*grampc)->sol->pnext);
-    free((*grampc)->sol->iter);
-
-    free((*grampc)->rws->t);
-    free((*grampc)->rws->tls);
-    free((*grampc)->rws->x);
-    free((*grampc)->rws->adj);
-    free((*grampc)->rws->dcdx);
-    free((*grampc)->rws->u);
-    free((*grampc)->rws->uls);
-    free((*grampc)->rws->uprev);
-    free((*grampc)->rws->gradu);
-    free((*grampc)->rws->graduprev);
-    free((*grampc)->rws->dcdu);
-    free((*grampc)->rws->p);
-    free((*grampc)->rws->pls);
-    free((*grampc)->rws->pprev);
-    free((*grampc)->rws->gradp);
-    free((*grampc)->rws->gradpprev);
-    free((*grampc)->rws->dcdp);
-    free((*grampc)->rws->mult);
-    free((*grampc)->rws->pen);
-    free((*grampc)->rws->cfct);
-    free((*grampc)->rws->cfctprev);
-    free((*grampc)->rws->cfctAbsTol);
-    free((*grampc)->rws->lsAdapt);
-    free((*grampc)->rws->lsExplicit);
-    free((*grampc)->rws->rwsScale);
-    free((*grampc)->rws->rwsGeneral);
-    free((*grampc)->rws->rparRodas);
-    free((*grampc)->rws->iparRodas);
-    free((*grampc)->rws->workRodas);
-    free((*grampc)->rws->iworkRodas);
-
-    free((*grampc)->param);
-    free((*grampc)->opt);
-    free((*grampc)->sol);
-    free((*grampc)->rws);
+    grampc_free_param(&(*grampc)->param);
+    grampc_free_opt(&(*grampc)->opt);
+    grampc_free_sol(&(*grampc)->sol);
+    grampc_free_rws(&(*grampc)->rws);
 
     free(*grampc);
 }

@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -27,8 +28,8 @@ notice, this list of conditions and the following disclaimer.
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS
-IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ï¿½AS
+ISï¿½ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
 CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
@@ -72,6 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef RODAS_DECSOL_F2C_H_
 #define RODAS_DECSOL_F2C_H_
+
+#include "rodas.h"
 
 	 /* Common Block Declarations */
 
@@ -3583,7 +3586,7 @@ L55:
 	typeRNum *f2, typeLInt *ip1, typeLInt *iphes, typeRNum *scal,
 	typeRNum *err, typeLogical *first, typeLogical *reject, typeRNum *fac1,
 	ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec,
-	typeGRAMPC *grampc, typeffctPtr pfct)
+	typeGRAMPC *grampc, typeSysPtr pfct)
 {
 	/* System generated locals */
 	typeLInt fjac_dim1, fjac_offset, fmas_dim1, fmas_offset, e1_dim1,
@@ -4084,7 +4087,7 @@ L55:
 	typeLInt *nns, typeRNum *e1, typeLInt *lde1, typeRNum *zz,
 	typeRNum *cont, typeRNum *ff, typeLInt *ip1, typeLInt *iphes,
 	typeRNum *scal, typeRNum *err, typeLogical *first, typeLogical *reject,
-	typeRNum *fac1, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, typeGRAMPC *grampc, typeffctPtr pfct)
+	typeRNum *fac1, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, typeGRAMPC *grampc, typeSysPtr pfct)
 {
 	/* System generated locals */
 	typeLInt fjac_dim1, fjac_offset, fmas_dim1, fmas_offset, e1_dim1,
@@ -5127,14 +5130,14 @@ L55:
 
 /*     END OF SUBROUTINE SLVSEU */
 
-/* Subroutine */ int rodas_(typeLInt *n, U_fp fcn, typeLInt *ifcn,
+/* Subroutine */ int rodas_(typeLInt *n, typeLInt *ifcn,
 	typeRNum * x, typeRNum *y, typeRNum *xend, typeRNum *h__, typeRNum *rtol, typeRNum *atol, typeLInt *itol,
-	U_fp jac, typeLInt *ijac, typeLInt *mljac, typeLInt *mujac,
-	U_fp dfx, typeLInt *idfx,
-	U_fp mas, typeLInt *	imas, typeLInt *mlmas, typeLInt *mumas,
-	U_fp solout, typeLInt *iout,
+	typeLInt *ijac, typeLInt *mljac, typeLInt *mujac,
+	typeLInt *idfx,
+	typeLInt *imas, typeLInt *mlmas, typeLInt *mumas,
+	typeLInt *iout,
 	typeRNum *work, typeLInt *lwork, typeLInt *iwork, typeLInt *liwork,
-	ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeffctPtr pfct, typeLInt *idid)
+	ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct, typeLInt *idid)
 {
 	/* System generated locals */
 	typeLInt i__1;
@@ -5161,10 +5164,10 @@ L55:
 	static typeLogical implct;
 	static typeLInt ieynew, istore;
 	static typeLogical autnms;
-	extern /* Subroutine */ int roscor_(typeLInt *, U_fp, typeRNum *,
+	extern /* Subroutine */ int roscor_(typeLInt *, typeRNum *,
 		typeRNum *, typeRNum *, typeRNum *, typeRNum *,
-		typeRNum *, typeRNum *, typeLInt *, U_fp, typeLInt *, typeLInt *,
-		typeLInt *, U_fp, typeLInt *, U_fp, typeLInt *, typeLInt *, U_fp,
+		typeRNum *, typeRNum *, typeLInt *, typeLInt *, typeLInt *,
+		typeLInt *, typeLInt *, typeLInt *, typeLInt *,
 		typeLInt *, typeLInt *, typeLInt *, typeRNum *, typeLInt *, typeLInt
 		*, typeRNum *, typeRNum *, typeRNum *, typeLogical *, typeLogical *,
 		typeLogical *, typeLogical *, typeLInt *, typeLInt *, typeLInt *,
@@ -5173,7 +5176,7 @@ L55:
 		typeRNum *, typeRNum *, typeRNum *, typeRNum *,
 		typeRNum *, typeLInt *, typeRNum *, typeLInt *, typeLInt *,
 		typeLInt *, typeLInt *, typeLInt *, typeLInt *, typeLInt *, typeLInt *,
-		typeLInt *, typeLInt *, ctypeRNum *, ctypeRNum *, ctypeRNum *, ctypeRNum *, ctypeRNum *, const typeGRAMPC *, const typeffctPtr);
+		typeLInt *, typeLInt *, ctypeRNum *, ctypeRNum *, ctypeRNum *, ctypeRNum *, ctypeRNum *, const typeGRAMPC *, const typeSysPtr);
 	static typeRNum uround;
 
 
@@ -5757,9 +5760,9 @@ L55:
 
 
 	/* -------- CALL TO CORE INTEGRATOR ------------ */
-	roscor_(n, (U_fp)fcn, x, &y[1], xend, &hmax, h__, &rtol[1], &atol[1],
-		itol, (U_fp)jac, ijac, mljac, mujac, (U_fp)dfx, idfx, (U_fp)mas,
-		mlmas, mumas, (U_fp)solout, iout, idid, &nmax, &uround, &meth, &
+	roscor_(n, x, &y[1], xend, &hmax, h__, &rtol[1], &atol[1],
+		itol, ijac, mljac, mujac, idfx,
+		mlmas, mumas, iout, idid, &nmax, &uround, &meth, &
 		ijob, &fac1, &fac2, &safe, &autnms, &implct, &jband, &pred, &
 		ldjac, &lde, &ldmas2, &work[ieynew], &work[iedy1], &work[iedy], &
 		work[ieak1], &work[ieak2], &work[ieak3], &work[ieak4], &work[
@@ -5783,11 +5786,11 @@ L55:
 
 /*  ----- ... AND HERE IS THE CORE INTEGRATOR  ---------- */
 
-/* Subroutine */ int roscor_(typeLInt *n, S_fp fcn, typeRNum *x, typeRNum *
+/* Subroutine */ int roscor_(typeLInt *n, typeRNum *x, typeRNum *
 	y, typeRNum *xend, typeRNum *hmax, typeRNum *h__, typeRNum *
-	rtol, typeRNum *atol, typeLInt *itol, S_fp jac, typeLInt *ijac,
-	typeLInt *mljac, typeLInt *mujac, S_fp dfx, typeLInt *idfx, S_fp mas,
-	typeLInt *mlmas, typeLInt *mumas, S_fp solout, typeLInt *iout, typeLInt *
+	rtol, typeRNum *atol, typeLInt *itol, typeLInt *ijac,
+	typeLInt *mljac, typeLInt *mujac, typeLInt *idfx,
+	typeLInt *mlmas, typeLInt *mumas, typeLInt *iout, typeLInt *
 	idid, typeLInt *nmax, typeRNum *uround, typeLInt *meth, typeLInt *ijob,
 	typeRNum *fac1, typeRNum *fac2, typeRNum *safe, typeLogical *
 	autnms, typeLogical *implct, typeLogical *banded, typeLogical *pred, typeLInt *
@@ -5797,7 +5800,7 @@ L55:
 	fx, typeRNum *fjac, typeRNum *e, typeRNum *fmas, typeLInt *ip,
 	typeRNum *cont, typeLInt *m1, typeLInt *m2, typeLInt *nm1, typeLInt *
 	nfcn, typeLInt *njac, typeLInt *nstep, typeLInt *naccpt, typeLInt *nrejct,
-	typeLInt *ndec, typeLInt *nsol, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeffctPtr pfct)
+	typeLInt *ndec, typeLInt *nsol, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	/* Format strings */
 	static char fmt_979[] = "(\002 EXIT OF RODAS AT X=\002,e18.4)";
@@ -5915,7 +5918,7 @@ L55:
 	lrc = *n << 2;
 	/* ------- COMPUTE MASS MATRIX FOR IMPLICIT CASE ---------- */
 	if (*implct) {
-		(*mas)(nm1, &fmas[fmas_offset], ldmas, grampc, pfct);
+		MfctRodas(nm1, &fmas[fmas_offset], ldmas, grampc, pfct);
 	}
 	/* ------ SET THE PARAMETERS OF THE METHOD ----- */
 	rocoe_(meth, &a21, &a31, &a32, &a41, &a42, &a43, &a51, &a52, &a53, &a54, &
@@ -5990,7 +5993,7 @@ L1:
 	/* *** *** *** *** *** *** *** */
 	/*  COMPUTATION OF THE JACOBIAN */
 	/* *** *** *** *** *** *** *** */
-	(*fcn)(n, x, &y[1], &dy1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, x, &y[1], &dy1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	++(*nfcn);
 	++(*njac);
 	if (*ijac == 0) {
@@ -6014,7 +6017,7 @@ L1:
 					if (j <= mm * *m2) {
 						goto L12;
 					}
-					(*fcn)(n, x, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+					ffctRodas(n, x, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 					j = k + (mm - 1) * *m2;
 					j1 = k;
 					/* Computing MAX */
@@ -6049,7 +6052,7 @@ L1:
 				d__1 = (typeRNum)1e-5, d__2 = DABS(ysafe);
 				delt = SQRT(*uround * MAX(d__1, d__2));
 				y[i__] = ysafe + delt;
-				(*fcn)(n, x, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+				ffctRodas(n, x, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 				i__2 = *n;
 				for (j = *m1 + 1; j <= i__2; ++j) {
 					fjac[j - *m1 + i__ * fjac_dim1] = (ak1[j] - dy1[j]) /
@@ -6062,7 +6065,7 @@ L1:
 	}
 	else {
 		/* --- COMPUTE JACOBIAN MATRIX ANALYTICALLY */
-		(*jac)(n, x, &y[1], &fjac[fjac_offset], ldjac, tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+		dfdxRodas(n, x, &y[1], &fjac[fjac_offset], ldjac, tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	}
 	if (!(*autnms)) {
 		if (*idfx == 0) {
@@ -6071,7 +6074,7 @@ L1:
 			d__1 = (typeRNum)1e-5, d__2 = DABS(*x);
 			delt = SQRT(*uround * MAX(d__1, d__2));
 			xdelt = *x + delt;
-			(*fcn)(n, &xdelt, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+			ffctRodas(n, &xdelt, &y[1], &ak1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 			i__1 = *n;
 			for (j = 1; j <= i__1; ++j) {
 				fx[j] = (ak1[j] - dy1[j]) / delt;
@@ -6079,7 +6082,7 @@ L1:
 		}
 		else {
 			/* --- COMPUTE ANALYTICALLY THE DERIVATIVE WITH RESPECT TO X */
-			(*dfx)(n, x, &y[1], &fx[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+			dfdtRodas(n, x, &y[1], &fx[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 		}
 	}
 L2:
@@ -6125,7 +6128,7 @@ L2:
 		ynew[i__] = y[i__] + a21 * ak1[i__];
 	}
 	d__1 = *x + c2 * *h__;
-	(*fcn)(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 		ynew[i__] = hc21 * ak1[i__];
@@ -6138,7 +6141,7 @@ L2:
 		ynew[i__] = y[i__] + a31 * ak1[i__] + a32 * ak2[i__];
 	}
 	d__1 = *x + c3 * *h__;
-	(*fcn)(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 		ynew[i__] = hc31 * ak1[i__] + hc32 * ak2[i__];
@@ -6151,7 +6154,7 @@ L2:
 		ynew[i__] = y[i__] + a41 * ak1[i__] + a42 * ak2[i__] + a43 * ak3[i__];
 	}
 	d__1 = *x + c4 * *h__;
-	(*fcn)(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 		ynew[i__] = hc41 * ak1[i__] + hc42 * ak2[i__] + hc43 * ak3[i__];
@@ -6165,7 +6168,7 @@ L2:
 			+ a54 * ak4[i__];
 	}
 	d__1 = *x + *h__;
-	(*fcn)(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 		ak6[i__] = hc52 * ak2[i__] + hc54 * ak4[i__] + hc51 * ak1[i__] + hc53
@@ -6180,7 +6183,7 @@ L2:
 		ynew[i__] += ak5[i__];
 	}
 	d__1 = *x + *h__;
-	(*fcn)(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+	ffctRodas(n, &d__1, &ynew[1], &dy[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 	i__1 = *n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 		cont[i__] = hc61 * ak1[i__] + hc62 * ak2[i__] + hc65 * ak5[i__] +
@@ -6276,7 +6279,7 @@ L2:
 			irtrn = 1;
 			conros_1.hout = *h__;
 			i__1 = *naccpt + 1;
-			(*solout)(&i__1, &conros_1.xold, x, &conros_1.hout, &y[1],
+			solout(&i__1, &conros_1.xold, x, &conros_1.hout, &y[1],
 				&cont[1], &lrc, n, grampc, pfct, &irtrn);
 			if (irtrn < 0) {
 				goto L179;

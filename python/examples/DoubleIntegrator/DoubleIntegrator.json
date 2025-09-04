@@ -1,0 +1,22 @@
+{
+  "Parameters":
+  {
+    "x0": [-1.0, -1.0],
+    "xdes": [0.0, 0.0],
+    "u0": [0.0],
+    "udes": [0.0],
+    "umax": [1.0],
+    "umin": [-1.0],
+    "Thor": 6.0,
+    "Tmax": 20.0,
+    "Tmin": 0.001,
+    "dt": 0.001,
+    "t0": 0.0
+  },
+  "Options":
+  {
+    "OptimTime": "on",
+    "OptimTimeLineSearchFactor": 0.35,
+    "ConstraintsAbsTol": [1e-3, 1e-3]
+  }
+}

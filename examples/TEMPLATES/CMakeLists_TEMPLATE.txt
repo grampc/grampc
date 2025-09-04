@@ -1,0 +1,29 @@
+add_executable(TEMPLATE
+    main_TEMPLATE.c
+    probfct_TEMPLATE.c
+)
+target_link_libraries(TEMPLATE grampc ${grampc_link_math})
+
+add_executable(TEMPLATE_OCP
+    main_OCP_TEMPLATE.c
+    probfct_TEMPLATE_OCP.c
+)
+target_link_libraries(TEMPLATE_OCP grampc ${grampc_link_math})
+
+# Optional compile with fixed-size option (read the manual first)
+add_executable(TEMPLATE_fixedsize
+    ${grampc_source_files}
+    main_TEMPLATE.c
+    probfct_TEMPLATE.c
+)
+target_include_directories(TEMPLATE_fixedsize PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(TEMPLATE_fixedsize PUBLIC FIXEDSIZE)
+target_link_libraries(TEMPLATE_fixedsize ${grampc_link_math})
+
+# create directory optional directory and copy the cfg file into it. This is especially needed for MSVC
+add_custom_command(
+    TARGET TEMPLATE
+    POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:TEMPLATE>"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/config_TEMPLATE.cfg" "$<TARGET_FILE_DIR:TEMPLATE>"
+)

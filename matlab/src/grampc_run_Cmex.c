@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -14,18 +15,10 @@
 #include "mex.h"
 #include "grampc.h"
 #include "grampc_conversion_Cmex.h"
+#include "timing.h"
 
 #ifndef N_TIMER
 #define N_TIMER 1
-#endif
-
-/* Runtime measurement */
-#ifdef N_TIMER
-#ifdef _WIN32
-#include <Windows.h>
-#elif defined(__linux__) || defined(__APPLE__)
-#include <sys/time.h> 
-#endif
 #endif
 
 
@@ -35,20 +28,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	typeGRAMPC* grampc;
-	typeRNum * comptime;
+	typeRNum* comptime;
 
 	mxArray *mxuserparam = NULL;
 
 	/* variables for runtime measurement */
-#ifdef N_TIMER
-	typeInt i;
-	typeGRAMPC* grampcArray[N_TIMER];
-#ifdef _WIN32
-	LARGE_INTEGER StartingTime, EndingTime, ElapsedMicroseconds;
-	LARGE_INTEGER Frequency;
-#elif defined(__linux__) || defined(__APPLE__)
-	struct timeval StartingTime, EndingTime;
-#endif
+    typeTime tic, toc;
+#if N_TIMER > 1
+    typeGRAMPC* grampcArray[N_TIMER-1];
 #endif
 
 	/* check proper number of input arguments */
@@ -78,44 +65,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	/* runtime analysis */
 
-#ifdef N_TIMER
+#if N_TIMER > 1
 	/* copy GRAMPC struct for runtime analysis */
-	for (i = 0; i < N_TIMER; i++) {
+	for (int i = 0; i < N_TIMER-1; i++) {
 		mx2typeGRAMPC((grampcArray + i), prhs[0], mxuserparam);
 	}
-
-	/* initialize variables for runtime check */
-#ifdef _WIN32
-	QueryPerformanceFrequency(&Frequency);
-	QueryPerformanceCounter(&StartingTime);
-#elif defined(__linux__) || defined(__APPLE__)
-	gettimeofday(&StartingTime, NULL);
 #endif
+
+    timer_now(&tic);
 
 	/* run GRAMPC while measuring time */
 	grampc_run(grampc);
 
-	for (i = 0; i < N_TIMER-1; i++) {
+#if N_TIMER > 1
+	for (int i = 0; i < N_TIMER-1; i++) {
 		grampc_run(grampcArray[i]);
 	}
-
-	/* runtime evaluation */
-#ifdef _WIN32
-	QueryPerformanceCounter(&EndingTime);
-	ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
-	ElapsedMicroseconds.QuadPart *= (100000000 / N_TIMER); /* 100ns */
-	ElapsedMicroseconds.QuadPart /= (Frequency.QuadPart);
-	*comptime = ((typeRNum)(ElapsedMicroseconds.QuadPart) / 100000); /* time in ms */
-#elif defined(__linux__) || defined(__APPLE__)
-	gettimeofday(&EndingTime, NULL);
-	*comptime = (EndingTime.tv_sec - StartingTime.tv_sec) * 1000000.0;      /* sec to µs */
-	*comptime += (EndingTime.tv_usec - StartingTime.tv_usec) * 1.0;         /* µs to µs */
-	*comptime /= 1000.0;																										/* µs to ms */
-	*comptime /= N_TIMER; /* Time of one MPC step */
 #endif
 
+    timer_now(&toc);
+    *comptime = timer_diff_ms(&tic, &toc) / N_TIMER;
+
+#if N_TIMER > 1
 	/* free copies of GRAMPC struct */
-	for (i = 0; i < N_TIMER; i++) {
+	for (int i = 0; i < N_TIMER-1; i++) {
 		grampc_free((grampcArray + i));
 	}
 #endif

@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -262,7 +263,10 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 #ifdef FIXEDSIZE
         grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
 #else
-		if (!strcmp(optValue, "trapezodial")) {
+        if (!strcmp(optValue, "discrete")) {
+            grampc->opt->IntegratorCost = INT_COSTDISC;
+        }
+        else if (!strcmp(optValue, "trapezoidal")) {
 			grampc->opt->IntegratorCost = INT_TRAPZ;
 		}
 		else if (!strcmp(optValue, "simpson")) {
@@ -279,20 +283,26 @@ void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, con
 #ifdef FIXEDSIZE
         grampc_warning_addstring(INVALID_OPTION_FIXEDSIZE, optName);
 #else
-		if (!strcmp(optValue, "euler")) {
-			grampc->opt->Integrator = INT_EULER;
+        if (!strcmp(optValue, "discrete")) {
+            grampc->opt->Integrator = INT_SYSDISC;
+        }
+        else if (!strcmp(optValue, "erk1") || !strcmp(optValue, "euler")) {
+			grampc->opt->Integrator = INT_ERK1;
 		}
-		else if (!strcmp(optValue, "modeuler")) {
-			grampc->opt->Integrator = INT_MODEULER;
+		else if (!strcmp(optValue, "erk2") || !strcmp(optValue, "heun")) {
+			grampc->opt->Integrator = INT_ERK2;
 		}
-		else if (!strcmp(optValue, "heun")) {
-			grampc->opt->Integrator = INT_HEUN;
+		else if (!strcmp(optValue, "erk3")) {
+			grampc->opt->Integrator = INT_ERK3;
 		}
-		else if (!strcmp(optValue, "rodas")) {
-			grampc->opt->Integrator = INT_RODAS;
+		else if (!strcmp(optValue, "erk4")) {
+			grampc->opt->Integrator = INT_ERK4;
 		}
 		else if (!strcmp(optValue, "ruku45")) {
 			grampc->opt->Integrator = INT_RUKU45;
+		}
+		else if (!strcmp(optValue, "rodas")) {
+			grampc->opt->Integrator = INT_RODAS;
 		}
 		else {
 			grampc_error_addstring(INVALID_OPTION_VALUE, optName);
@@ -460,7 +470,7 @@ void grampc_printopt(const typeGRAMPC *grampc)
 
 	myPrint("                 IntegralCost: %s\n", grampc->opt->IntegralCost == INT_ON ? "on" : "off");
 	myPrint("                 TerminalCost: %s\n", grampc->opt->TerminalCost == INT_ON ? "on" : "off");
-	myPrint("               IntegratorCost: %s\n", grampc->opt->IntegratorCost == INT_TRAPZ ? "trapezodial" : "simpson");
+    myPrint("               IntegratorCost: %s\n", IntegratorCostInt2Str(grampc->opt->IntegratorCost));
 
 	myPrint("                   Integrator: %s\n", IntegratorInt2Str(grampc->opt->Integrator));
 	myPrint("             IntegratorRelTol: %.2e\n", grampc->opt->IntegratorRelTol);

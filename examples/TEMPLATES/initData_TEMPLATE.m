@@ -1,16 +1,17 @@
-function [grampc,Tsim,grampc_sdata] = initData()
+function [grampc,Tsim,grampc_sdata] = initData_TEMPLATE()
 % This function initializes a grampc struct in MATLAB and sets parameters 
 % and options. In case of three output arguments the struct grampc_sdata for
 % the use in Simulink is created as well. Define all options and parameters
 % for the use of GRAMPC in MATLAB here.
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -53,10 +54,10 @@ user.opt.ShiftControl = 'on';
 % Cost integration
 user.opt.IntegralCost = 'on';
 user.opt.TerminalCost = 'on';
-user.opt.IntegratorCost = 'trapezodial';
+user.opt.IntegratorCost = 'trapezoidal';
 
 % System integration
-user.opt.Integrator = 'heun';
+user.opt.Integrator = 'erk2';
 user.opt.IntegratorRelTol = 1e-6;
 user.opt.IntegratorAbsTol = 1e-8;
 user.opt.IntegratorMinStepSize = 1e-16;

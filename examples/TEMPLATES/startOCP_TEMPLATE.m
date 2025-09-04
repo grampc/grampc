@@ -12,13 +12,14 @@ function [vec,grampc,figNr] = startOCP(figNr,compile,varargin)
 %            make.m in the matlab folder for more details
 %
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -63,7 +64,11 @@ end
 
 %% Initialization
 % init GRAMPC, estimate option PenaltyMin and print options and parameters
+% Init with options and parameter defines in initData.m
 [grampc,~] = initData_TEMPLATE;
+% Init with options and parameter from configuration file
+% [grampc,~] = initData_TEMPLATE_CONFIG;
+
 CmexFiles.grampc_printopt_Cmex(grampc);
 CmexFiles.grampc_printparam_Cmex(grampc);
 
@@ -72,11 +77,11 @@ MaxMultIter = 100;
 vec = grampc_init_struct_sol(grampc, [], MaxMultIter);
 
 % init plots and store figure handles
-if PLOT_PRED
+if figNr > 0 && PLOT_PRED
     phpP = grampc_init_plot_pred(grampc,figNr);
     figNr = figNr+1;
 end
-if PLOT_STAT
+if figNr > 0 && PLOT_STAT
     phpS = grampc_init_plot_stat(vec,grampc,figNr);
     figNr = figNr+1;
 end
@@ -113,7 +118,7 @@ while i <= MaxMultIter
     end
     
     % plot data
-    if mod(i,PLOT_STEPS) == 0 || i == MaxMultIter || converged
+    if figNr > 0 && (mod(i,PLOT_STEPS) == 0 || i == MaxMultIter || converged)
         if PLOT_PRED
             grampc_update_plot_pred(grampc,phpP);
         end

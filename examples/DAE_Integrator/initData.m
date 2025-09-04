@@ -4,13 +4,14 @@ function [grampc,Tsim,grampc_sdata] = initData()
 % the use in Simulink is created as well. Define all options and parameters
 % for the use of GRAMPC in MATLAB here.
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -54,7 +55,7 @@ user.opt.IntegratorRelTol = 1e-4;
 user.opt.IntegratorAbsTol = 1e-5;
 IFCN = 0;		% 0 --> right hand side independent of time t  
 IDFX = 0;		% 0 --> DF/Dt is numerically computed 
-IJAC = 0;		% 1(0) -> analytical (numerical) jacobian (partial derivatives of right hand side w.r.t. state) 
+IJAC = 1;       % 1(0) -> analytical (numerical) jacobian (partial derivatives of right hand side w.r.t. state)
 IMAS = 1;		% 1 --> mass matrix is supplied 
 MLJAC = Nx;		% no. of lower diagonals of jacobian ~	value must be between 1 and NX 
 MUJAC = Nx;		% no. of upper diagonals of jacobian ~	value must be between 1 and NX 

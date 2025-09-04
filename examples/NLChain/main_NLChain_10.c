@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -13,7 +14,7 @@
 
 
 #include "grampc.h"
-#include <time.h>
+#include "timing.h"
 
 #define N 10 /* number of chain elements */
 
@@ -36,16 +37,16 @@ void openFile(FILE **file, const char *name) {
 void printNumVector2File(FILE *file, ctypeRNum *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%.5f ,", val[i]);
+		fprintf(file, "%.5f, ", val[i]);
 	}
-	fprintf(file, "%.5f;\n", val[size - 1]); /* new line */
+	fprintf(file, "%.5f\n", val[size - 1]); /* new line */
 }
 void printIntVector2File(FILE *file, ctypeInt *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%d ,", val[i]);
+		fprintf(file, "%d, ", val[i]);
 	}
-	fprintf(file, "%d;\n", val[size - 1]); /* new line */
+	fprintf(file, "%d\n", val[size - 1]); /* new line */
 }
 #endif
 
@@ -59,7 +60,7 @@ int main()
 	FILE *file_x, *file_u, *file_p, *file_T, *file_J, *file_Ncfct, *file_Npen, *file_iter, *file_status, *file_t;
 #endif
 
-	clock_t tic, toc;
+	typeTime tic, toc;
 	typeRNum *CPUtimeVec;
 	typeRNum CPUtime = 0;
 
@@ -152,10 +153,10 @@ int main()
 	printf("MPC running ...\n");
 	for (iMPC = 0; iMPC <= MaxSimIter; iMPC++) {
 		/* run grampc */
-		tic = clock();
+		timer_now(&tic);
 		grampc_run(grampc);
-		toc = clock();
-		CPUtimeVec[iMPC] = (typeRNum)((toc - tic) * 1000 / CLOCKS_PER_SEC);
+		timer_now(&toc);
+		CPUtimeVec[iMPC] = timer_diff_ms(&tic, &toc);
 
 		/* check solver status */
 		if (grampc->sol->status > 0) {
@@ -197,8 +198,9 @@ int main()
 #endif
 
 	for (i = 0; i <= MaxSimIter; i++) {
-		CPUtime = CPUtime + CPUtimeVec[i] / (MaxSimIter + 1);
+		CPUtime = CPUtime + CPUtimeVec[i];
 	}
+	CPUtime = CPUtime / (MaxSimIter + 1);
 
 	grampc_free(&grampc);
 	free(CPUtimeVec);

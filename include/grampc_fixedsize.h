@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -93,9 +94,10 @@
 
 /* Compute required size of field rwsGeneral */
 #define SIZE_WADJSYS (NX)
-#define SIZE_EULER (NX)
-#define SIZE_MODEULER (5 * NX + NU + NC)
-#define SIZE_HEUN (3 * NX)
+#define SIZE_ERK1 (NX)
+#define SIZE_ERK2 (3 * NX)
+#define SIZE_ERK3 (6 * NX + NU)
+#define SIZE_ERK4 (7 * NX + NU)
 #define SIZE_RUKU45 (18 * NX + NU)
 #define SIZE_RODAS (2 * NX + NU)
 #define SIZE_SIMPSON (NX + NU + 3 * NC + 5)
@@ -105,27 +107,29 @@
 #define SIZE_GRADT (NX)
 
 /* Size for integration depends on integrator type */
-#if (INTEGRATOR == INT_EULER)
-#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_EULER)
-#elif (INTEGRATOR == INT_MODEULER)
-#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_MODEULER)
-#elif (INTEGRATOR == INT_HEUN)
-#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_HEUN)
+#if (INTEGRATOR == INT_ERK1 || INTEGRATOR == INT_SYSDISC)
+#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_ERK1)
+#elif (INTEGRATOR == INT_ERK2)
+#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_ERK2)
+#elif (INTEGRATOR == INT_ERK3)
+#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_ERK3)
+#elif (INTEGRATOR == INT_ERK4)
+#define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_ERK4)
 #elif (INTEGRATOR == INT_RUKU45)
 #define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_RUKU45)
 #elif (INTEGRATOR == INT_RODAS)
 #define SIZE_INTEGRATOR (SIZE_WADJSYS + SIZE_RODAS)
 #else
-#error "Invalid value for INTEGRATOR, define as one of INT_EULER, INT_MODEULER, INT_HEUN, INT_RUKU45, INT_RODAS."
+#error "Invalid value for INTEGRATOR, define as one of INT_SYSDISC, INT_ERK1, INT_ERK2, INT_ERK3, INT_ERK4, INT_RUKU45, INT_RODAS."
 #endif
 
 /* Size for cost integration depends on integrator type */
-#if (INTEGRATORCOST == INT_TRAPZ)
+#if (INTEGRATORCOST == INT_TRAPZ || INTEGRATORCOST == INT_COSTDISC)
 #define SIZE_INTEGRATORCOST SIZE_TRAPEZOIDAL
 #elif (INTEGRATORCOST == INT_SIMPSON)
 #define SIZE_INTEGRATORCOST SIZE_SIMPSON
 #else
-#error "Invalid value for INTEGRATORCOST, define as one of INT_TRAPZ, INT_SIMPSON."
+#error "Invalid value for INTEGRATORCOST, define as one of INT_TRAPZ, INT_SIMPSON, INT_COSTDISC."
 #endif
 
 /* Size for constraints depends on number of constraints */
@@ -172,11 +176,11 @@
 
 /* Macro for creating grampc structure and pointer 'name' without dynamic memory allocation */
 #define TYPE_GRAMPC_POINTER(name) \
-    typeGRAMPCparam name##_param = {}; \
-    typeGRAMPCopt name##_opt = {}; \
-    typeGRAMPCsol name##_sol = {}; \
-    typeGRAMPCrws name##_rws = {}; \
-    typeGRAMPC name##_struct = {}; \
+    typeGRAMPCparam name##_param = {0}; \
+    typeGRAMPCopt name##_opt = {0}; \
+    typeGRAMPCsol name##_sol = {0}; \
+    typeGRAMPCrws name##_rws = {0}; \
+    typeGRAMPC name##_struct = {0}; \
     name##_struct.param = &name##_param; \
     name##_struct.opt = &name##_opt; \
     name##_struct.sol = &name##_sol; \

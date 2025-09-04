@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -77,15 +78,18 @@
 #define INT_NONUNIFORM  1
 
 /* Integer values corresponding to option Integrator */
-#define INT_EULER       0
-#define INT_MODEULER    1
-#define INT_HEUN        2
-#define INT_RODAS       3
-#define INT_RUKU45      4
+#define INT_SYSDISC     0
+#define INT_ERK1        1
+#define INT_ERK2        2
+#define INT_ERK3        3
+#define INT_ERK4        4
+#define INT_RUKU45      5
+#define INT_RODAS       6
 
 /* Integer values corresponding to option IntegratorCost */
 #define INT_TRAPZ       0
 #define INT_SIMPSON     1
+#define INT_COSTDISC    2
 
 /* Integer values corresponding to option LineSearchType */
 #define INT_ADAPTIVELS  0

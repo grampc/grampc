@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -13,6 +14,15 @@
 
 
 #include "grampc_run.h"
+#include "grampc_erk.h"
+#include "grampc_mess.h"
+#include "grampc_util.h"
+#include "probfct.h"
+#include "discrete.h"
+#include "rodas.h"
+#include "ruku45.h"
+#include "trapezoidal.h"
+#include "simpson.h"
 
 
 void grampc_run(const typeGRAMPC *grampc)
@@ -46,6 +56,14 @@ void grampc_run(const typeGRAMPC *grampc)
 	if (grampc->param->Thor < grampc->param->dt) {
 		grampc_error(THOR_NOT_VALID);
 	}
+    if (grampc->opt->Integrator == INT_SYSDISC) {
+        if (grampc->param->Thor != (grampc->opt->Nhor - 1) * grampc->param->dt) {
+            grampc_error(DISCRETE_NOT_VALID);
+        }
+        if (grampc->opt->OptimTime) {
+            grampc_error(OPTIM_TIME_NOT_VALID);
+        }
+    }
 
 	/* Initial condition */
 	if (grampc->opt->ScaleProblem == INT_ON) {
@@ -316,7 +334,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 			if (grampc->param->Ng > 0 && grampc->opt->EqualityConstraints == INT_ON) {
 
 				/* Evaluate constraints */
-				gfct(cfct, t[i], x_, u_, p_, grampc->userparam);
+				MatSetScalar(cfct, 0, 1, grampc->param->Ng);
+				gfct(cfct, t[i], x_, u_, p_, grampc->param, grampc->userparam);
 				if (grampc->opt->ScaleProblem == INT_ON) {
 					scale_constraints(cfct, cScale, grampc->param->Ng);
 				}
@@ -333,16 +352,16 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 						scale_constraints(c, cScale, grampc->param->Ng);
 					}
 
-					dgdx_vec(dgdxvec, t[i], x_, u_, p_, c, grampc->userparam);
+					dgdx_vec(dgdxvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 					MatAdd(dcdx, dcdx, dgdxvec, 1, grampc->param->Nx);
 
 					if (grampc->opt->OptimControl == INT_ON) {
-						dgdu_vec(dgduvec, t[i], x_, u_, p_, c, grampc->userparam);
+						dgdu_vec(dgduvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 						MatAdd(dcdu, dcdu, dgduvec, 1, grampc->param->Nu);
 					}
 
 					if (grampc->opt->OptimParam == INT_ON) {
-						dgdp_vec(dgdpvec, t[i], x_, u_, p_, c, grampc->userparam);
+						dgdp_vec(dgdpvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 						MatAdd(dcdp, dcdp, dgdpvec, 1, grampc->param->Np);
 					}
 				}
@@ -359,7 +378,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 			if (grampc->param->Nh > 0 && grampc->opt->InequalityConstraints == INT_ON) {
 
 				/* Evaluate constraints */
-				hfct(cfct, t[i], x_, u_, p_, grampc->userparam);
+				MatSetScalar(cfct, 0, 1, grampc->param->Nh);
+				hfct(cfct, t[i], x_, u_, p_, grampc->param, grampc->userparam);
 				if (grampc->opt->ScaleProblem == INT_ON) {
 					scale_constraints(cfct, cScale, grampc->param->Nh);
 				}
@@ -377,16 +397,16 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 						scale_constraints(c, cScale, grampc->param->Nh);
 					}
 
-					dhdx_vec(dhdxvec, t[i], x_, u_, p_, c, grampc->userparam);
+					dhdx_vec(dhdxvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 					MatAdd(dcdx, dcdx, dhdxvec, 1, grampc->param->Nx);
 
 					if (grampc->opt->OptimControl == INT_ON) {
-						dhdu_vec(dhduvec, t[i], x_, u_, p_, c, grampc->userparam);
+						dhdu_vec(dhduvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 						MatAdd(dcdu, dcdu, dhduvec, 1, grampc->param->Nu);
 					}
 
 					if (grampc->opt->OptimParam == INT_ON) {
-						dhdp_vec(dhdpvec, t[i], x_, u_, p_, c, grampc->userparam);
+						dhdp_vec(dhdpvec, t[i], x_, u_, p_, c, grampc->param, grampc->userparam);
 						MatAdd(dcdp, dcdp, dhdpvec, 1, grampc->param->Np);
 					}
 				}
@@ -428,7 +448,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 		if (grampc->param->NgT > 0 && grampc->opt->TerminalEqualityConstraints == INT_ON) {
 
 			/* Evaluate constraints */
-			gTfct(cfct, t[i], x_, p_, grampc->userparam);
+			MatSetScalar(cfct, 0, 1, grampc->param->NgT);
+			gTfct(cfct, t[i], x_, p_, grampc->param, grampc->userparam);
 			if (grampc->opt->ScaleProblem == INT_ON) {
 				scale_constraints(cfct, cScale, grampc->param->NgT);
 			}
@@ -445,16 +466,16 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 					scale_constraints(c, cScale, grampc->param->NgT);
 				}
 
-				dgTdx_vec(dgdxvec, t[i], x_, p_, c, grampc->userparam);
+				dgTdx_vec(dgdxvec, t[i], x_, p_, c, grampc->param, grampc->userparam);
 				MatAdd(dcdx, dcdx, dgdxvec, 1, grampc->param->Nx);
 
 				if (grampc->opt->OptimParam == INT_ON) {
-					dgTdp_vec(dgdpvec, t[i], x_, p_, c, grampc->userparam);
+					dgTdp_vec(dgdpvec, t[i], x_, p_, c, grampc->param, grampc->userparam);
 					MatAdd(dcdp, dcdp, dgdpvec, 1, grampc->param->Np);
 				}
 
 				if (grampc->opt->OptimTime == INT_ON) {
-					dgTdT_vec(&dgTdT, t[i], x_, p_, c, grampc->userparam);
+					dgTdT_vec(&dgTdT, t[i], x_, p_, c, grampc->param, grampc->userparam);
 					*dcdt = *dcdt + dgTdT;
 				}
 			}
@@ -471,7 +492,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 		if (grampc->param->NhT > 0 && grampc->opt->TerminalInequalityConstraints == INT_ON) {
 
 			/* Evaluate constraints */
-			hTfct(cfct, t[i], x_, p_, grampc->userparam);
+			MatSetScalar(cfct, 0, 1, grampc->param->NhT);
+			hTfct(cfct, t[i], x_, p_, grampc->param, grampc->userparam);
 			if (grampc->opt->ScaleProblem == INT_ON) {
 				scale_constraints(cfct, cScale, grampc->param->NhT);
 			}
@@ -489,16 +511,16 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 					scale_constraints(c, cScale, grampc->param->NhT);
 				}
 
-				dhTdx_vec(dhdxvec, t[i], x_, p_, c, grampc->userparam);
+				dhTdx_vec(dhdxvec, t[i], x_, p_, c, grampc->param, grampc->userparam);
 				MatAdd(dcdx, dcdx, dhdxvec, 1, grampc->param->Nx);
 
 				if (grampc->opt->OptimParam == INT_ON) {
-					dhTdp_vec(dhdpvec, t[i], x_, p_, c, grampc->userparam);
+					dhTdp_vec(dhdpvec, t[i], x_, p_, c, grampc->param, grampc->userparam);
 					MatAdd(dcdp, dcdp, dhdpvec, 1, grampc->param->Np);
 				}
 
 				if (grampc->opt->OptimTime == INT_ON) {
-					dhTdT_vec(&dhTdT, t[i], x_, p_, c, grampc->userparam);
+					dhTdT_vec(&dhTdT, t[i], x_, p_, c, grampc->param, grampc->userparam);
 					*dcdt = *dcdt + dhTdT;
 				}
 			}
@@ -594,24 +616,18 @@ void compute_jacobian_multiplier(typeRNum *c, ctypeRNum *mult, ctypeRNum *pen, c
 
 void evaluate_sys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC *grampc)
 {
-	typeIntffctPtr pIntSys;
 	ctypeRNum *p_ = p;
+	typeSysIntegratorPtr pIntSys = &intsysERK2;
 
 	/* integrator for system integration */
-	if (grampc->opt->Integrator == INT_EULER) {
-		pIntSys = &intsysEuler;
-	}
-	else if (grampc->opt->Integrator == INT_MODEULER) {
-		pIntSys = &intsysModEuler;
-	}
-	else if (grampc->opt->Integrator == INT_HEUN) {
-		pIntSys = &intsysHeun;
-	}
-	else if (grampc->opt->Integrator == INT_RODAS) {
-		pIntSys = &intsysRodas;
-	}
-	else {
-		pIntSys = &intsysRuKu45;
+	switch (grampc->opt->Integrator) {
+	case INT_SYSDISC: pIntSys = &intsysDiscrete; break;
+	case INT_ERK1:    pIntSys = &intsysERK1; break;
+	case INT_ERK2:    pIntSys = &intsysERK2; break;
+	case INT_ERK3:    pIntSys = &intsysERK3; break;
+	case INT_ERK4:    pIntSys = &intsysERK4; break;
+	case INT_RUKU45:  pIntSys = &intsysRuKu45; break;
+	case INT_RODAS:   pIntSys = &intsysRodas; break;
 	}
 
 	/* Unscaling */
@@ -619,7 +635,7 @@ void evaluate_sys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC *gr
 		ASSIGN_P(p_, p, grampc);
 	}
 
-	(*pIntSys)(grampc->rws->x, FWINT, grampc->opt->Nhor, t, grampc->rws->x, u, p_, grampc, &Wsys);
+	(*pIntSys)(grampc->rws->x, FWINT, grampc->opt->Nhor, t, grampc->rws->x, u, p_, grampc->rws->dcdx, grampc, &Wsys);
 }
 
 void evaluate_adjsys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC *grampc)
@@ -628,24 +644,17 @@ void evaluate_adjsys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC 
 	ctypeRNum *x_ = grampc->rws->x + i * grampc->param->Nx;
 	ctypeRNum *p_ = p;
 	typeRNum *adj_ = grampc->rws->adj + i * grampc->param->Nx;
-
-	typeIntffctPtr pIntSys;
+	typeSysIntegratorPtr pIntSys = &intsysERK2;
 
 	/* integrator for adjoint system integration */
-	if (grampc->opt->Integrator == INT_EULER) {
-		pIntSys = &intsysEuler;
-	}
-	else if (grampc->opt->Integrator == INT_MODEULER) {
-		pIntSys = &intsysModEuler;
-	}
-	else if (grampc->opt->Integrator == INT_HEUN) {
-		pIntSys = &intsysHeun;
-	}
-	else if (grampc->opt->Integrator == INT_RODAS) {
-		pIntSys = &intsysRodas;
-	}
-	else {
-		pIntSys = &intsysRuKu45;
+	switch (grampc->opt->Integrator) {
+	case INT_SYSDISC: pIntSys = &intsysDiscrete; break;
+	case INT_ERK1:    pIntSys = &intsysERK1; break;
+	case INT_ERK2:    pIntSys = &intsysERK2; break;
+	case INT_ERK3:    pIntSys = &intsysERK3; break;
+	case INT_ERK4:    pIntSys = &intsysERK4; break;
+	case INT_RUKU45:  pIntSys = &intsysRuKu45; break;
+	case INT_RODAS:   pIntSys = &intsysRodas; break;
 	}
 
 	/* Unscaling */
@@ -655,11 +664,10 @@ void evaluate_adjsys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC 
 	}
 
 	/* Terminal condition for adjoint states */
-	MatSetScalar(adj_, 0, 1, grampc->param->Nx);
-
 	/* Jacobian of Terminal cost */
+	MatSetScalar(adj_, 0, 1, grampc->param->Nx);
 	if (grampc->opt->TerminalCost == INT_ON) {
-		dVdx(adj_, t[i], x_, p_, grampc->param->xdes, grampc->userparam);
+		dVdx(adj_, t[i], x_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(adj_, grampc->opt->JScale, grampc->param->Nx);
 		}
@@ -677,7 +685,8 @@ void evaluate_adjsys(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC 
 	}
 
 	/* integration of adjoint system in reverse time */
-	(*pIntSys)(adj_, BWINT, grampc->opt->Nhor, t + i, grampc->rws->x + i * grampc->param->Nx, u + i * grampc->param->Nu, p_, grampc, &Wadjsys);
+	(*pIntSys)(adj_, BWINT, grampc->opt->Nhor, t + i, grampc->rws->x + i * grampc->param->Nx, 
+	           u + i * grampc->param->Nu, p_, grampc->rws->dcdx + i * grampc->param->Nx, grampc, &Wadjsys);
 }
 
 void Wsys(typeRNum *s, ctypeRNum *x, ctypeRNum *t, ctypeRNum *dummy,
@@ -697,7 +706,8 @@ void Wsys(typeRNum *s, ctypeRNum *x, ctypeRNum *t, ctypeRNum *dummy,
 		ASSIGN_U(u_, u, grampc);
 	}
 
-	ffct(s, t[0] + grampc->param->t0, x_, u_, p_, grampc->userparam);
+	MatSetScalar(s, 0, 1, grampc->param->Nx);
+	ffct(s, t[0], x_, u_, p_, grampc->param, grampc->userparam);
 
 	/* Scaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
@@ -713,7 +723,7 @@ void Wadjsys(typeRNum *s, ctypeRNum *adj, ctypeRNum *t, ctypeRNum *x,
 	ctypeRNum *x_ = x;
 	ctypeRNum *adj_ = adj;
 	ctypeRNum *u_ = u;
-	typeRNum *dLdx = grampc->rws->rwsGeneral; /* size:  Nx */
+	typeRNum *dldx_val = grampc->rws->rwsGeneral; /* size:  Nx */
 
 	typeInt i;
 
@@ -724,26 +734,26 @@ void Wadjsys(typeRNum *s, ctypeRNum *adj, ctypeRNum *t, ctypeRNum *x,
 		ASSIGN_U(u_, u, grampc);
 	}
 
-	MatSetScalar(dLdx, 0, 1, grampc->param->Nx);
-
+	MatSetScalar(dldx_val, 0, 1, grampc->param->Nx);
 	if (grampc->opt->IntegralCost == INT_ON) {
-		dldx(dLdx, t[0], x_, u_, p_, grampc->param->xdes, grampc->param->udes, grampc->userparam);
+		dldx(dldx_val, t[0], x_, u_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
-			scale_cost(dLdx, grampc->opt->JScale, grampc->param->Nx);
+			scale_cost(dldx_val, grampc->opt->JScale, grampc->param->Nx);
 		}
 	}
 
-	dfdx_vec(s, t[0] + grampc->param->t0, x_, adj_, u_, p_, grampc->userparam);
+	MatSetScalar(s, 0, 1, grampc->param->Nx);
+	dfdx_vec(s, t[0], x_, u_, p_, adj_, grampc->param, grampc->userparam);
 
 	/* Scaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
 		for (i = 0; i < grampc->param->Nx; i++) {
-			s[i] = (-dLdx[i] - s[i] - dcdx[i]) * grampc->opt->xScale[i];
+			s[i] = (-dldx_val[i] - s[i] - dcdx[i]) * grampc->opt->xScale[i];
 		}
 	}
 	else {
 		for (i = 0; i < grampc->param->Nx; i++) {
-			s[i] = -dLdx[i] - s[i] - dcdx[i];
+			s[i] = -dldx_val[i] - s[i] - dcdx[i];
 		}
 	}
 }
@@ -751,6 +761,8 @@ void Wadjsys(typeRNum *s, ctypeRNum *adj, ctypeRNum *t, ctypeRNum *x,
 void evaluate_gradu(const typeGRAMPC *grampc)
 {
 	typeInt i, j;
+    typeInt adj_offset;
+    typeInt num_steps;
 
 	ctypeRNum *t = grampc->rws->t;
 	ctypeRNum *x_ = NULL;
@@ -759,52 +771,63 @@ void evaluate_gradu(const typeGRAMPC *grampc)
 	ctypeRNum *adj_ = NULL;
 	ctypeRNum *dcdu = NULL;
 
-	typeRNum *dLdu = grampc->rws->rwsGeneral;
-	typeRNum *s = dLdu + grampc->param->Nu;
-	/*                      dLdu  s  */
+	typeRNum *dldu_val = grampc->rws->rwsGeneral;
+	typeRNum *s = dldu_val + grampc->param->Nu;
+	/*                  dldu_val  s  */
 	/* sizeof(rwsGeneral) = Nu + Nu */
 
-	MatSetScalar(dLdu, 0, 1, grampc->param->Nu);
+    /* Discrete-time systems use H_u(x_k, u_k, \lambda_k+1) instead of H_u(x(t), u(t), \lambda(t)) */
+    /* Discrete-time systems never use u(T)=u_{N-1} therefore no gradient computation */
+    if (grampc->opt->Integrator == INT_SYSDISC) {
+        adj_offset = 1;
+        num_steps = grampc->opt->Nhor - 1;
+    }
+    else {
+        adj_offset = 0;
+        num_steps = grampc->opt->Nhor;
+    }
 
 	/* Unscaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
 		ASSIGN_P(p_, grampc->rws->p, grampc);
 	}
 
-	for (i = 0; i < grampc->opt->Nhor; i++) {
+    for (i = 0; i < num_steps; i++) {
 
 		dcdu = grampc->rws->dcdu + i * grampc->param->Nu;
 
 		/* Unscaling */
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			ASSIGN_X(x_, grampc->rws->x + i * grampc->param->Nx, grampc);
-			ASSIGN_ADJ(adj_, grampc->rws->adj + i * grampc->param->Nx, grampc);
+            ASSIGN_ADJ(adj_, grampc->rws->adj + (i + adj_offset) * grampc->param->Nx, grampc);
 			ASSIGN_U(u_, grampc->rws->u + i * grampc->param->Nu, grampc);
 		}
 		else {
 			x_ = grampc->rws->x + i * grampc->param->Nx;
-			adj_ = grampc->rws->adj + i * grampc->param->Nx;
+            adj_ = grampc->rws->adj + (i + adj_offset) * grampc->param->Nx;
 			u_ = grampc->rws->u + i * grampc->param->Nu;
 		}
 
+		MatSetScalar(dldu_val, 0, 1, grampc->param->Nu);
 		if (grampc->opt->IntegralCost == INT_ON) {
-			dldu(dLdu, t[i], x_, u_, p_, grampc->param->xdes, grampc->param->udes, grampc->userparam);
+			dldu(dldu_val, t[i], x_, u_, p_, grampc->param, grampc->userparam);
 			if (grampc->opt->ScaleProblem == INT_ON) {
-				scale_cost(dLdu, grampc->opt->JScale, grampc->param->Nu);
+				scale_cost(dldu_val, grampc->opt->JScale, grampc->param->Nu);
 			}
 		}
 
-		dfdu_vec(s, t[i] + grampc->param->t0, x_, adj_, u_, p_, grampc->userparam);
+		MatSetScalar(s, 0, 1, grampc->param->Nu);
+		dfdu_vec(s, t[i], x_, u_, p_, adj_, grampc->param, grampc->userparam);
 
 		/* Scaling */
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			for (j = 0; j < grampc->param->Nu; j++) {
-				grampc->rws->gradu[i*grampc->param->Nu + j] = (dLdu[j] + s[j] + dcdu[j]) * grampc->opt->uScale[j];
+				grampc->rws->gradu[i*grampc->param->Nu + j] = (dldu_val[j] + s[j] + dcdu[j]) * grampc->opt->uScale[j];
 			}
 		}
 		else {
 			for (j = 0; j < grampc->param->Nu; j++) {
-				grampc->rws->gradu[i*grampc->param->Nu + j] = dLdu[j] + s[j] + dcdu[j];
+				grampc->rws->gradu[i*grampc->param->Nu + j] = dldu_val[j] + s[j] + dcdu[j];
 			}
 		}
 	}
@@ -842,6 +865,8 @@ void evaluate_gradp(const typeGRAMPC *grampc)
 {
 	typeInt i, j;
 	typeRNum h;
+    typeInt adj_offset;
+    typeInt num_steps;
 
 	ctypeRNum *t = grampc->rws->t;
 	typeRNum *x = NULL;
@@ -856,27 +881,43 @@ void evaluate_gradp(const typeGRAMPC *grampc)
 	/* Initialize to zero */
 	MatSetScalar(gradp, 0.0, 1, grampc->param->Np);
 
+    /* Discrete-time systems use H_p(x_k, u_k, \lambda_k+1) instead of H_p(x(t), u(t), \lambda(t)) */
+    /* Discrete-time systems never use u(T)=u_{N-1} therefore no gradient computation */
+    if (grampc->opt->Integrator == INT_SYSDISC) {
+        adj_offset = 1;
+        num_steps = grampc->opt->Nhor - 1;
+    }
+    else {
+        adj_offset = 0;
+        num_steps = grampc->opt->Nhor;
+    }
+
 	/* Unscaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
 		ASSIGN_P(p_, grampc->rws->p, grampc);
 	}
 
-	/* Compute integral over gradp using trapezoidal rule */
-	for (i = 0; i < grampc->opt->Nhor; i++)
+	/* Evaluate integral using trapezoidal rule or discrete summation */
+	for (i = 0; i < num_steps; i++)
 	{
-		/* Integration step size */
-		if (i == 0) {
-			h = (t[i + 1] - t[i]) / 2;
-		}
-		else if (i <= grampc->opt->Nhor - 2) {
-			h = (t[i + 1] - t[i - 1]) / 2;
+		if (grampc->opt->Integrator == INT_SYSDISC) {
+			h = 1;
 		}
 		else {
-			h = (t[i] - t[i - 1]) / 2;
+			/* Integration step size */
+			if (i == 0) {
+				h = (t[i + 1] - t[i]) / 2;
+			}
+			else if (i <= grampc->opt->Nhor - 2) {
+				h = (t[i + 1] - t[i - 1]) / 2;
+			}
+			else {
+				h = (t[i] - t[i - 1]) / 2;
+			}
 		}
 
 		x = grampc->rws->x + i * grampc->param->Nx;
-		adj = grampc->rws->adj + i * grampc->param->Nx;
+		adj = grampc->rws->adj + (i + adj_offset) * grampc->param->Nx;
 		u = grampc->rws->u + i * grampc->param->Nu;
 		dcdp = grampc->rws->dcdp + i * grampc->param->Np;
 
@@ -889,7 +930,7 @@ void evaluate_gradp(const typeGRAMPC *grampc)
 	x = grampc->rws->x + (grampc->opt->Nhor - 1) * grampc->param->Nx;
 	dcdp = grampc->rws->dcdp + grampc->opt->Nhor * grampc->param->Np;
 
-	WtermParam(s, t[i], x, p_, dcdp, grampc);
+    WtermParam(s, t[grampc->opt->Nhor - 1], x, p_, dcdp, grampc);
 	MatAdd(gradp, gradp, s, 1, grampc->param->Np);
 
 	/* Scaling */
@@ -910,7 +951,6 @@ void WintParam(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *adj,
 
 	typeRNum *dldp_val = grampc->rws->rwsGeneral + grampc->param->Np;
 	typeRNum *dfdp_val = dldp_val + grampc->param->Np;
-	MatSetScalar(dldp_val, 0, 1, grampc->param->Np);
 
 	/* Unscaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
@@ -920,14 +960,16 @@ void WintParam(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *adj,
 	}
 
 	/* dl(x,u,p)/dp + df(x,u,p)/dp' * adj + dc(x,u,p)/dp' * mult */
+	MatSetScalar(dldp_val, 0, 1, grampc->param->Np);
 	if (grampc->opt->IntegralCost == INT_ON) {
-		dldp(dldp_val, t, x_, u_, p_, grampc->param->xdes, grampc->param->udes, grampc->userparam);
+		dldp(dldp_val, t, x_, u_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(dldp_val, grampc->opt->JScale, grampc->param->Np);
 		}
 	}
 
-	dfdp_vec(dfdp_val, t + grampc->param->t0, x_, adj_, u_, p_, grampc->userparam);
+	MatSetScalar(dfdp_val, 0, 1, grampc->param->Np);
+	dfdp_vec(dfdp_val, t, x_, u_, p_, adj_, grampc->param, grampc->userparam);
 
 	for (i = 0; i < grampc->param->Np; i++) {
 		s[i] = dldp_val[i] + dfdp_val[i] + dcdp[i];
@@ -939,8 +981,7 @@ void WtermParam(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *p_, ctypeRNum
 	typeInt i;
 	ctypeRNum *x_ = x;
 
-	typeRNum *dldp = grampc->rws->rwsGeneral + grampc->param->Np;
-	MatSetScalar(dldp, 0, 1, grampc->param->Np);
+	typeRNum *dVdp_val = grampc->rws->rwsGeneral + grampc->param->Np;
 
 	/* Unscaling */
 	if (grampc->opt->ScaleProblem == INT_ON) {
@@ -948,15 +989,16 @@ void WtermParam(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *p_, ctypeRNum
 	}
 
 	/* dV(x(T),p)/dp + dc(x(T),p)/dp' * mult(T) */
+	MatSetScalar(dVdp_val, 0, 1, grampc->param->Np);
 	if (grampc->opt->TerminalCost == INT_ON) {
-		dVdp(dldp, t, x_, p_, grampc->param->xdes, grampc->userparam);
+		dVdp(dVdp_val, t, x_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
-			scale_cost(dldp, grampc->opt->JScale, grampc->param->Np);
+			scale_cost(dVdp_val, grampc->opt->JScale, grampc->param->Np);
 		}
 	}
 
 	for (i = 0; i < grampc->param->Np; i++) {
-		s[i] = dldp[i] + dcdp[i];
+		s[i] = dVdp_val[i] + dcdp[i];
 	}
 }
 
@@ -1016,14 +1058,15 @@ void evaluate_gradT(const typeGRAMPC *grampc)
 	/* H(x(T),u(T),p,adj(T),T) = */
 	/* l(x,u,p,t)  */
 	if (grampc->opt->IntegralCost == INT_ON) {
-		lfct(&l, t[grampc->opt->Nhor - 1], x_, u_, p_, grampc->param->xdes, grampc->param->udes, grampc->userparam);
+		lfct(&l, t[grampc->opt->Nhor - 1], x_, u_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(&l, grampc->opt->JScale, 1);
 		}
 	}
 
 	/* + adj' * f(x,u,p,t)   */
-	ffct(s1, t[grampc->opt->Nhor - 1], x_, u_, p_, grampc->userparam);
+	MatSetScalar(s1, 0, 1, grampc->param->Nx);
+	ffct(s1, t[grampc->opt->Nhor - 1], x_, u_, p_, grampc->param, grampc->userparam);
 	MatMult(&f, adj_, s1, 1, grampc->param->Nx, 1);
 
 	/* + c(x,u,p,t)' * (mult + c(x,u,p,t)' * diag(pen) / 2); */
@@ -1042,7 +1085,7 @@ void evaluate_gradT(const typeGRAMPC *grampc)
 
 	/* dV(x,p,T)/dT */
 	if (grampc->opt->TerminalCost == INT_ON) {
-		dVdT(&dVdt, t[grampc->opt->Nhor - 1], x_, p_, grampc->param->xdes, grampc->userparam);
+		dVdT(&dVdt, t[grampc->opt->Nhor - 1], x_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(&dVdt, grampc->opt->JScale, 1);
 		}
@@ -1176,6 +1219,8 @@ void linesearch_explicit(typeRNum *alpha, const typeGRAMPC *grampc)
 	typeRNum graduMax, graduAbs;
 	typeRNum NomDenum[2];
 
+	lsExplicit[0] = 0;
+	lsExplicit[1] = 0;
 	if (grampc->opt->OptimControl == INT_ON) {
 		update_lsExplicit(lsExplicit, grampc->rws->u, grampc->rws->uprev, grampc->rws->gradu, grampc->rws->graduprev, grampc->opt->Nhor*grampc->param->Nu, grampc);
 	}
@@ -1261,14 +1306,17 @@ void update_lsExplicit(typeRNum* NomDenum, ctypeRNum* a, ctypeRNum* aprev, ctype
 
 void evaluate_cost(typeRNum *s, ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeGRAMPC *grampc)
 {
-	typeInVfctPtr pIntCost;
+	typeCostIntegratorPtr pIntCost;
 	typeRNum Jint[2] = { 0, 0 };
 	typeRNum Jterm[2] = { 0, 0 };
 	ctypeRNum *p_ = p;
 
-	/* integrator for integral cost function */
-	if (grampc->opt->IntegratorCost == INT_TRAPZ) {
-		pIntCost = &trapezodial;
+    /* integrator for integral cost function */
+    if (grampc->opt->IntegratorCost == INT_COSTDISC) {
+        pIntCost = &intcostDiscrete;
+    }
+    else if (grampc->opt->IntegratorCost == INT_TRAPZ) {
+		pIntCost = &trapezoidal;
 	}
 	else {
 		pIntCost = &simpson;
@@ -1306,17 +1354,16 @@ void WintCost(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p
 		ASSIGN_U(u_, u, grampc);
 	}
 
-	s[0] = 0;
-	s[1] = 0;
-
 	/* Integral Cost */
+	s[0] = 0;
 	if (grampc->opt->IntegralCost == INT_ON) {
-		lfct(s, t, x_, u_, p_, grampc->param->xdes, grampc->param->udes, grampc->userparam);
+		lfct(s, t, x_, u_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(s, grampc->opt->JScale, 1);
 		}
 	}
 
+	s[1] = 0;
 	/* Equality Constraints */
 	if (grampc->opt->EqualityConstraints == INT_ON) {
 		for (i = 0; i < grampc->param->Ng; i++) {
@@ -1346,17 +1393,16 @@ void WtermCost(typeRNum *s, ctypeRNum t, ctypeRNum *x, ctypeRNum *p_,
 		ASSIGN_X(x_, x, grampc);
 	}
 
-	s[0] = 0;
-	s[1] = 0;
-
 	/* Terminal Cost */
+	s[0] = 0;
 	if (grampc->opt->TerminalCost == INT_ON) {
-		Vfct(s, t, x_, p_, grampc->param->xdes, grampc->userparam);
+		Vfct(s, t, x_, p_, grampc->param, grampc->userparam);
 		if (grampc->opt->ScaleProblem == INT_ON) {
 			scale_cost(s, grampc->opt->JScale, 1);
 		}
 	}
 
+	s[1] = 0;
 	/* Terminal Equality Constraints */
 	if (grampc->opt->TerminalEqualityConstraints == INT_ON) {
 		for (i = 0; i < grampc->param->NgT; i++) {

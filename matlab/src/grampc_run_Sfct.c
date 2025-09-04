@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -61,7 +62,7 @@ void sdata2typeGRAMPC(const typeGRAMPC *grampc, ctypeInt *intoptidx, ctypeInt *i
 
 	grampc_setopt_string(grampc, "IntegralCost", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
 	grampc_setopt_string(grampc, "TerminalCost", intopt[intoptidx[i]] == INT_ON ? "on" : "off"); i++;
-	grampc_setopt_string(grampc, "IntegratorCost", intopt[intoptidx[i]] == INT_TRAPZ ? "trapezodial" : "simpson"); i++;
+	grampc_setopt_string(grampc, "IntegratorCost", intopt[intoptidx[i]] == INT_TRAPZ ? "trapezoidal" : "simpson"); i++;
 
 	grampc_setopt_string(grampc, "Integrator", IntegratorInt2Str(intopt[intoptidx[i]])); i++;
 	grampc_setopt_int(grampc, "IntegratorMaxSteps", intopt[intoptidx[i]]); i++;
@@ -253,13 +254,7 @@ static void mdlStart(SimStruct *S)
 	ptr = ssGetPWork(S);
 
 	/* Memory allocation for userparam, use size of input port */
-	const typeRNum *d_userparam = (typeRNum *)ssGetInputPortRealSignal(S, 4);
-	size_userpram = ssGetInputPortWidth(S, 4);
-	userparam = calloc(size_userpram * sizeof(typeRNum), 1);
-	real_userparam = (typeRNum*)userparam;
-	for (i = 0; i < size_userpram; i++) {
-		real_userparam[i] = (typeRNum)d_userparam[i];
-	}
+	userparam = (typeUSERPARAM *)ssGetInputPortRealSignal(S, 4);
 
 	/* Memory allocation and initialization of grampc */
 	grampc_init(&grampc, userparam);
@@ -317,7 +312,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 	typeInt *status = (typeInt *)ssGetOutputPortRealSignal(S, 7);
 
 	/* workspace */
-	const typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S, 0);
+	typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S, 0);
 
 	/* remove warning unreferenced formal parameter */
 	(void)(tid);
@@ -329,13 +324,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 	grampc_setparam_real_vector(grampc, "udes", udes);
 	
 	/* update userparm */
-	typeUSERPARAM *userparam = grampc->userparam;
-	const typeRNum *d_userparam = (typeRNum *)ssGetInputPortRealSignal(S, 4);
-	size_t size_userpram = ssGetInputPortWidth(S, 4);
-	typeRNum *loc_userparam = (typeRNum *)userparam;
-	for (i = 0; i < size_userpram; i++) {
-		loc_userparam[i] = (typeRNum)d_userparam[i];
-	}
+	grampc->userparam = (typeUSERPARAM *)ssGetInputPortRealSignal(S, 4);
 
 	/* run mpc */
 	grampc_run(grampc);
@@ -360,7 +349,6 @@ static void mdlTerminate(SimStruct *S)
 	typeGRAMPC *grampc = (typeGRAMPC *)ssGetPWorkValue(S, 0);
 
 	/* free allocated memory */
-	free(grampc->userparam);
 	grampc_free(&grampc);
 }
 

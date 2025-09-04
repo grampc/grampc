@@ -1,11 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
- * All rights reserved.
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
 *
@@ -49,6 +49,22 @@ typeInt cAddNumMatrix(typeRNum **cs, const char *fieldname, const mxArray *sourc
 	}
 }
 
+typeInt cAddNumMatrixNoAlloc(typeRNum *cs, const char *fieldname, const mxArray *source) {
+	mxArray *field = mxGetField(source, 0, fieldname);
+	if (field != NULL) {
+		size_t size = mxGetM(field)*mxGetN(field);
+		if (cs != NULL) {
+			memcpy(cs, (typeRNum*)mxGetPr(field), size * sizeof(typeRNum));
+			return 1;
+		}
+		return -1;
+	}
+	else {
+		grampc_error_addstring("struct from matlab does not have this field \n", fieldname);
+		return -1;
+	}
+}
+
 typeInt cAddIntMatrix(typeInt **cs, const char *fieldname, const mxArray *source) {
 	mxArray *field = mxGetField(source, 0, fieldname);
 	if (field != NULL) {
@@ -70,6 +86,21 @@ typeInt cAddIntMatrix(typeInt **cs, const char *fieldname, const mxArray *source
 	}
 }
 
+typeInt cAddIntMatrixNoAlloc(typeInt *cs, const char *fieldname, const mxArray *source) {
+	mxArray *field = mxGetField(source, 0, fieldname);
+	if (field != NULL) {
+		size_t size = mxGetM(field)*mxGetN(field);
+		if (cs != NULL) {
+			memcpy(cs, (typeInt*)mxGetPr(field), size * sizeof(typeInt));
+			return 1;
+		}
+		return -1;
+	}
+	else {
+		grampc_error_addstring("struct from matlab does not have this field \n", fieldname);
+		return -1;
+	}
+}
 
 typeInt mxAddNumMatrix(mxArray *pm, const char *fieldname, ctypeRNum *value, ctypeInt rows, ctypeInt cols) {
 	typeInt idx = mxAddField(pm, fieldname);
@@ -100,9 +131,45 @@ typeInt mxAddStructField(mxArray *pm, const char *fieldname, mxArray*field) {
 }
 
 
+void mx2typeGRAMPCparam(typeGRAMPCparam **param, const mxArray *mxparam) {
+
+    *param = (typeGRAMPCparam*)calloc(1, sizeof(**param));
+    if (*param == NULL) {
+		grampc_error(PARAM_ALLOC_FAILED);
+    }
+    
+	cAddIntScalar(&(*param)->Nx, "Nx", mxparam);
+	cAddIntScalar(&(*param)->Nu, "Nu", mxparam);
+	cAddIntScalar(&(*param)->Np, "Np", mxparam);
+	cAddIntScalar(&(*param)->Ng, "Ng", mxparam);
+	cAddIntScalar(&(*param)->Nh, "Nh", mxparam);
+	cAddIntScalar(&(*param)->NgT, "NgT", mxparam);
+	cAddIntScalar(&(*param)->NhT, "NhT", mxparam);
+	cAddIntScalar(&(*param)->Nc, "Nc", mxparam);
+
+	cAddNumMatrix(&(*param)->x0, "x0", mxparam);
+	cAddNumMatrix(&(*param)->xdes, "xdes", mxparam);
+
+	cAddNumMatrix(&(*param)->u0, "u0", mxparam);
+	cAddNumMatrix(&(*param)->udes, "udes", mxparam);
+	cAddNumMatrix(&(*param)->umax, "umax", mxparam);
+	cAddNumMatrix(&(*param)->umin, "umin", mxparam);
+
+	cAddNumMatrix(&(*param)->p0, "p0", mxparam);
+	cAddNumMatrix(&(*param)->pmax, "pmax", mxparam);
+	cAddNumMatrix(&(*param)->pmin, "pmin", mxparam);
+
+	cAddNumScalar(&(*param)->Thor, "Thor", mxparam);
+	cAddNumScalar(&(*param)->Tmax, "Tmax", mxparam);
+	cAddNumScalar(&(*param)->Tmin, "Tmin", mxparam);
+
+	cAddNumScalar(&(*param)->dt, "dt", mxparam);
+	cAddNumScalar(&(*param)->t0, "t0", mxparam);
+}
+
+
 void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *mxuserparam) {
 
-	typeGRAMPCparam* param;
 	typeGRAMPCopt* opt;
 	typeGRAMPCsol* sol;
 	typeGRAMPCrws* rws;
@@ -122,10 +189,6 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	if (*grampc == NULL) {
 		grampc_error(GRAMPC_ALLOC_FAILED);
 	}
-	(*grampc)->param = (typeGRAMPCparam *)calloc(1, sizeof(*(*grampc)->param));
-	if ((*grampc)->param == NULL) {
-		grampc_error(PARAM_ALLOC_FAILED);
-	}
 	(*grampc)->sol = (typeGRAMPCsol *)calloc(1, sizeof(*(*grampc)->sol));
 	if ((*grampc)->sol == NULL) {
 		grampc_error(SOL_ALLOC_FAILED);
@@ -139,39 +202,12 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 		grampc_error(OPT_ALLOC_FAILED);
 	}
 
-	param = ((*grampc)->param);
 	opt = ((*grampc)->opt);
 	sol = ((*grampc)->sol);
 	rws = ((*grampc)->rws);
 
 	/* PARAM STRUCTURE **********************************************************/
-	cAddIntScalar(&param->Nx, "Nx", mxparam);
-	cAddIntScalar(&param->Nu, "Nu", mxparam);
-	cAddIntScalar(&param->Np, "Np", mxparam);
-	cAddIntScalar(&param->Ng, "Ng", mxparam);
-	cAddIntScalar(&param->Nh, "Nh", mxparam);
-	cAddIntScalar(&param->NgT, "NgT", mxparam);
-	cAddIntScalar(&param->NhT, "NhT", mxparam);
-	cAddIntScalar(&param->Nc, "Nc", mxparam);
-
-	cAddNumMatrix(&param->x0, "x0", mxparam);
-	cAddNumMatrix(&param->xdes, "xdes", mxparam);
-
-	cAddNumMatrix(&param->u0, "u0", mxparam);
-	cAddNumMatrix(&param->udes, "udes", mxparam);
-	cAddNumMatrix(&param->umax, "umax", mxparam);
-	cAddNumMatrix(&param->umin, "umin", mxparam);
-
-	cAddNumMatrix(&param->p0, "p0", mxparam);
-	cAddNumMatrix(&param->pmax, "pmax", mxparam);
-	cAddNumMatrix(&param->pmin, "pmin", mxparam);
-
-	cAddNumScalar(&param->Thor, "Thor", mxparam);
-	cAddNumScalar(&param->Tmax, "Tmax", mxparam);
-	cAddNumScalar(&param->Tmin, "Tmin", mxparam);
-
-	cAddNumScalar(&param->dt, "dt", mxparam);
-	cAddNumScalar(&param->t0, "t0", mxparam);
+	mx2typeGRAMPCparam(&((*grampc)->param), mxparam);
 
 	/* OPTIONS STRUCTURE ******************************************************/
 	cAddIntScalar(&opt->Nhor, "Nhor", mxopt);
@@ -190,7 +226,7 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	cAddNumScalar(&opt->IntegratorAbsTol, "IntegratorAbsTol", mxopt);
 	cAddNumScalar(&opt->IntegratorMinStepSize, "IntegratorMinStepSize", mxopt);
 	cAddIntScalar(&opt->IntegratorMaxSteps, "IntegratorMaxSteps", mxopt);
-	/*cAddIntMatrix(&opt->FlagsRodas, "FlagsRodas", mxopt);*/
+	cAddIntMatrixNoAlloc(opt->FlagsRodas, "FlagsRodas", mxopt);
 
 	cAddIntScalar(&opt->LineSearchType, "LineSearchType", mxopt);
 	cAddIntScalar(&opt->LineSearchExpAutoFallback, "LineSearchExpAutoFallback", mxopt);
@@ -244,7 +280,7 @@ void mx2typeGRAMPC(typeGRAMPC**grampc, const mxArray *mxgrampc, const mxArray *m
 	cAddNumMatrix(&sol->unext, "unext", mxsol);
 	cAddNumMatrix(&sol->pnext, "pnext", mxsol);
 	cAddNumScalar(&sol->Tnext, "Tnext", mxsol);
-	/*cAddNumMatrix(&sol->J, "J", mxsol);*/
+	cAddNumMatrixNoAlloc(sol->J, "J", mxsol);
 	cAddNumScalar(&sol->cfct, "cfct", mxsol);
 	cAddNumScalar(&sol->pen, "pen", mxsol);
 	cAddIntScalar(&sol->status, "status", mxsol);

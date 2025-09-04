@@ -1,13 +1,50 @@
+Changes in version 2.3 of GRAMPC:
+-------------------------------------------------------------------------------
+
+Major changes:
+
+- Added grampc.param as an additional input for the probfct signatures
+
+  - In addition the parameter ordering of dfdx_vec, dfdu_vec, dfdp_vec and dHdxdt changed
+  - xdes and udes are no longer passed to the cost functions as they are available inside grampc.param
+- The explicit time dependency of the system dynamics was removed. The dynamics are now called with the MPC internal time. If the global time is needed, one can access t0 in the grampc.param struct
+- Added support for discrete-time systems
+- Added config reader which reads a .cfg file for GRAMPC parameters and options
+- Added CMakeLists.txt files for the GRAMPC library and every example
+- Added online documentation
+- Added gradient checker and an utility function via finite-differences for computing the gradients in the probfct
+- Added Python interface
+
+Minor changes:
+
+- Added timer helper functions for Windows and Linux OS
+- Added C++ example
+- Added Matlab example for comparing MPC and MHE with continuous-time and discrete-time dynamics
+- Simplified grampc_run_Sfct.c
+- Bugfix: Rodas-Flags were not passed in the Matlab-Interface
+- Bugfix: fixed typo in option trapezoidal
+- Bugfix: fixed error in explicit line search strategy for problems without control optimization as, for example, MHE
+- Bugfix: fixed error in Rodas integrator with analytical derivatives with respect to time (IFCN=1 and IDFX=1)
+- Bugfix: fixed gradients in the following examples:
+
+  - DAE_Integrator: dfdx and dfdxtrans were specified row-wise instead of column-wise
+  - Crane_2D: dhdx_vec was incorrect
+  - Reactor_PDE: dVdx was incorrect
+  - VTOL: Vfct was missing a POW() statement and dfdu_vec was incorrect
+
+
 Changes in version 2.2 of GRAMPC:
 -------------------------------------------------------------------------------
 
 Major changes:
+
 - Switch from GNU Lesser General Public License (LGPL) to BSD-3-Clause License, see LICENSE.txt
 - Support for fixed-size arrays instead of dynamic memory allocation, see Section 5.1.5 in documentation
 - Added userparam as additional input to Simulink models
 - Function for estimation of PenaltyMin is exposed in C++ interface
 
 Minor changes:
+
 - Bugfix: Consider scaling for calculating terminal constraints in grampc_update_plot_pred.m
 - Bugfix: Computation of augmented cost function correctly adds equality constraints
 - Bugfix: Removed wrong flag "-o" from "ar" commands and added "-rcs" flags, which fixes problems on Windows and MacOS

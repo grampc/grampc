@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -14,7 +15,6 @@
 
 #include "grampc_util.h"
 #include "grampc_alloc.h"
-
 
 void discretize_time(typeRNum *tvec, typeRNum T, const typeGRAMPC *grampc)
 {
@@ -58,13 +58,24 @@ void check_ControlLimits(const typeGRAMPC* grampc) {
 	}
 }
 
+char* IntegratorCostInt2Str(ctypeInt INT_Integrator) {
+    switch (INT_Integrator) {
+    case INT_COSTDISC: return "discrete";
+    case INT_TRAPZ:    return "trapezoidal";
+    case INT_SIMPSON:  return "simpson";
+    }
+    return "";
+}
+
 char* IntegratorInt2Str(ctypeInt INT_Integrator) {
 	switch (INT_Integrator) {
-	case INT_EULER:    return "euler";
-	case INT_MODEULER: return "modeuler";
-	case INT_HEUN:     return "heun";
-	case INT_RODAS:    return "rodas";
+    case INT_SYSDISC:  return "discrete";
+	case INT_ERK1:     return "erk1";
+	case INT_ERK2:     return "erk2";
+	case INT_ERK3:     return "erk3";
+	case INT_ERK4:     return "erk4";
 	case INT_RUKU45:   return "ruku45";
+	case INT_RODAS:    return "rodas";
 	}
 	return "";
 }
@@ -319,10 +330,10 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 	typeRNum PenaltyMin = grampc->opt->PenaltyMin;
 	typeRNum NormTol = 0;
 	typeRNum NormConstraints = 0;
-	typeInt i, j, MaxGradIter, MaxMultIter, Status;
+	typeInt i, j, MaxGradIter = -1, MaxMultIter = -1, Status;
 
 #if defined(FIXEDSIZE) && (NC > 0)
-    typeRNum Constraints[NC] = {};
+    typeRNum Constraints[NC] = {0};
 #else
     typeRNum *Constraints = NULL;
 #endif
@@ -366,8 +377,8 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 			x_ = grampc->rws->x + i * grampc->param->Nx;
 			u_ = grampc->rws->u + i * grampc->param->Nu;
 		}
-		gfct(Constraints, grampc->rws->t[i], x_, u_, p_, grampc->userparam);
-		hfct(Constraints + grampc->param->Ng, grampc->rws->t[i], x_, u_, p_, grampc->userparam);
+		gfct(Constraints, grampc->rws->t[i], x_, u_, p_, grampc->param, grampc->userparam);
+		hfct(Constraints + grampc->param->Ng, grampc->rws->t[i], x_, u_, p_, grampc->param, grampc->userparam);
 
 		/* scale constraints */
 		if (grampc->opt->ScaleProblem == INT_ON) {
@@ -390,8 +401,8 @@ typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc) {
 	}
 
 	/* evaluate the terminal constraints */
-	gTfct(Constraints + grampc->param->Ng + grampc->param->Nh, grampc->param->Thor, xT_, p_, grampc->userparam);
-	hTfct(Constraints + grampc->param->Ng + grampc->param->Nh + grampc->param->NgT, grampc->param->Thor, xT_, p_, grampc->userparam);
+	gTfct(Constraints + grampc->param->Ng + grampc->param->Nh, grampc->param->Thor, xT_, p_, grampc->param, grampc->userparam);
+	hTfct(Constraints + grampc->param->Ng + grampc->param->Nh + grampc->param->NgT, grampc->param->Thor, xT_, p_, grampc->param, grampc->userparam);
 
 	/* scale constraints */
 	if (grampc->opt->ScaleProblem == INT_ON) {

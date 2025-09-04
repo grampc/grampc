@@ -12,13 +12,14 @@ function [vec,grampcMPC,figNr] = startMHE(figNr,compile,varargin)
 %            make.m in the matlab folder for more details
 %
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -93,19 +94,19 @@ vec.JMHE        = nan * zeros(2, Nsim);
 vec.CPUtimeMHE  = nan * zeros(1, Nsim);
 
 % init plots and store figure handles
-if PLOT_PRED
+if figNr > 0 && PLOT_PRED
     phpP = grampc_init_plot_pred(grampcMPC,figNr);
     figNr = figNr+1;
 end
-if PLOT_TRAJ
+if figNr > 0 && PLOT_TRAJ
     phpT = grampc_init_plot_sim(vec,figNr);
     figNr = figNr+1;
 end
-if PLOT_STAT
+if figNr > 0 && PLOT_STAT
     phpS = grampc_init_plot_stat(vec,grampcMPC,figNr);
     figNr = figNr+1;
 end
-if PLOT_MHE
+if figNr > 0 && PLOT_MHE
     figNrMHE = figNr+1;
 end
 
@@ -133,7 +134,7 @@ while 1
     % run MPC and save results
     [grampcMPC,vec.CPUtime(i)] = CmexFiles.grampc_run_Cmex(grampcMPC);
     vec = grampc_update_struct_sol(grampcMPC, vec, i);
-        
+    
     % print solver status
     printed = CmexFiles.grampc_printstatus_Cmex(grampcMPC.sol.status,'Error');
     if printed
@@ -146,7 +147,7 @@ while 1
     end
     
     % simulate system
-    [~,xtemp] = ode45(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 (grampcMPC.param.dt)],vec.x(:,i),odeopt,(grampcMPC.sol.unext),(grampcMPC.sol.pnext),(grampcMPC.userparam));
+    [~,xtemp] = ode45(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 (grampcMPC.param.dt)],vec.x(:,i),odeopt,grampcMPC.sol.unext,grampcMPC.sol.pnext,grampcMPC.param,grampcMPC.userparam);
 %     xtemp(end,1:2) = xtemp(end,1:2) + randn(1,2)*10; % system noise
     vec.x(:,i+1) = xtemp(end,:);
             
@@ -155,10 +156,10 @@ while 1
     xMeas_array = [xMeas_array(3:end), xMeas_temp];
     grampcMHE.userparam(end-2*grampcMHE.opt.Nhor+1:end) = xMeas_array;
     % set values of last MHE-Nhor controls or use initial values 
-    if i > 10
-        grampcMHE.rws.u = (vec.u(:,i-9:i) - repmat(grampcMHE.opt.uOffset,1,10))./repmat(grampcMHE.opt.uScale,1,10);
+    if i > grampcMHE.opt.Nhor
+        grampcMHE.rws.u = (vec.u(:,(i-grampcMHE.opt.Nhor+1):i) - repmat(grampcMHE.opt.uOffset,1,grampcMHE.opt.Nhor))./repmat(grampcMHE.opt.uScale,1,grampcMHE.opt.Nhor);
     else
-        grampcMHE.rws.u(:,10-i+1:10) = (vec.u(:,1:i) - repmat(grampcMHE.opt.uOffset,1,i))./repmat(grampcMHE.opt.uScale,1,i);
+        grampcMHE.rws.u(:,grampcMHE.opt.Nhor-i+1:grampcMHE.opt.Nhor) = (vec.u(:,1:i) - repmat(grampcMHE.opt.uOffset,1,i))./repmat(grampcMHE.opt.uScale,1,i);
     end    
     % run MHE and save results
     [grampcMHE,vec.CPUtimeMHE(i)] = CmexFiles.grampc_run_Cmex_MHE(grampcMHE);
@@ -173,7 +174,7 @@ while 1
     i = i + 1;
     
     % plot data
-    if mod(i,PLOT_STEPS) == 0 || i == length(vec.t)
+    if figNr > 0 && (mod(i,PLOT_STEPS) == 0 || i == length(vec.t))
         if PLOT_PRED
             grampc_update_plot_pred(grampcMPC,phpP);
         end
@@ -207,7 +208,7 @@ while 1
             plot(vec.t(1:PLOT_STEPS:i), vec.xEst(3,1:PLOT_STEPS:i)', 'r')
             plot(vec.t(1:PLOT_STEPS:i), vec.x(3,1:PLOT_STEPS:i)', 'b')
             xlim([0, Tsim]);
-            ylabel('Reactor temperature T [°C]');
+            ylabel('Reactor temperature T [ï¿½C]');
             subplot(3,2,4)
             plot(vec.t(1:PLOT_STEPS:i), vec.xMeas(2,1:PLOT_STEPS:i)','x')
             hold on
@@ -215,7 +216,7 @@ while 1
             plot(vec.t(1:PLOT_STEPS:i), vec.x(4,1:PLOT_STEPS:i)', 'b')
             legend('Measured state','Estimated state','Simulated state','Location','NorthEast');
             xlim([0, Tsim]);
-            ylabel('Cooling temperature T_C [°C]');
+            ylabel('Cooling temperature T_C [ï¿½C]');
             subplot(3,2,5)
             plot(vec.t(1:PLOT_STEPS:i), vec.u(1,1:PLOT_STEPS:i)', 'b')
             ylabel('Normalized flow rate u_1 [h^{-1}]');

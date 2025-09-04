@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -32,6 +33,7 @@ namespace grampc
 		~Grampc();
 
 	private:
+        /** Copy and assignment constructors are private, to prevent duplicate ressource management of the grampc struct */
 		Grampc(const Grampc&);
 
 		Grampc& operator=(const Grampc&);
@@ -66,6 +68,12 @@ namespace grampc
 
         /** Estimate bound for minimal penalty parameter */
         typeInt estim_penmin(ctypeInt rungrampc);
+
+        /** Check gradients of the supplied problem description */
+        void check_gradients(ctypeRNum tolerance, ctypeRNum step_size);
+
+        /** Get options and parameter from file **/
+        void get_config_from_file(const typeChar *fileName);
 
 		/** Run GRAMPC solver */
 		void run();

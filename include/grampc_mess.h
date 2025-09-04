@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -32,6 +33,9 @@
 #define INVALID_NO_ELEMENTS       "Input vector has an invalid number of elements.\n"
 #define DT_NOT_VALID              "Sampling time dt is not valid. dt must be greater than zero.\n"  
 #define THOR_NOT_VALID            "Prediction horizon Thor is not valid. Thor must be greater than the sampling time dt.\n"
+#define DISCRETE_NOT_VALID        "Parameterization for discrete-time dynamics is not valid. Thor = (Nhor - 1) * dt is required.\n"
+#define OPTIM_TIME_NOT_VALID      "Optimization of end time in combination with discrete-time dynamics is not valid.\n"
+#define INVALID_SECTION_NAME      "Invalid section name.\n"
 #define INVALID_OPTION_NAME       "Invalid option name.\n"
 #define INVALID_OPTION_VALUE      "Invalid value for option.\n"
 #define INVALID_OPTION_DATATYP    "Invalid datatyp of parameter. \n"

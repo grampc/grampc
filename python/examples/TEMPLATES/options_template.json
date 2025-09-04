@@ -1,0 +1,84 @@
+{
+  "Parameters":
+  {
+    "x0": [0.0, 0.0],
+    "xdes": [1.0, 1.0],
+    "u0": [0.0, 0.0],
+    "udes": [0.0, 0.0],
+    "umax": [1.0, 1.0],
+    "umin": [0.0, 0.0],
+    "p0": [0.0, 0.0],
+    "pmax": [0.0, 0.0],
+    "pmin": [0.0, 0.0],
+    "Thor": 3600.0,
+    "Tmax": 1e8,
+    "Tmin": 1e-8,
+    "dt": 300.0,
+    "t0": 0.0
+  },
+  "Options":
+  {
+    "Nhor": 30,
+    "MaxGradIter": 2,
+    "MaxMultIter": 1,
+    "ShiftControl": "on",
+
+    "IntegralCost": "on",
+    "TerminalCost": "on",
+    "IntegratorCost": "trapezoidal",
+    
+    "Integrator": "erk2",
+    "IntegratorRelTol": 1e-6,
+    "IntegratorAbsTol": 1e-8,
+    "IntegratorMinStepSize": 1e-16,
+    "IntegratorMaxSteps": 1e8,
+    "FlagsRodas": [0, 0, 0, 0, 0, 0, 0, 0],
+
+    "LineSearchType": "explicit2",
+    "LineSearchExpAutoFallback": "on",
+    "LineSearchMax": 0.75,
+    "LineSearchMin": 1e-10,
+    "LineSearchInit": 1e-4,
+    "LineSearchAdaptAbsTol": 1e-6,
+    "LineSearchAdaptFactor": 1.5,
+    "LineSearchIntervalTol": 0.1,
+    "LineSearchIntervalFactor": 0.85,
+
+    "OptimControl": "on",
+    "OptimParam": "off",
+    "OptimParamLineSearchFactor": 1.0,
+    "OptimTime": "off",
+    "OptimTimeLineSearchFactor": 1.0,
+
+    "ScaleProblem": "off",
+    "xScale": [1.0, 1.0],
+    "xOffset": [0.0, 0.0],
+    "uScale": [1.0, 1.0],
+    "uOffset": [0.0, 0.0],
+    "pScale": [1.0, 1.0],
+    "pOffset": [0.0, 0.0],
+    "TScale": 1.0,
+    "TOffset": 0.0,
+    "JScale": 1.0,
+    "cScale": [1.0, 1.0],
+
+    "EqualityConstraints": "on",
+    "InequalityConstraints": "on",
+    "TerminalEqualityConstraints": "on",
+    "TerminalInequalityConstraints": "on",
+    "ConstraintsHandling": "auglag",
+    "ConstraintsAbsTol": [1e-4, 1e-4],
+
+    "MultiplierMax": 1e6,
+    "MultiplierDampingFactor": 0,
+    "PenaltyMax": 1e6,
+    "PenaltyMin": 1,
+    "PenaltyIncreaseFactor": 1.05,
+    "PenaltyDecreaseFactor": 0.95,
+    "PenaltyIncreaseThreshold": 1,
+    "AugLagUpdateGradientRelTol": 1e-2,
+
+    "ConvergenceCheck": "off",
+    "ConvergenceGradientRelTol": 1e-6
+  }
+}

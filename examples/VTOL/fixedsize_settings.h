@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -40,8 +41,8 @@
 #define MAXMULTITER 1
 /* Define this macro as the number of discretization points Nhor */
 #define NHOR 40
-/* Define this macro as one of the integrators INT_EULER, INT_HEUN, INT_MODEULER, INT_RUKU45, INT_RODAS */
-#define INTEGRATOR INT_HEUN
+/* Define this macro as one of the integrators INT_SYSDISC, INT_ERK1, INT_ERK2, INT_ERK3, INT_ERK4, INT_RUKU45, INT_RODAS */
+#define INTEGRATOR INT_ERK2
 /* Define this macro as one of the cost integrators INT_TRAPZ, INT_SIMPSON */
 #define INTEGRATORCOST INT_TRAPZ
 /* Define this macro as one the line search strategies INT_ADAPTIVELS, INT_EXPLS1, INT_EXPLS2 */

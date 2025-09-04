@@ -9,13 +9,14 @@ function grampc_update_plot_pred(grampc,ph,idx,decimation)
 % 3) idx - index struct that specifies the quantities to be plotted (optional)
 % 4) decimation - factor for downsampling the plot (optional
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -120,7 +121,7 @@ if ~isempty(idx.Constraints)
             ppred = grampc.rws.p;
         end
         for i = ipred
-            constr(:,i) = CmexFiles.grampc_ghfct_Cmex(grampc.rws.t(i), xpred(:,i), upred(:,i), ppred, grampc.userparam);
+            constr(:,i) = CmexFiles.grampc_ghfct_Cmex(grampc.rws.t(i), xpred(:,i), upred(:,i), ppred, grampc.param, grampc.userparam);
         end
         
         for i = idx.gConstraints
@@ -153,7 +154,7 @@ if ~isempty(idx.Constraints)
             xend = grampc.rws.x(:,end);
             ppred = grampc.rws.p;
         end
-        Tconstr = CmexFiles.grampc_gThTfct_Cmex(grampc.rws.t(end), xend, ppred, grampc.userparam);
+        Tconstr = CmexFiles.grampc_gThTfct_Cmex(grampc.rws.t(end), xend, ppred, grampc.param, grampc.userparam);
         
         for i = idx.TConstraints
             % Constraints

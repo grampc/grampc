@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -13,7 +14,7 @@
 
 
 #include "grampc.h"
-#include <time.h>
+#include "timing.h"
 
 #define NX	3
 #define NU	2
@@ -33,16 +34,16 @@ void openFile(FILE **file, const char *name) {
 void printNumVector2File(FILE *file, ctypeRNum *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%.5f ,", val[i]);
+		fprintf(file, "%.5f, ", val[i]);
 	}
-	fprintf(file, "%.5f;\n", val[size - 1]); /* new line */
+	fprintf(file, "%.5f\n", val[size - 1]); /* new line */
 }
 void printIntVector2File(FILE *file, ctypeInt *const val, ctypeInt size) {
 	typeInt i;
 	for (i = 0; i < size - 1; i++) {
-		fprintf(file, "%d ,", val[i]);
+		fprintf(file, "%d, ", val[i]);
 	}
-	fprintf(file, "%d;\n", val[size - 1]); /* new line */
+	fprintf(file, "%d\n", val[size - 1]); /* new line */
 }
 #endif
 
@@ -56,52 +57,10 @@ int main()
 	FILE *file_x, *file_u, *file_p, *file_T, *file_J, *file_Ncfct, *file_Npen, *file_iter, *file_status, *file_t;
 #endif
 
-	clock_t tic, toc;
+	typeTime tic, toc;
 	typeRNum *CPUtimeVec;
 	typeRNum CPUtime = 0;
 
-	/********* Parameter definition *********/
-	/* Initial values and setpoints of the states, inputs, parameters, penalties and Lagrangian mmultipliers, setpoints for the states and inputs */
-  ctypeRNum x0[NX]   = { 1.0, 0.0, 1.0 };
-  ctypeRNum xdes[NX] = { 0.0, 1.0, 1.0 };
-	ctypeRNum xdes2[NX] = { 0.5, 0.5, 1.0 };
-
-	/* Initial values, setpoints and limits of the inputs */
-  ctypeRNum u0[NU]   = { -2.0, 2.0 };
-  ctypeRNum udes[NU] = { 0.0, 0.0 };
-  ctypeRNum umax[NU] = { 2.0, 2.0 };
-  ctypeRNum umin[NU] = { -2.0, -2.0 };
-
-	/* Time variables */
-	ctypeRNum Thor = 0.4;	/* Prediction horizon */
-
-	ctypeRNum dt = (typeRNum)0.01;  /* Sampling time */
-	typeRNum t = (typeRNum)0.0;   /* time at the current sampling step */
-
-	/********* Option definition *********/
-	/* Basic algorithmic options */
-	ctypeInt Nhor = (typeInt)30;        /* Number of steps for the system integration */
-	ctypeInt MaxGradIter = (typeInt)10;  /* Maximum number of gradient iterations */
-	ctypeInt MaxMultIter = (typeInt)3;  /* Maximum number of augmented Lagrangian iterations */
-
-	/* Cost integration */
-	const char* IntegralCost = "on";
-	const char* TerminalCost = "off";
-
-	/* System integration */
-	const char* Integrator = "rodas";
-	ctypeRNum IntegratorRelTol = (typeRNum)1e-4;
-	ctypeRNum IntegratorAbsTol = (typeRNum)1e-5;
-	ctypeInt FlagsRodas[8] = { 0, 0, 0, 1, NX, NX, 0, 0 };
-
-	/* Line search */
-	ctypeRNum LineSearchMax = (typeRNum)1e-1;
-
-	/* Tye of constraints' consideration */
-	ctypeRNum ConstraintsAbsTol[NC] = { 1e-4 };
-
-	/* Multipliers & penalties */
-	ctypeRNum PenaltyIncreaseFactor = (typeRNum)1.1;
 
 	/********* userparam *********/
 	typeRNum pCost[3] = { 500, 0, 1 };
@@ -110,51 +69,30 @@ int main()
 	/********* grampc init *********/
 	grampc_init(&grampc, userparam);
 
-	/********* set parameters *********/
-	grampc_setparam_real_vector(grampc, "x0", x0);
-	grampc_setparam_real_vector(grampc, "xdes", xdes);
 
-	grampc_setparam_real_vector(grampc, "u0", u0);
-	grampc_setparam_real_vector(grampc, "udes", udes);
-	grampc_setparam_real_vector(grampc, "umax", umax);
-	grampc_setparam_real_vector(grampc, "umin", umin);
+	/********* Get and set options and parameter from configuration file *********/
+	const char *fileName = "config_DAE_Integrator.cfg";
+	grampc_get_config_from_file(grampc, fileName);
 
-	grampc_setparam_real(grampc, "Thor", Thor);
-	grampc_setparam_real(grampc, "dt", dt);
-	grampc_setparam_real(grampc, "t0", t);
 
-	/********* Option definition *********/
-	grampc_setopt_int(grampc, "Nhor", Nhor);
-	grampc_setopt_int(grampc, "MaxGradIter", MaxGradIter);
-	grampc_setopt_int(grampc, "MaxMultIter", MaxMultIter);
+	/********* Additional parameter *********/
+	ctypeRNum xdes2[3] = { 0.0, 1.0, 1.0 };
 
-	grampc_setopt_string(grampc, "IntegralCost", IntegralCost);
-	grampc_setopt_string(grampc, "TerminalCost", TerminalCost);
-
-	grampc_setopt_string(grampc, "Integrator", Integrator);
-	grampc_setopt_real(grampc, "IntegratorRelTol", IntegratorRelTol);
-	grampc_setopt_real(grampc, "IntegratorAbsTol", IntegratorAbsTol);
-	grampc_setopt_int_vector(grampc, "FlagsRodas", FlagsRodas);
-
-	grampc_setopt_real(grampc, "LineSearchMax", LineSearchMax);
-
-	grampc_setopt_real_vector(grampc, "ConstraintsAbsTol", ConstraintsAbsTol);
-	grampc_setopt_real(grampc, "PenaltyIncreaseFactor", PenaltyIncreaseFactor);
 
 	/********* estimate and set PenaltyMin *********/
 	grampc_estim_penmin(grampc, 1);
 
 #ifdef PRINTRES
-	openFile(&file_x, "res/xvec.txt");
-	openFile(&file_u, "res/uvec.txt");
-	openFile(&file_p, "res/pvec.txt");
-	openFile(&file_T, "res/Thorvec.txt");
-	openFile(&file_J, "res/Jvec.txt");
-	openFile(&file_Ncfct, "res/Ncfctvec.txt");
-	openFile(&file_Npen, "res/Npenvec.txt");
-	openFile(&file_iter, "res/itervec.txt");
-	openFile(&file_status, "res/status.txt");
-	openFile(&file_t, "res/tvec.txt");
+	openFile(&file_x, "xvec.txt");
+	openFile(&file_u, "uvec.txt");
+	openFile(&file_p, "pvec.txt");
+	openFile(&file_T, "Thorvec.txt");
+	openFile(&file_J, "Jvec.txt");
+	openFile(&file_Ncfct, "Ncfctvec.txt");
+	openFile(&file_Npen, "Npenvec.txt");
+	openFile(&file_iter, "itervec.txt");
+	openFile(&file_status, "status.txt");
+	openFile(&file_t, "tvec.txt");
 #endif
 
 	MaxSimIter = (int)(Tsim / grampc->param->dt);
@@ -166,22 +104,28 @@ int main()
 	grampc_printopt(grampc);
 	grampc_printparam(grampc);
 
+
+	/* Get time variables */
+	typeRNum t = grampc->param->t0;	     /* time at the current sampling step */
+
+
 	printf("MPC running ...\n");
 	for (iMPC = 0; iMPC <= MaxSimIter; iMPC++) {
 
 		if (2.0 <= t) {
-			grampc_setparam_real_vector(grampc, "xdes", x0);
+			grampc_setparam_real_vector(grampc, "xdes", grampc->param->x0);
 		}
 		else if (1.0 <= t) {
 			grampc_setparam_real_vector(grampc, "xdes", xdes2);
 		}
 		
-		tic = clock();
+		timer_now(&tic);
 		grampc_run(grampc);
-		grampc_setparam_real_vector(grampc, "x0", grampc->sol->xnext);
-		toc = clock();
-		CPUtimeVec[iMPC] = (typeRNum)((toc - tic) * 1000 / CLOCKS_PER_SEC);
+		timer_now(&toc);
+		CPUtimeVec[iMPC] = timer_diff_ms(&tic, &toc);
+
 		t = t + grampc->param->dt;
+		grampc_setparam_real_vector(grampc, "x0", grampc->sol->xnext);
 
 		/* check solver status */
 		if (grampc->sol->status > 0) {
@@ -218,8 +162,9 @@ int main()
 #endif
 
 	for (i = 0; i <= MaxSimIter; i++) {
-		CPUtime = CPUtime + CPUtimeVec[i] / (MaxSimIter + 1);
+		CPUtime = CPUtime + CPUtimeVec[i];
 	}
+	CPUtime = CPUtime / (MaxSimIter + 1);
 
 	grampc_free(&grampc);
 	free(CPUtimeVec);

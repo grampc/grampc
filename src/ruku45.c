@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -17,7 +18,7 @@
 
 
 void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctypeRNum *x,
-	ctypeRNum *u, ctypeRNum *p_, const typeGRAMPC *grampc, const typeffctPtr pfct)
+	ctypeRNum *u, ctypeRNum *p, ctypeRNum *dcdx, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	typeInt i;
 	typeInt Nres = Nint;
@@ -41,15 +42,13 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 	ctypeRNum *tnow = t;
 	ctypeRNum *xnow = x;
 	ctypeRNum *unow = u;
+	ctypeRNum *dcdxnow = dcdx;
 	typeRNum *ynow = y;
 	ctypeRNum tt = t[pInt*(Nint - 1)];
 	ctypeRNum *tvec;
 	ctypeRNum *uvec;
 	ctypeRNum *zvec;
-
-	/* only used for integrating the adjoint system */
-	typeRNum *dcdxvec = grampc->rws->dcdx;
-	typeRNum *dcdxnow = grampc->rws->dcdx + grampc->param->Nx * (grampc->opt->Nhor - 1);
+	ctypeRNum *dcdxvec;
 
 	/* intermediate steps */
 	typeRNum t1;
@@ -141,11 +140,13 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 		tvec = t;
 		uvec = u;
 		zvec = x;
+		dcdxvec = dcdx;
 	}
 	else {
 		tvec = t - (Nint - 1);
 		uvec = u - grampc->param->Nu*(Nint - 1);
 		zvec = x - grampc->param->Nx*(Nint - 1);
+		dcdxvec = dcdx - grampc->param->Nx*(Nint - 1);
 	}
 
 	/* initialization */
@@ -160,11 +161,14 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 		for (i = 0; i < grampc->param->Nx; i++) {
 			xakt[i] = xnow[i];
 		}
+		for (i = 0; i < grampc->param->Nx; i++) {
+			dcdxakt[i] = dcdxnow[i];
+		}
 	}
 	h = tnow[pInt] - tnow[0];
 
 	/* Stage 1 */
-	(*pfct)(s1, ynow, tnow, xnow, unow, p_, dcdxnow, grampc);
+	(*pfct)(s1, ynow, tnow, xnow, unow, p, dcdxnow, grampc);
 
 	while (pInt*(tt - tnow[pInt]) >= 0 && ende == 0) {
 		/* START WHILE LOOP *******************************************************/
@@ -178,9 +182,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s2, ys1, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s2, ys1, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Stage 3 */
 			for (i = 0; i < grampc->param->Nx; i++) {
@@ -190,9 +194,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s3, ys2, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s3, ys2, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Stage 4 */
 			for (i = 0; i < grampc->param->Nx; i++) {
@@ -202,9 +206,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s4, ys3, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s4, ys3, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Stage 5 */
 			for (i = 0; i < grampc->param->Nx; i++) {
@@ -214,9 +218,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s5, ys4, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s5, ys4, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Stage 6 */
 			for (i = 0; i < grampc->param->Nx; i++) {
@@ -226,9 +230,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s6, ys5, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s6, ys5, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Stage 7 */
 			for (i = 0; i < grampc->param->Nx; i++) {
@@ -238,9 +242,9 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 			interplin(uakt, tvec, uvec, tdummy, grampc->param->Nu, Nres, pInt);
 			if (y != x) {
 				interplin(xakt, tvec, zvec, tdummy, grampc->param->Nx, Nres, pInt);
+				interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
 			}
-			interplin(dcdxakt, tvec, dcdxvec, tdummy, grampc->param->Nx, Nres, pInt);
-			(*pfct)(s7, ys6, &tdummy, xakt, uakt, p_, dcdxakt, grampc);
+			(*pfct)(s7, ys6, &tdummy, xakt, uakt, p, dcdxakt, grampc);
 
 			/* Error */
 			t2 = t1 + h;
@@ -309,10 +313,12 @@ void intsysRuKu45(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *t, ctype
 						xnow += pInt * grampc->param->Nx;
 						unow += pInt * grampc->param->Nu;
 						ynow += pInt * grampc->param->Nx;
+						dcdxnow += pInt * grampc->param->Nx;
 						if (pInt == FWINT) {
 							tvec += 1;
 							zvec += grampc->param->Nx;
 							uvec += grampc->param->Nu;
+							dcdxvec += grampc->param->Nx;
 						}
 					}
 				}

@@ -1,11 +1,12 @@
 #
-# This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+# This file is part of GRAMPC - (https://github.com/grampc/grampc)
 #
 # GRAMPC -- A software framework for embedded nonlinear model predictive
 # control using a gradient-based augmented Lagrangian approach
 #
-# Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-# Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+# Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+# Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+# Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 # All rights reserved.
 #
 # GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -65,24 +66,26 @@ endif
 # object files and lib
 #		
 GRAMPC_OBJS = \
-		$(SOURCE_PATH)/euler1.$(OBJEXT) \
-		$(SOURCE_PATH)/eulermod2.$(OBJEXT) \
-		$(SOURCE_PATH)/heun2.$(OBJEXT) \
-		$(SOURCE_PATH)/ruku45.$(OBJEXT) \
-		$(SOURCE_PATH)/rodas.$(OBJEXT) \
-		$(SOURCE_PATH)/trapezodial.$(OBJEXT) \
-		$(SOURCE_PATH)/simpson.$(OBJEXT) \
+		$(SOURCE_PATH)/discrete.$(OBJEXT) \
+		$(SOURCE_PATH)/finite_diff.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_alloc.$(OBJEXT) \
+		$(SOURCE_PATH)/grampc_configreader.$(OBJEXT) \
+		$(SOURCE_PATH)/grampc_erk.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_fixedsize.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_init.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_mess.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_run.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_setopt.$(OBJEXT) \
 		$(SOURCE_PATH)/grampc_setparam.$(OBJEXT) \
-		$(SOURCE_PATH)/grampc_util.$(OBJEXT) 
+		$(SOURCE_PATH)/grampc_util.$(OBJEXT) \
+		$(SOURCE_PATH)/rodas.$(OBJEXT) \
+		$(SOURCE_PATH)/ruku45.$(OBJEXT) \
+		$(SOURCE_PATH)/simpson.$(OBJEXT) \
+		$(SOURCE_PATH)/timing.$(OBJEXT) \
+		$(SOURCE_PATH)/trapezoidal.$(OBJEXT)
 GRAMPC_CPP_OBJS = \
 		$(CPP_SOURCE_PATH)/grampc.$(OBJEXT) \
-                $(CPP_SOURCE_PATH)/problem_description.$(OBJEXT)
+		$(CPP_SOURCE_PATH)/problem_description.$(OBJEXT)
 GRAMPC_CPP_LIB = \
 		$(CPP_LIBS_PATH)/lib$(LIBNAME).$(LIBEXT)
 

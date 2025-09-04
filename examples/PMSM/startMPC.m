@@ -12,13 +12,14 @@ function [vec,grampc,figNr] = startMPC(figNr,compile,varargin)
 %            make.m in the matlab folder for more details
 %
 %
-% This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+% This file is part of GRAMPC - (https://github.com/grampc/grampc)
 %
 % GRAMPC -- A software framework for embedded nonlinear model predictive
 % control using a gradient-based augmented Lagrangian approach
 %
-% Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
-% Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+% Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+% Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+% Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
 % All rights reserved.
 %
 % GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -79,15 +80,15 @@ CmexFiles.grampc_printparam_Cmex(grampc);
 vec = grampc_init_struct_sol(grampc, Tsim);
 
 % init plots and store figure handles
-if PLOT_PRED
+if figNr > 0 && PLOT_PRED
     phpP = grampc_init_plot_pred(grampc,figNr);
     figNr = figNr+1;
 end
-if PLOT_TRAJ
+if figNr > 0 && PLOT_TRAJ
     phpT = grampc_init_plot_sim(vec,figNr);
     figNr = figNr+1;
 end
-if PLOT_STAT
+if figNr > 0 && PLOT_STAT
     phpS = grampc_init_plot_stat(vec,grampc,figNr);
     figNr = figNr+1;
 end
@@ -116,18 +117,18 @@ while 1
     end
     
     % simulate system
-    [~,xtemp] = ode45(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 double(grampc.param.dt)],vec.x(:,i),odeopt,vec.u(:,i),vec.p(:,i),grampc.userparam);
+    [~,xtemp] = ode45(@CmexFiles.grampc_ffct_Cmex,vec.t(i)+[0 double(grampc.param.dt)],vec.x(:,i),odeopt,vec.u(:,i),vec.p(:,i),grampc.param,grampc.userparam);
     vec.x(:,i+1) = xtemp(end,:);
         
     % evaluate time-dependent constraints 
     % to obtain h(x,u,p) instead of max(0,h(x,u,p))
-    vec.constr(:,i) = CmexFiles.grampc_ghfct_Cmex(vec.t(i), vec.x(:,i), vec.u(:,i), vec.p(:,i), grampc.userparam);
+    vec.constr(:,i) = CmexFiles.grampc_ghfct_Cmex(vec.t(i), vec.x(:,i), vec.u(:,i), vec.p(:,i), grampc.param, grampc.userparam);
     
     % update iteration counter
     i = i + 1;
     
     % plot data
-    if mod(i,PLOT_STEPS) == 0 || i == length(vec.t)
+    if figNr > 0 && (mod(i,PLOT_STEPS) == 0 || i == length(vec.t))
         if PLOT_PRED
             grampc_update_plot_pred(grampc,phpP);
         end
@@ -146,7 +147,7 @@ end
 
 
 %% Additional code
-if PLOT == 1
+if figNr > 0 && PLOT == 1
     figure(figNr)
     clf
     figNr = figNr+1;

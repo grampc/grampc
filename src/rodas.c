@@ -1,10 +1,11 @@
-/* This file is part of GRAMPC - (https://sourceforge.net/projects/grampc/)
+/* This file is part of GRAMPC - (https://github.com/grampc/grampc)
  *
  * GRAMPC -- A software framework for embedded nonlinear model predictive
  * control using a gradient-based augmented Lagrangian approach
  *
- * Copyright 2014-2019 by Tobias Englert, Knut Graichen, Felix Mesmer,
- * Soenke Rhein, Andreas Voelz, Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
+ * Copyright 2014-2025 by Knut Graichen, Andreas Voelz, Thore Wietzke,
+ * Tobias Englert (<v2.3), Felix Mesmer (<v2.3), Soenke Rhein (<v2.3),
+ * Bartosz Kaepernick (<v2.0), Tilman Utz (<v2.0).
  * All rights reserved.
  *
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
@@ -18,10 +19,9 @@
 
 
 
-void intsysRodas(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, const typeGRAMPC *grampc, const typeffctPtr pfct)
+void intsysRodas(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *tvec,
+	ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *p, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
-	typeRNum *dcdxvec = grampc->rws->dcdx;
-
 	int i, j;
 
 	int IFCN = grampc->opt->FlagsRodas[0];  /* 0 --> right hand side independent of time t */
@@ -87,6 +87,7 @@ void intsysRodas(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *tvec, cty
 		tvec = tvec - (Nint - 1);
 		xvec = xvec - (Nint - 1)*grampc->param->Nx;
 		uvec = uvec - (Nint - 1)*grampc->param->Nu;
+		dcdxvec = dcdxvec - (Nint - 1)*grampc->param->Nx;
 
 		/*jacobian of right hand side of adjoint system equal to transpose(dfdx)*/
 		IJAC = grampc->opt->FlagsRodas[2];   /* 1(0) -> analytical (numerical) jacobian (partial derivatives of right hand side w.r.t. state) */
@@ -100,14 +101,14 @@ void intsysRodas(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *tvec, cty
 
 	/* calling RODAS ... */
 	rodas_(&grampc->param->Nx,
-		(U_fp)ffctRodas, &IFCN,
+		&IFCN,
 		&t0, y, &t1, &HINIT, &tolr, &tola, &ITOL,
-		(U_fp)dfdxRodas, &IJAC, &MLJAC, &MUJAC,
-		(U_fp)dfdtRodas, &IDFX,
-		(U_fp)MfctRodas, &IMAS, &MLMAS, &MUMAS,
-		(U_fp)solout, &IOUT,
+		&IJAC, &MLJAC, &MUJAC,
+		&IDFX,
+		&IMAS, &MLMAS, &MUMAS,
+		&IOUT,
 		&grampc->rws->workRodas[0], &grampc->rws->lworkRodas, &grampc->rws->iworkRodas[0], &grampc->rws->liworkRodas,
-		tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct, &IDID);
+		tvec, xvec, uvec, p, dcdxvec, grampc, pfct, &IDID);
 
 	if (IDID == -1) { grampc->sol->status |= STATUS_INTEGRATOR_INPUT_NOT_CONSISTENT; }
 	if (IDID == -2) { grampc->sol->status |= STATUS_INTEGRATOR_MAXSTEPS; }
@@ -130,7 +131,7 @@ void intsysRodas(typeRNum *y, ctypeInt pInt, ctypeInt Nint, ctypeRNum *tvec, cty
 
 }
 
-void ffctRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *rhs, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeffctPtr pfct)
+void ffctRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *rhs, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *p, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	typeRNum *uakt = grampc->rws->rwsGeneral + LWadjsys; /* size NU */
 	typeRNum *xakt = uakt + grampc->param->Nu;           /* size NX */
@@ -154,17 +155,17 @@ void ffctRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *rhs, ctypeRNum *tvec,
 		interplin(xakt, tvec, xvec, takt, grampc->param->Nx, Nres, 1);
 		interplin(dcdxakt, tvec, dcdxvec, takt, grampc->param->Nx, Nres, 1);
 
-		(*pfct)(rhs, x, &takt, xakt, uakt, pvec, dcdxakt, grampc);
+		(*pfct)(rhs, x, &takt, xakt, uakt, p, dcdxakt, grampc);
 		for (i = 0; i < grampc->param->Nx; i++) {
 			rhs[i] = -rhs[i];
 		}
 	}
 	else {
-		(*pfct)(rhs, x, &takt, xakt, uakt, pvec, dcdxakt, grampc);
+		(*pfct)(rhs, x, &takt, xakt, uakt, p, dcdxakt, grampc);
 	}
 }
 
-void dfdxRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdx_val, int *ldfdy, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeffctPtr pfct)
+void dfdxRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdx_val, int *ldfdy, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *p, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	typeRNum takt;
 	typeRNum *uakt = grampc->rws->rwsGeneral + LWadjsys;  /* size NU */
@@ -183,16 +184,16 @@ void dfdxRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdx_val, int *ldfdy,
 	interplin(uakt, tvec, uvec, takt, grampc->param->Nu, Nres, 1);
 
 	if (pInt == FWINT) {
-		dfdx(dfdx_val, takt, x, uakt, pvec, grampc->userparam);
+		dfdx(dfdx_val, takt, x, uakt, p, grampc->param, grampc->userparam);
 	}
 	else
 	{
 		interplin(xakt, tvec, xvec, takt, grampc->param->Nx, Nres, 1);
-		dfdxtrans(dfdx_val, takt, xakt, uakt, pvec, grampc->userparam);
+		dfdxtrans(dfdx_val, takt, xakt, uakt, p, grampc->param, grampc->userparam);
 	}
 }
 
-void dfdtRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdt_val, int *ldfdy, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *pvec, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeffctPtr pfct)
+void dfdtRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdt_val, ctypeRNum *tvec, ctypeRNum *xvec, ctypeRNum *uvec, ctypeRNum *p, ctypeRNum *dcdxvec, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	typeRNum takt;
 	typeRNum *uakt = grampc->rws->rwsGeneral + LWadjsys;  /* size NU */
@@ -211,31 +212,31 @@ void dfdtRodas(int *N, typeRNum *t, typeRNum *x, typeRNum *dfdt_val, int *ldfdy,
 	interplin(uakt, tvec, uvec, takt, grampc->param->Nu, Nres, 1);
 
 	if (pInt == FWINT) {
-		dfdt(dfdt_val, takt, x, uakt, pvec, grampc->userparam);
+		dfdt(dfdt_val, takt, x, uakt, p, grampc->param, grampc->userparam);
 	}
 	else
 	{
 		interplin(xakt, tvec, xvec, takt, grampc->param->Nx, Nres, 1);
-		dHdxdt(dfdt_val, takt, xakt, uakt, x, pvec, grampc->userparam);
+		dHdxdt(dfdt_val, takt, xakt, uakt, p, x, grampc->param, grampc->userparam);
 	}
 }
 
-void MfctRodas(int *N, typeRNum *out, int *LMAS, const typeGRAMPC *grampc, const typeffctPtr pfct)
+void MfctRodas(int *N, typeRNum *out, int *LMAS, const typeGRAMPC *grampc, const typeSysPtr pfct)
 {
 	ctypeInt pInt = grampc->rws->iparRodas[0];
 
 	if (pInt == FWINT) {
-		Mfct(out, grampc->userparam);
+		Mfct(out, grampc->param, grampc->userparam);
 	}
 	else
 	{
-		Mtrans(out, grampc->userparam);
+		Mtrans(out, grampc->param, grampc->userparam);
 	}
 
 
 }
 
-void solout(int *nr, typeRNum *xold, typeRNum *x, typeRNum *h, typeRNum *y, typeRNum *cont, int *lrc, int *n, const typeGRAMPC *grampc, const typeffctPtr pfct, int *irtrn)
+void solout(int *nr, typeRNum *xold, typeRNum *x, typeRNum *h, typeRNum *y, typeRNum *cont, int *lrc, int *n, const typeGRAMPC *grampc, const typeSysPtr pfct, int *irtrn)
 {
 	/* Local variables */
 	typeInt i;
