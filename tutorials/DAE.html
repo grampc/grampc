@@ -1,0 +1,593 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Differential algebraic equations &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/DAE';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Constraint Tuning" href="Constraints.html" />
+    <link rel="prev" title="Moving horizon estimation of a CSTR" href="CSTR.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/DAE.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Differential algebraic equations</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-aspects">Implementation aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="differential-algebraic-equations">
+<span id="sec-tut-dae"></span><h1>Differential algebraic equations<a class="headerlink" href="#differential-algebraic-equations" title="Link to this heading">#</a></h1>
+<p>This section first introduces the DAE-system, before implementation
+aspects regarding the dedicated DAE-solver RODAS are considered.
+Finally, the example is evaluated.</p>
+<section id="problem-formulation">
+<span id="problem-formulation-3"></span><h2>Problem formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">#</a></h2>
+<p>The problem at hand is a toy example to illustrate the functionality of
+GRAMPC with regard to the solution of DAEs. It consists of two
+differential integrator states and one algebraic state. In addition,
+this algebraic state is subject to an equality constraint. The
+corresponding MPC problem is given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-daeexample">
+<span class="eqno">(28)<a class="headerlink" href="#equation-eq-daeexample" title="Link to this equation">#</a></span>\[ \begin{align}\begin{aligned}    \min_{u} \quad &amp; J(\mb{x}, \mb{u}) = \int_0^T \frac{1}{2}\left( {\Delta} \mb{x} \mb{Q} {\Delta} \mb{x}^\mathsf{T}+ \mb{u} \mb{R} \mb{u}^\mathsf{T}\right)  \, {\rm d}t\\    \textrm{s.t.} \quad &amp; {\dot x_1}(t) = u_1(t) \,, \quad \quad x_1(0) = x_{1,0}\\&amp; {\dot x_2}(t) = u_2(t) \,, \quad \quad x_2(0) = x_{2,0}\\&amp; \hspace{6.5mm} 0 = x_1(t) + x_2(t) - x_3(t)\\&amp; g(\mb{x}(t)) = x_3(t) - 1 = 0\\&amp; \mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right],\end{aligned}\end{align} \]</div>
+<p>where
+<span class="math notranslate nohighlight">\(\Delta \mb{x} = \mb{x} - \mb{x}_{\mathrm{des}}\)</span>
+and the weight matrices are chosen as
+<span class="math notranslate nohighlight">\(\mb{Q}  = \text{diag}(500,0,0)\)</span> and
+<span class="math notranslate nohighlight">\(\mb{R} = \text{diag}(1,1)\)</span>, respectively. The target of
+the MPC formulation is to steer the first differential state to the
+desired value, while remaining on the manifold defined by
+<span class="math notranslate nohighlight">\(x_1(t) + x_2(t) = 1\)</span>. Note that this equation results from
+substituting the algebraic equation into the constraint <span class="math notranslate nohighlight">\(g(\mb{x}(t))\)</span> .
+Even though it would be possible to do this substitution and solve the resulting problem, the
+purpose of this example is to illustrate the solution of a DAE.</p>
+<p>The DAE given in <a class="reference internal" href="#equation-eq-daeexample">(28)</a> can be rewritten
+with a mass matrix <span class="math notranslate nohighlight">\(\mb{M}\)</span>, i.e.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\underbrace{\begin{pmatrix}
+    1 &amp; 0 &amp; 0\\
+    0 &amp; 1 &amp; 0\\
+    0 &amp; 0 &amp; 0\\
+    \end{pmatrix}}_{\mb{M}} \dot{\mb{x}} = \underbrace{\begin{pmatrix}
+                                                                              u_1\\
+                                                                              u_2\\
+                                                                              x_1 + x_2 - x_3\\
+                                                                              \end{pmatrix}}_{\mb{f}(\mb{x}, \mb{u})}.\end{split}\]</div>
+<p>Clearly, the mass matrix is different from the identity matrix and
+singular, i.e. the inverse does not exist and therefore the solver RODAS
+is used to integrate the system dynamics as well as the corresponding
+adjoint dynamics.</p>
+</section>
+<section id="implementation-aspects">
+<span id="implementation-aspects-1"></span><h2>Implementation aspects<a class="headerlink" href="#implementation-aspects" title="Link to this heading">#</a></h2>
+<p>To solve the MPC problem for a DAE, the integrator RODAS has to be used
+and some additional options have to be set. Furthermore, some additional
+functions have to be implemented in the <code class="docutils literal notranslate"><span class="pre">probfct</span></code>-file.</p>
+<p>The options are described in <a class="reference internal" href="../algorithm/numerical_integration.html#sec-algopt-integrationrodas"><span class="std std-ref">Integration of semi-implicit ODEs and DAEs (RODAS)</span></a>. In the example at
+hand, the right hand side of the system dynamics is not explicitly
+dependent on the time <span class="math notranslate nohighlight">\(t\)</span> and therefore
+<code class="docutils literal notranslate"><span class="pre">IFCN</span></code> is set to zero. The next option concerns
+the calculation of <span class="math notranslate nohighlight">\(\frac{\partial f}{\partial t}\)</span> and
+<span class="math notranslate nohighlight">\(\frac{\partial^2 H}{\partial x \partial t}\)</span>. It can either be set
+to zero (i.e. <span class="math notranslate nohighlight">\(\text{IDFX}=0\)</span>) and finite differences
+are utilized or set to one (i.e. <span class="math notranslate nohighlight">\(\text{IDFX}=1\)</span>) and
+the analytical solutions implemented in the functions <code class="docutils literal notranslate"><span class="pre">dfdt</span></code> and <code class="docutils literal notranslate"><span class="pre">dHdxdt</span></code> are called.
+The third option determines if the numerical (i.e. finite differences)
+or the analytical solution (i.e. <code class="docutils literal notranslate"><span class="pre">dfdx</span></code> and <code class="docutils literal notranslate"><span class="pre">dfdxtrans</span></code>) is used to compute the Jacobians
+<span class="math notranslate nohighlight">\(\frac{\partial f}{\partial x}\)</span> and
+<span class="math notranslate nohighlight">\((\frac{\partial f}{\partial x})^\mathrm{T} = \frac{\partial^2 H}{\partial x \partial \lambda}\)</span>.
+The next option (<code class="docutils literal notranslate"><span class="pre">IMAS</span></code>) determines if the the mass matrix is equal to the
+identity matrix (i.e. <span class="math notranslate nohighlight">\(\text{IMAS}=0\)</span>) or if it is
+specified by the functions <code class="docutils literal notranslate"><span class="pre">Mfct</span></code> and <code class="docutils literal notranslate"><span class="pre">Mtrans</span></code> (i.e. <span class="math notranslate nohighlight">\(\text{IMAS}=1\)</span>).
+In the current example, the mass matrix is singular (not the identity
+matrix) and therefore the option is set to one. The remaining options
+regard the size of the Jacobian and the mass matrix. The number of
+non-zero lower and upper diagonals of the Jacobian are given by <code class="docutils literal notranslate"><span class="pre">MLJAC</span></code> and <code class="docutils literal notranslate"><span class="pre">MUJAC</span></code> ,
+respectively. In our case, we have a full matrix and therefore set both
+options to the system dimension, i.e. <span class="math notranslate nohighlight">\(N_{\mb{x}}\)</span>. The
+only non-zero entries of the mass matrix lie on the main diagonal. Thus,
+the corresponding options (i.e. <code class="docutils literal notranslate"><span class="pre">MLMAS</span></code> and <code class="docutils literal notranslate"><span class="pre">MUMAS</span></code>) are set to zero. Note that one has
+to be careful, if the Jacobian or mass matrix are sparse, since the
+lower and upper diagonals are padded with zeros. This is shown for the
+example matrix in <a class="reference internal" href="#fig-examplemassmatrix"><span class="std std-numref">Fig. 14</span></a> with the
+corresponding code in the following Example.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-number">Listing 9 </span><span class="caption-text">Example (C-Code for the mass function illustrated in <a class="reference internal" href="#fig-examplemassmatrix"><span class="std std-numref">Fig. 14</span></a>)</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">Mfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">            </span><span class="cm">/* row 1 */</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="cm">/* row 2 */</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="cm">/* row 3 */</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="cm">/* row 4 */</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="cm">/* row 5 */</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">            </span><span class="n">out</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<figure class="align-default" id="fig-examplemassmatrix">
+<img alt="../_images/MassMatrixExample.svg" src="../_images/MassMatrixExample.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">Example mass matrix with the index i showing at which position in the output array (i.e. out[i]) the corresponding value has to be written, cf. the example above.</span><a class="headerlink" href="#fig-examplemassmatrix" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="evaluation">
+<span id="evaluation-1"></span><h2>Evaluation<a class="headerlink" href="#evaluation" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-exampledae">
+<img alt="../_images/ExampleDAE.svg" src="../_images/ExampleDAE.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">Simulated MPC trajectories for the DAE-example</span><a class="headerlink" href="#fig-exampledae" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><a class="reference internal" href="#fig-exampledae"><span class="std std-numref">Fig. 15</span></a> shows the simulated trajectories for
+three set point changes. The setpoint of the first state <span class="math notranslate nohighlight">\(x_1\)</span>
+changes from 1 to 0 at <span class="math notranslate nohighlight">\(0\,\mathrm{s}\)</span>, from 0 to 0.5 after
+<span class="math notranslate nohighlight">\(1\,\mathrm{s}\)</span>, and finally from 0.5 to 1 after
+<span class="math notranslate nohighlight">\(2\,\mathrm{s}\)</span>. Due to the algebraic state and the equality
+constraint, the trajectory of the second state <span class="math notranslate nohighlight">\(x_2\)</span> has to be the
+mirror image of <span class="math notranslate nohighlight">\(x_1\)</span> around 0.5, which can be observed in the
+upper left plot. The corresponding controls in the upper right plot are
+also mirrored. The constraint violation during the simulation is shown
+in the lower left plot of <a class="reference internal" href="#fig-exampledae"><span class="std std-numref">Fig. 15</span></a>. The allowed
+constraint violation was set to 1 x 10<sup>-4</sup>, which is
+approximately met. Lastly, the lower right plot shows the original
+costs and the augmented costs. Both of which quickly converge to zero after each set
+point change (after 0, 1 and <span class="math notranslate nohighlight">\(2\,\mathrm{s}\)</span>, respectively).</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="CSTR.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Moving horizon estimation of a CSTR</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Constraints.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Constraint Tuning</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-aspects">Implementation aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

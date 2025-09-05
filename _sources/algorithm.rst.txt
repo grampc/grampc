@@ -1,0 +1,1336 @@
+.. _chap:AlgOpt:
+
+Optimization algorithm and options
+==================================
+
+This chapter summarizes the optimization scheme that is used to solve
+the optimization problem in :ref:`chap:problemformulation`. This includes
+the basic algorithm as well as the options that can be adjusted by the
+user. Note that all options as well as their corresponding default
+values are listed in Table :ref:`tab:ListOfOptions`. The setting of
+the options is detailed in :ref:`chap:grampcStructure` for
+usage in C and Matlab.
+
+.. _sec:AlgOpt:BasicAlgorithm:
+
+Optimization algorithm
+----------------------
+
+The optimization algorithm of GRAMPC is based on an augmented
+Lagrangian formulation with an inner projected gradient method as
+minimization step and an outer multiplier and penalty update. This
+section gives a brief sketch of the algorithm. Note that a more detailed
+description is given in :footcite:`Englert:OE:2019`.
+
+.. _sec:AlgOpt:AugLag:
+
+Augmented Lagrangian method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GRAMPC implements the augmented Lagrangian approach to handle the equality and inequality constraints of the OCP. 
+The constraints are adjoined to the integral cost function using the time-dependent multipliers
+:math:`\mb{\mu}= [\mb{\mu}_{\mb{g}}^\mathsf{T}, \mb{\mu}_{\mb{h}}^\mathsf{T}]^\mathsf{T}`
+and penalties :math:`\mb{c}= [\mb{c}_{\mb{g}}^\mathsf{T},\mb{c}_{\mb{h}}^\mathsf{T}]^\mathsf{T}`. 
+Similarly, multipliers
+:math:`\mb{\mu}_T = [\mb{\mu}_{\mb{g}_T}^\mathsf{T}, \mb{\mu}_{\mb{h}_T}^\mathsf{T}]^\mathsf{T}`
+and penalties
+:math:`\mb{c}_T = [\mb{c}_{\mb{g}_T}^\mathsf{T}, \mb{c}_{\mb{h}_T}^\mathsf{T}]^\mathsf{T}`
+are used for the terminal constraints. 
+Where appropriate, the syntax
+:math:`\mb{\bar \mu} = (\mb{\mu}_{\mb{g}}, \mb{\mu}_{\mb{h}}, \mb{\mu}_{\mb{g}_T}, \mb{\mu}_{\mb{h}_T})`
+and
+:math:`\mb{\bar c} = (\mb{c}_{\mb{g}}, \mb{c}_{\mb{h}}, \mb{c}_{\mb{g}_T}, \mb{c}_{\mb{h}_T})`
+is used to denote all multipliers and penalties. 
+The algorithm requires a reformulation of the inequality constraints that leads to the transformed functions (see :footcite:`Englert:OE:2019` for details)
+
+.. math::
+
+   \mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}_{\mb{h}}, \mb{c}_{\mb{h}}) &=
+   \mb{\max}\left\{ \mb{h}(\mb{x}, \mb{u}, \mb{p}, t), -\mb{C}_{\mb{h}}^{-1} \mb{\mu}_{\mb{h}} \right\}
+   \\
+   \mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T}, \mb{c}_{\mb{h}_T}) &= 
+   \mb{\max}\left\{ \mb{h}_T(\mb{x}, \mb{p}, T), -\mb{C}_{\mb{h}_T}^{-1} \mb{\mu}_{\mb{h}_T} \right\}
+
+with the component-wise **max**-function and the diagonal matrix syntax :math:`\mb{C}= {\rm diag}(\mb{c})`. 
+The augmented Lagrangian function is defined as
+
+.. math::
+    :label: eq:AlgOpt:AugLag
+
+    \bar J(\mb{u}, \mb{p}, T, \mb{\bar \mu}, \mb{\bar c};\mb{x}_0) = 
+    \bar V(\mb{x}, \mb{p}, T, \mb{\mu}_T, \mb{c}_T) 
+    + \int_0^T \bar l(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) \, \mathrm dt
+
+with the augmented terminal cost term
+
+.. math::
+
+   \bar V(\mb{x}, \mb{p}, T, \mb{\mu}_T, \mb{c}_T) =\,& V(\mb{x}, \mb{p}, T) 
+   + \mb{\mu}_{\mb{g}_T}^\mathsf{T}\, \mb{g}_T(\mb{x}, \mb{p}, T)
+   + \frac12 \| \mb{g}_T(\mb{x}, \mb{p}, T) \|^2_{\mb{C}_{\mb{g}_T}} 
+   \nonumber\\
+   &+ \mb{\mu}_{\mb{h}_T}^\mathsf{T}\, \mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T},\mb{c}_{\mb{h}_T})
+   + \frac12 \| \mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T},\mb{c}_{\mb{h}_T}) \|^2_{\mb{C}_{\mb{h}_T}}
+
+and the augmented integral cost term
+
+.. math::
+
+   \bar l(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) =\,& l(\mb{x}, \mb{u}, \mb{p}, t)
+   + \mb{\mu}_{\mb{g}}^\mathsf{T}\, \mb{g}(\mb{x}, \mb{u}, \mb{p}, t)
+   + \frac12 \| \mb{g}(\mb{x}, \mb{u}, \mb{p}, t) \|^2_{\mb{C}_{\mb{g}}}
+   \nonumber\\
+   &+ \mb{\mu}_{\mb{h}}^\mathsf{T}\, \mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu_h},\mb{c_h})
+   + \frac12 \| \mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu_h},\mb{c_h}) \|^2_{\mb{C}_{\mb{h}}} \,.
+
+Instead of solving the original problem, the algorithm solves the max-min-problem
+
+.. math::
+    :label: eq:MaxMin
+
+    \max_{\mb{\bar\mu}} \, \min_{\mb{u}, \mb{p}, T} \quad& 
+    \bar{ J}(\mb{u}, \mb{p}, T, \mb{\bar\mu}, \mb{\bar c}; \mb{x}_0) 
+    \\ 
+    \textrm{s.t.} \quad& \mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}, \mb{u}, \mb{p}, t) 
+    \,,\quad 
+    \mb{x}(0) = \mb{x}_0
+    \\
+    & \mb{u}(t) \in [\mb{u}_{\min}, \mb{u}_{\max}] %\,,\quad t \in [0, T]
+    \,,\quad 
+    t\in[0,T]
+    \\
+    & \mb{p} \in [\mb{p}_{\min}, \mb{p}_{\max}]
+    \,,\quad 
+    T \in [T_{\min}, T_{\max}] \,,
+
+whereby the augmented Lagrangian function :math:`\bar{J}` is maximized with respect to the multipliers :math:`\mb{\bar \mu}` and minimized with respect to the controls :math:`\mb{u}`, the parameters :math:`\mb{p}` and the end time :math:`\mb{T}`. 
+Note that the full set of optimization variables :math:`(\mb{u},\mb{p},T)` is considered in what follows for the sake of completeness. 
+The max-min-problem :math:numref:`eq:MaxMin` corresponds to the dual problem of :math:numref:`OCP` in the case of :math:`\mb{\bar c} = \mb{0}`. 
+The maximization step is performed by steepest ascent using the constraint residual as direction and the penalty parameter as step size. 
+See :footcite:`Englert:OE:2019` a detailed description of the augmented Lagrangian algorithm.
+
+.. _sec:AlgOpt:ProjGrad:
+
+Projected gradient method
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GRAMPC uses a projected gradient method to solve the inner
+minimization problem subject to the dynamics
+:math:`\mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)` as well as the box constraints
+:math:`\mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]` and
+:math:`\mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right]`. 
+The algorithm is based on the first-order optimality conditions that can be compactly stated using the Hamiltonian
+
+.. math::
+
+   H(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) = 
+   \bar{ l}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) + \mb{\lambda}^\mathsf{T}\mb{f}(\mb{x}, \mb{u}, \mb{p}, t)
+
+
+with the adjoint states :math:`\mb{\lambda}`. 
+The canonical equations are then given by
+
+.. math::
+    :label: eq:AlgOpt:OptCondLambda
+
+    \mb{M}\mb{\dot x} &= \mb{f} (\mb{x}, \mb{u}, \mb{p}, t) \,, &\mb{x}(0) &= \mb{x}_0 \,,
+
+    \mb{M}^\mathsf{T}\mb{\dot \lambda} &= -H_{\mb{x}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) \,, &\mb{M}^\mathsf{T}\mb{\lambda}(T) &= \bar{ V}_{\mb{x}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T)
+
+consisting of the original dynamics :math:`\dot{x}` and the adjoint dynamics :math:`\dot{\lambda}`. 
+The canonical equations can be iteratively solved in forward and backward time for given initial values of the optimization variables. 
+In each iteration and depending on the optimization variables of the actual problem to be solved, the gradients
+
+.. math::
+
+    \mb{d}_{\mb{u}} &= H_{\mb{u}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) 
+    \\
+    \mb{d}_{\mb{p}} &= \bar V_{\mb{p}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T) +     \int_0^T H_{\mb{p}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) \, {\rm d}t 
+    \\
+    d_T &= \bar V_T(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T) + H(\mb{x}(T), \mb{u}(T), \mb{p}, \mb{\lambda}(T), T, \mb{\mu}(T), \mb{c}(T))
+
+with respect to the controls :math:`\mb{u}`, parameters :math:`\mb{p}`, 
+and end time :math:`T` are used to formulate a line search problem
+
+.. math::
+
+   \min_{\alpha} \bar{J} \left( 
+     \mb{\psi}_{\mb{u}} \left( \mb{u} - \alpha \mb{d}_{\mb{u}} \right),
+     \mb{\psi}_{\mb{p}} \left( \mb{p} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}} \right),
+     \psi_{T} \left( T - \gamma_{T} \alpha d_{T} \right); 
+     \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+   \right)
+
+with projection functions :math:`\mb{\psi}_{\mb{u}}`,
+:math:`\mb{\psi}_{\mb{p}}` and :math:`\psi_{T}` and,
+finally, to update the optimization variables according to
+
+.. math::
+
+   \mb{u} \leftarrow \mb{\psi}_{\mb{u}} \left( \mb{u} - \alpha \mb{d}_{\mb{u}} \right)
+   \,,\quad
+   \mb{p} \leftarrow \mb{\psi}_{\mb{p}} \left( \mb{p} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}} \right)
+   \,,\quad
+   T \leftarrow \psi_{T} \left( T - \gamma_{T} \alpha d_{T} \right) \,.
+
+See :footcite:`InTech_GraichenKaepernick2012,Kaepernick2014,Englert:OE:2019`
+for a detailed description of the projected gradient algorithm. 
+GRAMPC provides two methods for the approximate solution of the line search
+problem, which are explained in :ref:`sec:AlgOpt:LineSearch`.
+
+.. _sec:AlgOpt:Structure:
+
+Algorithmic structure
+~~~~~~~~~~~~~~~~~~~~~
+
+.. prf:algorithm:: Basic algorithmic structure of GRAMPC.
+    :label: alg:AlgOpt:GrampcAlgorithm
+
+    Optional: Shift trajectories by sampling time :math:`\Delta t`
+
+    **For** :math:`i = 1` to :math:`i_{max}` **do**
+        **For** :math:`j = 1` to :math:`j_{max}` **do**
+            **If** :math:`i > 1` and :math:`j = 1` **then**
+                Set :math:`\mb x^{i|j} =\mb x^{i-1}`
+            **else**
+                Compute :math:`\mb x^{i|j}` by forward time integration of system dynamics
+
+                Evalute all constraints
+
+            **End If**
+            Compute :math:`\mb \lambda^{i|j}` by backward time integration of adjoint system
+
+            Evaluate gradients :math:`\mb{d_u}^{i|j}`, :math:`\mb{d_p}^{i|j}` and :math:`d_T^{i|j}`
+
+            Solve line search problem to determine step size :math:`\alpha^{i|j}`
+
+
+The basic structure of the algorithm that is implemented in the main calling function ``grampc_run`` is outlined in
+:prf:ref:`alg:AlgOpt:GrampcAlgorithm`.
+The projected gradient method is realized in the inner loop and consists
+of the forward and backward integration of the canonical equations as
+well as the update of the optimization variables based on the gradient
+and the approximate solution of the line search problem. The outer loop
+corresponds to the augmented Lagrangian method consisting of the
+solution of the inner minimization problem and the update of the
+multipliers and penalty parameters.
+
+As an alternative to the augmented Lagrangian framework, the user can
+choose external penalty functions in GRAMPC that handle the equality
+and inequality constraints as “soft” constraints. In this case, the
+multipliers :math:`\mb{\bar \mu}` are fixed at zero and only the
+penalty parameters are updated in the outer loop. Note that the user can
+set the options ``PenaltyIncreaseFactor`` and ``PenaltyDecreaseFactor`` to :math:`1.0` in order to keep the penalty
+parameters at the initial value ``PenaltyMin``. The single steps of the algorithm and
+the related options are described in more detail in the following sections.
+
+The following options can be used to adjust the basic algorithm. The
+corresponding default values are listed in
+:numref:`tab:ListOfOptions` in the appendix.
+
+-  ``MaxMultIter``: Sets the maximum number of augmented Lagrangian iterations
+   :math:`i_\text{max} \geq 1`. If the option ``ConvergenceCheck`` is activated, the
+   algorithm evaluates the convergence criterion and terminates if the
+   inner minimization converged and all constraints are satisfied within
+   the tolerance defined by ``ConstraintsAbsTol``.
+
+-  ``MaxGradIter``: If the option ``ConvergenceCheck`` is activated, the algorithm terminates the inner loop
+   as soon as the convergence criterion is fulfilled.
+
+-  ``EqualityConstraints``: Equality constraints
+   :math:`\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}`
+   can be disabled by the option value ``off``.
+
+-  ``InequalityConstraints``: To disable inequality constraints
+   :math:`\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}`,
+   set this option to ``off``.
+
+-  ``TerminalEqualityConstraints``: To disable terminal equality constraints
+   :math:`\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}`,
+   set this option to ``off``.
+
+-  ``TerminalInequalityConstraints``: To disable terminal inequality constraints
+   :math:`\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}`,
+   set this option to ``off``.
+
+-  ``ConstraintsHandling``: State constraints are handled either by means of the augmented
+   Lagrangian approach (option value ``auglag``) or as soft constraints by outer
+   penalty functions (option value ``extpen``).
+
+-  ``OptimControl``: Specifies whether the cost functional should be minimized with
+   respect to the control variable :math:`\mb{u}`.
+
+-  ``OptimParam``: Specifies whether the cost functional should be minimized with
+   respect to the optimization parameters :math:`\mb{p}`.
+
+-  ``OptimTime``: Specifies whether the cost functional should be minimized with
+   respect the horizon length :math:`T` (free end time problem) or if
+   :math:`T` is kept constant.
+
+.. _sec:AlgOpt:Integration:
+
+Numerical Integration
+---------------------
+
+GRAMPC employs a continuous-time formulation of the optimization
+problem. However, internally, all time-dependent functions are stored in
+discretized form with :math:`N_\text{hor}` elements and numerical
+integration is performed to compute the cost functional and to solve the
+differential equations.
+
+.. _sec:AlgOpt:IntegrationCostODE:
+
+Integration of cost functional and explicit ODEs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The approximate line search method requires the evaluation of the cost
+functional. To this end, the integral cost is integrated numerically
+with the trapezodial, Simpson rule or discrete summation and the
+terminal cost is added. Note that the discrete summation does not
+compute the Riemann sum but the plain sum with
+:math:`\sum_k l(\mb{x}_k, \mb{u}_k, \mb{p}, t_k)`.
+The cost values are additionally evaluated at the end of the
+optimization as an add-on information for the user.
+
+The gradient algorithm involves the sequential forward integration of
+the system dynamics and backward integration of the adjoint dynamics.
+GRAMPC implements three integrators with fixed step size (Euler,
+modified Euler and Heun) and time-discrete dynamics. Furthermore, a
+4th-order Runge-Kutta m ethod and a semi-implicit Rosenbrock solver
+(RODAS :footcite:`Hairer:Book:1996:Stiff,Rodas:Webpage:2018`)
+with variable step size are available.
+
+Evaluating the trajectories via time-discrete dynamics requires that the
+prediction horizon ``Thor`` matches the discretization steps ``Nhor`` and sample time ``dt`` and  via
+
+.. math:: \mathtt{Thor} = (\mathtt{Nhor} - 1) \cdot \mathtt{dt}.
+
+The following options can be used to adjust the numerical integrations:
+
+-  ``Nhor``: Number of discretization points within the time interval :math:`[0,T]`.
+
+-  ``IntegralCost``, ``TerminalCost``: Indicate if the integral and/or terminal cost functions are defined.
+
+-  ``IntegratorCost``: This option specifies the integration scheme for the cost
+   functionals. Possible values are ``trapezodial``, ``simpson`` and ``discrete``.
+
+-  ``Integrator``: This option specifies the integration scheme for the system and
+   adjoint dynamics. Possible values are ``euler``, ``modeuler``,
+   ``heun`` and ``discrete`` with fixed step size and ``ruku45`` and
+   ``rodas`` with variable step size.
+
+-  ``IntegratorMinStepSize``: Minimum step size for RODAS and the Runge-Kutta integrator.
+
+-  ``IntegratorMaxSteps``: Maximum number of steps for RODAS and the Runge-Kutta integrator.
+
+-  ``IntegratorRelTol``: Relative tolerance for RODAS and the Runge-Kutta integrator with
+   variable step size. Note that this option may be insignificant if the
+   minimum step size is chosen too high or the maximum number of steps
+   is set too low.
+
+-  ``IntegratorAbsTol``: Absolute tolerance for RODAS and the Runge-Kutta integrator with
+   variable step size. Note that this option may be insignificant if the
+   minimum step size is chosen too high or the maximum number of steps
+   is set too low.
+
+.. _sec:AlgOpt:IntegrationRodas:
+
+Integration of semi-implicit ODEs and DAEs (RODAS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GRAMPC supports problem descriptions with ordinary differential
+equations in semi-implicit form as well as differential algebraic
+equations using the solver RODAS for numerical integration (see
+:ref:`sec:ProblemImplementation:Implicit`). If a
+semi-implicit problem or differential algebraic equations are
+considered, the mass matrix :math:`\mb{M}` and its transposed
+version :math:`\mb{M}^\mathsf{T}` must be defined by the C
+functions ``Mfct`` and ``Mtrans``. The numerical integration can be accelerated by
+additionally providing the C functions ``dfdx``, ``dfdxtrans``, ``dfdt`` and ``dHdxdt``. See
+:ref:`sec:ProblemImplementation` for a detailed description of the problem implementation.
+
+The integration with RODAS is configured by a number of flags that are
+passed to the solver using the vector ``FlagsRodas`` with the elements
+``[IFCN, IDFX, IJAC, IMAS, MLJAC, MUJAC, MLMAS, MUMAS]``.
+See :footcite:`Rodas:Webpage:2018,Hairer:Book:1996:Stiff` for a
+detailed description of these flags. The default values
+:math:`[0,0,0,0,N_x,N_x,N_x,N_x]` correspond to an autonomous system
+with an identity matrix as mass matrix. The following options can be
+adjusted via :
+
+-  ``IFCN``: Specifies if the right hand side of the system dynamics
+   :math:`\mb{f} (\mb{x},\mb{u},\mb{p},T)`
+   explicitly depends on time :math:`t` (``IFCN`` = :math:`1`) or if
+   the problem is autonomous (``IFCN`` = :math:`0`).
+
+-  ``IDFX``: Specifies how the computation of the partial derivatives
+   :math:`\frac{\partial^{} \mb{f}}{\partial t^{}}` and
+   :math:`\frac{\partial^{2} H}{\partial x\partial t}` is carried out.
+   The partial derivatives are computed internally by finite differences
+   (``IDFX`` = :math:`0`) or are provided by the functions ``dfdt`` and ``dHdxdt``
+   (``IDFX`` = :math:`1`) as described in :ref:`sec:ProblemImplementation`.
+
+-  ``IJAC``: Specifies how the computation of the Jacobians
+   :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}`
+   and
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}=\frac{\partial^{2} H}{\partial x\partial \lambda}`
+   is carried out for numerically solving the canonical equations. The
+   Jacobians are computed internally by finite differences
+   (``IJAC`` = :math:`0`) or are provided by the functions ``dfdx`` and ``dfdxtrans``
+   (``IJAC`` = :math:`1`), also see :ref:`sec:ProblemImplementation`.
+
+-  ``IMAS``: Gives information on the mass matrix :math:`\mb{M}`, which
+   is either an identity matrix (``IMAS`` = :math:`0`) or is specified
+   by the function ``Mfct`` (``IMAS`` = :math:`1`). Note that the
+   adjoint dynamics requires the transposed mass matrix that has to be
+   provided by the function ``Mtrans``.
+
+-  ``MLJAC``: Gives information on the banded structure of the Jacobian
+   :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}`
+   and
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}`,
+   respectively. The Jacobian is either a full matrix
+   (``MLJAC`` = :math:`N_x`) or is of banded structure. In the latter
+   case, the number of non-zero diagonals below the main diagonal are
+   specified by :math:`0\leq\,`\ ``MLJAC``\ :math:`\,<N_x`.
+
+-  ``MUJAC``: Specifies the number of non-zero diagonals above the main diagonal
+   of the Jacobian
+   :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}`.
+   This flag needs not to to be defined if ``MLJAC`` = :math:`N_x`.
+   Since the partial derivative of the right hand side of the adjoint
+   dynamics with respect to the adjoint state
+   :math:`\mb{\lambda}` is given by
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}`,
+   the meaning of the flags ``MLJAC`` and ``MUJAC`` switches in this
+   case.
+
+-  ``MLMAS`` and ``MUMAS`` : Both options have the same meaning as ``MLJAC`` and
+   ``MUJAC``, but refer to the mass matrix :math:`\mb{M}`.
+
+If a semi-implicit problem (option ``IMAS`` = :math:`1`) with Mayer term (option
+``TerminalCost`` = ``on``) is considered, the terminal conditions of the adjoint system
+must be specified in a specific form. To provide
+RODAS :footcite:`Hairer:Book:1996:Stiff,Rodas:Webpage:2018` the
+proper terminal condition :math:`\mb{\lambda}(T)`, the function ``dVdx``
+must be specified as follows
+
+.. math::
+
+   \mb{\lambda}(T) = \underbrace{\left(\mb{M}^\mathsf{T}\right)^{-1}\bar{ V}_{\mb{x}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T)}_{\texttt{dVdx}}
+
+cf. Equation :math:numref:`eq:AlgOpt:OptCondLambda`.
+In the case of a DAE system, the mass matrix is singular and therefore
+only the elements of the mass matrix for the differential equations are
+inverted. FOR an example of using RODAS and the respective options, take
+a look at the MPC problem ``Reactor_PDE`` in the folder ``<grampc_root>/examples``.
+
+.. _sec:AlgOpt:LineSearch:
+
+Line search
+-----------
+
+The projected gradient method as part of the GRAMPC algorithm
+:prf:ref:`alg:AlgOpt:GrampcAlgorithm`)
+requires the solution of the line search
+problem :footcite:`Englert:OE:2019`
+
+.. math::
+    :label: eq:AlgOpt:LineSearchProblem
+
+    \min_{\alpha} \bar{J} \left( 
+        \mb{\psi}_{\mb{u}} \left( \mb{u}^{i|j} - \alpha \mb{d}_{\mb{u}}^{i|j} \right),
+        \mb{\psi}_{\mb{p}} \left( \mb{p}^{i|j} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}}^{i|j} \right),
+        \psi_{T} \left( T^{i|j} - \gamma_{T} \alpha d_{T}^{i|j} \right);
+        \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+    \right)\,.
+
+GRAMPC implements two efficient strategies to solve this problem in an
+approximate manner. The following options apply to both line search
+methods that are detailed below
+(:ref:`sec:AlgOpt:LineSearchAdaptive` and
+:ref:`sec:AlgOpt:LineSearchExplicit`):
+
+-  ``LineSearchType``: This option selects either the adaptive line search strategy (value
+   ``adaptive``) or the explicit approach (value ``explicit1`` or ``explicit2``).
+
+-  ``LineSearchExpAutoFallback``: If this option is activated, the automatic fallback strategy is
+   used in the case that the explicit formulas result in negative step sizes.
+
+-  ``LineSearchMax``: This option sets the maximum value :math:`\alpha_{\max}` of the
+   step size :math:`\alpha`.
+
+-  ``LineSearchMin``: This option sets the minimum value :math:`\alpha_{\min}` of the
+   step size :math:`\alpha`.
+
+-  ``LineSearchInit``: Indicates the initial value :math:`\alpha_{\text{init}}>0` for the
+   step size :math:`\alpha`. If the adaptive line search is used, the
+   sample point :math:`\alpha_2` is set
+   to\ :math:`\alpha_2 = \alpha_{\text{init}}`.
+
+-  ``OptimParamLineSearchFactor``: This option sets the adaptation factor
+   :math:`\gamma_{\mb{p}}` that weights the update of the
+   parameter vector :math:`\mb{p}` against the update of the
+   control :math:`\mb{u}`.
+
+-  ``OptimTimeLineSearchFactor``: This option sets the adaptation factor :math:`\gamma_{T}` that
+   weights the update of the end time :math:`T` against the update of
+   the control :math:`\mb{u}`.
+
+.. _sec:AlgOpt:LineSearchAdaptive:
+
+Adaptive line search
+~~~~~~~~~~~~~~~~~~~~
+
+An appropriate way to determine the step size is the adaptive line
+search approach from :footcite:`InTech_GraichenKaepernick2012`,
+where a polynomial approximation of the cost :math:`\bar J` is used and an adaptation of
+the search intervals is performed. More precisely, the cost functional
+is evaluated at three sample points
+:math:`\alpha_1 < \alpha_2 < \alpha_3` with
+:math:`\alpha_2=\frac{1}{2}\left(\alpha_1+\alpha_3\right)`, which are
+used to construct a quadratic polynomial of the cost according to
+
+.. math::
+    :label: eq:AlgOpt:ls_adapt_approx
+
+    \bar{J}\left(
+        \mb{\psi}_{\mb{u}} \left(\mb{u} ^{i|j} - \alpha \mb{d}_{\mb{u}} ^{i|j}\right),
+        \mb{\psi}_{\mb{p}} \left(\mb{p} ^{i|j} - \gamma_{\mb{p}}\alpha \mb{d}_{\mb{p}} ^{i|j}\right),
+        \psi_{T} \left(T ^{i|j} - \gamma_{T}\alpha   d_{T} ^{i|j} \right);
+        \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+    \right)\\
+    \approx \Phi(\alpha) = p_0+p_1\alpha +p_2\alpha_2\,.
+
+.. figure:: img/ls_adapt.*
+    :name: fig:AlgOpt:LS_Adapt
+
+    Adaptation of line search interval.
+
+Subsequently, a step size :math:`\alpha^{j}` is computed by minimizing
+the cost approximation :math:numref:`eq:AlgOpt:ls_adapt_approx`. If
+necessary, the interval :math:`[\alpha_1,\alpha_3]` is adapted for the
+next gradient iteration in the following way
+
+.. math::
+    :label: eq:AlgOpt:IntervalAdaptation
+
+    [\alpha_1,\alpha_3] & \leftarrow 
+    \begin{cases}
+    \hfill \kappa\,[\alpha_1,\alpha_3] & \text{if} \ \alpha \geq
+    \alpha_3 - \varepsilon_{\alpha}(\alpha_3-\alpha_1) \ \text{and} \
+    \alpha_3 \leq \alpha_{\max} \ \text{and} \
+    |\Phi(\alpha_1)-\Phi(\alpha_3)| >  \varepsilon_{\phi}
+    \\[1.5ex]
+    \hfill \frac{1}{\kappa} \,[\alpha_1,\alpha_3] & \text{if} \ \alpha \leq
+    \alpha_1 + \varepsilon_{\alpha}(\alpha_3-\alpha_1) \ \text{and} \
+    \alpha_1 \geq \alpha_{\min}\ \text{and} \
+    |\Phi(\alpha_1)-\Phi(\alpha_3)| > \varepsilon_{\phi}
+    \\[1.5ex]
+    \hfill[\alpha_1,\alpha_3] & \text{otherwise}
+    \end{cases} \\[1.5ex]
+    %
+    \alpha_2 & \leftarrow \frac{1}{2}\left(\alpha_1+\alpha_3\right)
+
+with the adaptation factor :math:`\kappa > 1`, the interval tolerance
+:math:`\varepsilon_{\alpha} \in (0,0.5)`, the absolute cost tolerance
+:math:`{\varepsilon_{\phi}\in[0,\infty)}` for adapting the interval and
+the interval bounds :math:`\alpha_{\max}>\alpha_{\min}>0`.
+The modification :math:numref:`eq:AlgOpt:IntervalAdaptation` of
+the line search interval tracks the minimum point :math:`\alpha^{j}` of
+the line search problem in the case when :math:`\alpha^{j}` is either
+outside of the interval :math:`[\alpha_1,\alpha_3]` or close to one of
+the outer bounds :math:`\alpha_1`, :math:`\alpha_3`, as illustrated in
+:numref:`fig:AlgOpt:LS_Adapt`. The adaptation factor
+:math:`\kappa` accounts for scaling as well as shifting of the interval
+:math:`[\alpha_1,\alpha_3]` in the next gradient iteration, if
+:math:`\alpha^{j}` lies in the vicinity of the interval bounds
+:math:`[\alpha_1,\alpha_3]` as specified by the interval tolerance
+:math:`\varepsilon_\alpha`. This adaptive strategy allows one to track
+the minimum of the line search problem :math:numref:`eq:AlgOpt:LineSearchProblem` over
+the gradient iterations :math:`j` and MPC steps :math:`k`, while
+guaranteeing a fixed number of operations in view of a real-time MPC
+implementation. The absolute tolerance :math:`\varepsilon_{\phi}` of the
+difference in the (scaled) costs at the interval bounds
+:math:`|\Phi(\alpha_1)-\Phi(\alpha_3)|` avoids oscillations of the
+interval width in regions where the cost function :math:`\bar{J}` is
+almost constant.
+
+The following options apply specifically to the adaptive line search
+strategy:
+
+-  ``LineSearchAdaptAbsTol``: This option sets the absolute tolerance :math:`\varepsilon_{\phi}`
+   of the difference in costs at the interval bounds :math:`\alpha_1`
+   and :math:`\alpha_2`. If the difference in the (scaled) costs on
+   these bounds falls below :math:`\varepsilon_{\phi}`, the adaption of
+   the interval is stopped in order to avoid oscillations.
+
+-  ``LineSearchAdaptFactor``: This option sets the adaptation factor :math:`\kappa > 1` in
+   :math:numref:`eq:AlgOpt:IntervalAdaptation`
+   that determines how much the line search interval can be adapted from
+   one gradient iteration to the next.
+
+-  ``LineSearchIntervalTol``: This option sets the interval tolerance
+   :math:`\varepsilon_{\alpha} \in (0,0.5)` in
+   :math:numref:`eq:AlgOpt:IntervalAdaptation`
+   that determines for which values of :math:`\alpha` the adaption is
+   performed.
+
+-  ``LineSearchIntervalFactor``: This option sets the interval factor :math:`\beta \in (0,1)` that
+   specifies the interval bounds :math:`[\alpha_1,\alpha_3]` according
+   to :math:`\alpha_1 = \alpha_2 (1 - \beta)` and
+   :math:`\alpha_3 = \alpha_2 (1 + \beta)`, whereby the mid sample point
+   is initialized as :math:`\alpha_2 = \alpha_\text{init}`.
+
+.. _sec:AlgOpt:LineSearchExplicit:
+
+Explicit line search
+~~~~~~~~~~~~~~~~~~~~
+
+An alternative way to determine the step size in order to further reduce
+the computational effort for time-critical problems is the explicit line
+search approach originally discussed in :footcite:`Barzilai1988`
+and adapted in :footcite:`Kaepernick2013` for the optimal
+control case. The motivation is to minimize the difference between two
+consecutive control updates :math:`u_k^{i|j}(\tau)` and
+:math:`u_k^{i|j+1}(\tau)` in the unconstrained case and additionally
+assuming the same step size :math:`\alpha^{i|j}`, i.e.
+
+.. math::
+    :label: eq:AlgOpt:ls_expl_prob
+
+    \alpha^{i|j} &= \underset{\alpha > 0}{\arg\min} \; \Bigl\| {\mb{u}}^{i|j+1} - {\mb{u}}^{i|j} \Bigr\|^2_{L^2_m[0,T]} + \Bigl\| {\mb{p}}^{i|j+1} - {\mb{p}}^{i|j} \Bigr\|^2_2 + \Bigl| {T}^{i|j+1} - {T}^{i|j} \Bigr| \\
+    &= \underset{\alpha > 0}{\arg\min} \; \Bigl\| \underbrace{{\mb{u}}^{i|j} - {\mb{u}}^{j-1}}_{=:\Delta {\mb{u}}^{i|j}}- \alpha \underbrace{\left(\mb{d}^{i|j}_{\mb{u}}-\mb{d}^{j-1}_{\mb{u}}\right)}_{=:\Delta \mb{d}^{i|j}_{\mb{u}}} \Bigr\|^2_{L^2_m[0,T]} + \Bigl\| \underbrace{{\mb{p}}^{i|j} - {\mb{p}}^{j-1}}_{=:\Delta {\mb{p}}^{i|j}}- \gamma_{\mb{p}} \alpha \underbrace{\left(\mb{d}^{i|j}_{\mb{p}}-\mb{d}^{j-1}_{\mb{p}}\right)}_{=:\Delta \mb{d}^{i|j}_{\mb{p}}} \Bigr\|^2_2 \\
+    & \qquad\qquad +\Bigl\| \underbrace{{T}^{i|j} - {T}^{j-1}}_{=:\Delta {T}^{i|j}}- \gamma_{T} \alpha \underbrace{\left({d}^{i|j}_{T}-{d}^{j-1}_{T}\right)}_{=:\Delta {d}^{i|j}_{T}} \Bigr\|^2_2 
+
+with :math:`|| z ||^2_{L^2_m[0,T]} = \langle z,z \rangle :=\int_0^T z^\mathsf{T}(t) z(t) {\rm d}t`.
+
+.. figure:: img/ls_explicit.*
+    :name: fig:AlgOpt:LS_Explicit
+
+    Motivation for the explicit line search strategy.
+
+:numref:`fig:AlgOpt:LS_Explicit` illustrates the general idea
+behind :math:numref:`eq:AlgOpt:ls_expl_prob`. To solve
+:math:numref:`eq:AlgOpt:ls_expl_prob`, consider the
+following function
+
+.. math::
+    :label: eq:AlgOpt:q_alpha
+
+    q(\alpha) : & = 
+    \Bigl\| \Delta u_k^{j} - \alpha \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]}
+    \\
+    & = \int_{0}^{T} \left( \Delta u_k^{j} - \alpha \Delta d_k^{j} \right)^\mathsf{T}
+    \left( \Delta u_k^{j} - \alpha \Delta d_k^{j} \right) \, {\rm d}t 
+    \\
+    & = \int_{0}^{T} \left(\Delta u_k^{j}\right)^\mathsf{T}\Delta u_k^{j} \, {\rm d}t
+    + \alpha^2 \int_{0}^{T} \left(\Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t 
+    - 2 \alpha \int_{0}^{T} \left(\Delta u_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t.
+
+The minimum has to satisfy the stationarity condition
+
+.. math::
+
+    \frac{\partial^{} q(\alpha)}{\partial \alpha^{}} = 
+    2 \alpha \int_{0}^{T} \left(\Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t 
+    - 2 \int_{0}^{T} \left(\Delta u_k^{j} \right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t 
+    = 0 .
+
+A suitable step size :math:`\alpha^{j}` then follows to
+
+.. math::
+
+    \alpha^{j} = 
+    \frac{\int_{0}^{T} \left( \Delta u_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t}
+    {\int_{0}^{T} \left( \Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t} 
+    = \frac{\langle \Delta u_k^{j},\Delta d_k^{j}\rangle}
+    {\langle \Delta d_k^{j},\Delta d_k^{j} \rangle} \,.
+
+Another way to compute an appropriate step size for the control update
+can be achieved by reformulating
+:math:numref:`eq:AlgOpt:q_alpha` in the following way:
+
+.. math::
+
+   \label{eq:AlgOpt:OptStepSizeQbar}
+   q(\alpha) = 
+   \Bigl\| \Delta u_k^{j} - \alpha \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]} = 
+   \alpha^2 \Bigl\| \frac{1}{\alpha} \Delta u_k^{j} - \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]} 
+   =: \alpha^2 \bar q(\alpha).
+
+In the subsequent, the new function :math:`\bar q(\alpha)` is minimized
+w.r.t. the step size leading to a similar solution
+
+.. math::
+
+   \label{eq:AlgOpt:OptStepSize2}
+   \alpha^{j} = \frac{\langle\Delta u^{j}, \Delta u^{j} \rangle}
+   {\langle \Delta u^{j}, \Delta d_k^{j} \rangle} \,.
+
+For the original problem :math:numref:`eq:AlgOpt:ls_expl_prob`, the solution
+
+.. math::
+    :label: eq:AlgOpt:ls_expl1
+
+    \alpha^{i|j} = 
+    \frac{\langle \Delta \mb{u}^{i|j},\Delta\mb{d}^{i|j}_{\mb{u}}\rangle 
+        +\gamma_{\mb{p}} \langle \Delta\mb{p}^{i|j},\Delta\mb{d}^{i|j}_{\mb{p}}\rangle 
+        +\gamma_{T} \Delta T^{i|j}\Delta{d}^{i|j}_{T}}
+    {\langle \Delta\mb{d}^{i|j}_{\mb{u}},\Delta \mb{d}^{i|j}_{\mb{u}} \rangle 
+        + \gamma_{\mb{p}}^2 \langle{\Delta\mb{d}^{i|j}_{\mb{p}}}^\mathsf{T}\Delta \mb{d}^{i|j}_{\mb{p}}\rangle 
+        + \gamma_{T}^2\big( \Delta {d}^{i|j}_{T}\big)^2}
+
+.. math::
+    :label: eq:AlgOpt:ls_expl2
+    
+    \alpha^{i|j} = 
+    \frac{\langle \Delta \mb{u}^{i|j}, \Delta\mb{u}^{i|j}\rangle 
+        + \gamma_{\mb{p}} \langle\Delta\mb{p}^{i|j}, \Delta\mb{p}^{i|j} \rangle
+        + \gamma_{T} \big(\Delta T^{i|j}\big)^2}
+    {\langle \Delta\mb{u}^{i|j}, \Delta \mb{d}^{i|j}_{\mb{u}} \rangle 
+        + \gamma_{\mb{p}}^2 \langle\Delta\mb{p}^{i|j}, \Delta \mb{d}^{i|j}_{\mb{p}} \rangle 
+        + \gamma_{T}^2 \Delta {T}^{i|j} \Delta {d}^{i|j}_{T}} 
+
+follows.
+
+In the GRAMPC implementation, both approaches :math:numref:`eq:AlgOpt:ls_expl1` and
+:math:numref:`eq:AlgOpt:ls_expl2` are available. 
+In addition, the step size :math:`\alpha^{j}` is bounded by the upper and
+lower values :math:`\alpha_{\max} > \alpha_{\min} > 0`. However, if the
+originally computed step size :math:`\alpha^{j}` is less than zero [1]_,
+either the initial step size :math:`\alpha^{j} = \alpha_\text{init}` or
+the automatic fallback strategy that is detailed in the next subsection
+is used in order to achieve a valid step size. The fallback strategy is
+set with the following option (only available for the explicit line
+search strategies):
+
+-  ``LineSearchExpAutoFallback``: If this option is activated, the automatic fallback strategy is
+   used in the case that the explicit formulas result in negative step sizes.
+
+.. _sec:AlgOpt:LineSearchFallback:
+
+Fallback strategy for explicit line search
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+While the initial step size can be used as fallback solution if the
+explicit step size computation yields negative values, it often requires
+problem-specific tuning of :math:`\alpha_\text{init}` for achieving
+optimal performance. As alternative, GRAMPC implements an automatic
+fallback strategy that is based on the idea of using at most 1% of the
+control range defined by and . FOR this purpose, the maximum absolute
+value
+:math:`\mb{d}^{i|j}_{\mb{u},\text{max}} = \| \mb{d}_{\mb{u}} ^{i|j}(t) \|_{L^\infty}`
+of the search direction
+:math:`\mb{d}_{\mb{u}} ^{i|j}(t)` over the horizon is
+determined. Subsequently, the step size
+
+.. math::
+
+   	\alpha^{i|j} = \frac{1}{100} \cdot \min_{k\in\{1,\dots,N_{\mb{u}}\}}\left\lbrace  
+    \frac{u_{\text{max},k}- u_{\text{min},k}} {d_{\mb{u},\text{max},k}^{i|j}}  \right\rbrace
+
+follows as the minimal step size required to perform a step of 1% with
+respect to the range of at least one control in at least one time step.
+Additionally, the step size is limited to 10% of the maximum step size
+:math:`\alpha_{\max}`. Since this strategy requires reasonable limits
+for the controls, it is only executed if ``LineSearchExpAutoFallback`` is activated and if these
+limits are defined by the user. Furthermore, this strategy can only be
+used if ``OptimControl`` is switched ``on``. In all other case, the initial step size
+:math:`\alpha^{j}=\alpha_\text{init}` will be used as fallback solution.
+
+.. _sec:AlgOpt:UpdateMultPen:
+
+Update of multipliers and penalties
+-----------------------------------
+
+GRAMPC handles general nonlinear constraints using an augmented
+Lagrangian approach or, alternatively, using an external penalty method.
+The key to the efficient solution of constrained problems using these
+approaches are the updates of the multipliers in the outer loop for
+:math:`i = 1,\, \dots,\, i_\text{max}`.
+
+.. _sec:AlgOpt:UpdateMult:
+
+Update of Lagrangian multipliers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The outer loop of the GRAMPC algorithm in:prf:ref:`alg:AlgOpt:GrampcAlgorithm`
+maximizes the augmented Lagrangian function with respect to the
+multipliers :math:`\mb{\bar \mu}`. This update is carried out in
+the direction of steepest ascent that is given by the constraint
+residual. The penalty parameter is used as step size, as it is typically
+done in augmented Lagrangian methods.
+
+FOR an arbitrary equality constraint
+:math:`g^{i} = g(\mb{x}^{i}, \dots)` with multiplier
+:math:`\mu_g^{i}`, penalty :math:`c_g^i`, and tolerance
+:math:`\varepsilon_g`, the update is defined by
+
+.. math::
+
+   \mu_g^{i+1} = \zeta_{g}(\mu_g^{i}, c_g^{i}, g^{i}, \varepsilon_g) 
+   = 
+   \begin{cases}
+   \mu^{i} + (1-\rho) c_g^{i} g^{i}
+   & \text{if } \left|g^{i}\right| >  \varepsilon_g
+   \, \land \,
+   \eta^{i} \leq \varepsilon_\text{rel,u}
+   \\
+   {\mu}_g^{i}
+   & \text{else} \,.
+   \end{cases}
+
+The update is not performed if the constraint is satisfied within its
+tolerance :math:`\varepsilon` or if the inner minimization is not
+sufficiently converged, which is checked by the maximum relative
+gradient :math:`\eta^i` (see :math:numref:`eq:AlgOpt:RelGrad` for the definition) and the
+threshold :math:`\varepsilon_\text{rel,u}`. Similarly, for an inequality
+constraint :math:`h^{i} = h(\mb{x}^{i}, \dots)` with multiplier
+:math:`\mu_h^{i}`, penalty :math:`c_h^{i}`, and tolerance
+:math:`\varepsilon_h`, the update is defined by
+
+.. math::
+
+   \mu_h^{i+1} = \zeta_{h}(\mu_h^{i}, c_h^{i}, \bar h^{i}, \varepsilon_h) 
+   = 
+   \begin{cases}
+   \mu_h^{i} + (1-\rho) c_h^{i} \bar h^{i}
+   & \text{if } \left(\bar h^{i} > \varepsilon_h
+   \, \land \, 
+   \eta^{i} \leq \varepsilon_\text{rel,u} \right) 
+   \, \lor \, 
+   \bar h^{i} < 0
+   \\
+   \mu_h^{i}
+   & \text{else} \,.
+   \end{cases}
+
+Similar update rules are used for the terminal equality and terminal
+inequality constraints.
+
+GRAMPC provides several means to increase the robustness of the
+multiplier update, which may be required if few iterations
+:math:`j_\text{max}` are used for the suboptimal solution of the inner
+minimization problem. The damping factor :math:`\rho \in [0, 1)` can be
+used to scale the step size of the steepest ascent and the tolerance
+:math:`\varepsilon_\text{rel,u}` can be used to skip the multiplier
+update in case that the minimization is not sufficiently converged.
+Furthermore, the multipliers are limited by lower and upper bounds
+:math:`\mu_g \in [-\mu_\text{max}, \mu_\text{max}]` for equalities and
+:math:`\mu_h \leq \mu_\text{max}` for inequalities, respectively, to
+avoid unlimited growth. A status flag is set if one of the multipliers
+reaches this bound and the user should check the problem formulation as
+this case indicates an ill-posed or even infeasible optimization
+problem.
+
+The following options can be used to adjust the update of the Lagrangian
+multipliers:
+
+-  ``MultiplierMax``: Upper bound :math:`\mu_\text{max}` and lower bound
+   :math:`-\mu_\text{max}` for the Lagrangian multpliers.
+
+-  ``MultiplierDampingFactor``:Damping factor :math:`\rho \in [0,1)` for the multiplier update.
+
+-  ``AugLagUpdateGradientRelTol``: Threshold :math:`\varepsilon_\text{rel,u}` for the maximum relative
+   gradient of the inner minimization problem.
+
+-  ``ConstraintsAbsTol``: Thresholds
+   :math:`(\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}`
+   for the equality, inequality, terminal equality, and terminal
+   inequality constraints.
+
+.. _sec:AlgOpt:UpdatePen:
+
+Update of penalty parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The penalty parameters :math:`\mb{\bar c}` are adapted in each
+outer iteration according to a heuristic rule that is motivated by the
+LANCELOT package :footcite:`Conn2013,Nocedal2006`. A carefully
+tuned adaptation of the penalties can speed-up the convergence
+significantly and is therefore highly recommended (also see
+:ref:`sec:AlgOpt:EstimPenMin` and the tutorial in
+:ref:`sec:TUT:PMSM`). Note that the penalty parameters are
+also updated if external penalties are used instead of the augmented
+Lagrangian method, i.e. ``ConstraintsHandling`` is set to ``extpen``. In order to keep the
+penalty parameters at the initial value ``PenaltyMin``, the options ``PenaltyIncreaseFactor`` and ``PenaltyDecreaseFactor`` can be set to
+:math:`1.0`, which basically deactivates the penalty update.
+
+For an arbitrary equality constraint
+:math:`g^{i} = g(\mb{x}^{i}, \dots)` with penalty :math:`c_g^i`
+and tolerance :math:`\varepsilon_g`, the update is defined by
+
+.. math::
+    :label: eq:AlgOpt:UpdatePeng
+
+    c_g^{i+1} = \xi_g(c_g^{i}, g^{i}, g^{i-1}, \varepsilon_g) 
+    =
+    \begin{cases}
+    \beta_{\mathrm{in}} \, c_g^{i}
+    &\text{if } \left|g^{i}\right| \geq \gamma_{\mathrm{in}} \left|g^{i-1}\right| 
+    \, \land \,
+    \left|g^{i}\right| > \varepsilon_g
+    \, \land \,
+    \eta^{i} \leq \varepsilon_\text{rel,u}
+    \\
+    \beta_{\mathrm{de}} \, c_g^{i}
+    &\text{else if } \left|g^{i}\right| \leq \gamma_{\mathrm{de}} \, \varepsilon_g
+    \\
+    c_g^{i}
+    & \textrm{else} \,.
+    \end{cases}
+
+The penalty :math:`c_g^{i}` is increased by the factor
+:math:`\beta_\text{in}> 1` if the (sub-optimal) solution of the inner minimization problem
+does not generate sufficient progress in the constraint, which is rated
+by the factor :math:`\gamma_\text{in} > 0` and compared to the previous
+iteration :math:`i-1`. This update is skipped if the inner minimization
+is not sufficiently converged, which is checked by the maximum relative
+gradient :math:`\eta^i` and the threshold
+:math:`\varepsilon_\text{rel,u}`. The penalty :math:`c_g^{i}` is
+decreased by the factor :math:`\beta_\text{de} < 1` if the constraint
+:math:`g^{i}` is sufficiently satisfied within its tolerance, whereby
+currently the constant factor :math:`\gamma_\text{de} = 0.1` is used.
+The setting :math:`\beta_\text{in} = \beta_\text{de} = 1` can be used to
+keep the penalty constant, i.e., to deactivate the penalty adaptation.
+Similarly, for an inequality constraint
+:math:`\bar h^{i} = \bar h(\mb{x}^{i}, \dots)` with penalty
+:math:`c_h^i` and tolerance :math:`\varepsilon_h`, the update is defined
+by
+
+.. math::
+    :label: eq:AlgOpt:UpdatePenh
+
+    c_h^{i+1} = \xi_h(c_h^{i}, \bar h^{i}, \bar h^{i-1}, \varepsilon_h) 
+    = 
+    \begin{cases}
+    \beta_{\mathrm{in}} \, c_h^{i}
+    &\text{if } \bar h^{i} \geq \gamma_{\mathrm{in}} \bar h^{i-1}
+    \, \land \,
+    \bar h^{i} > \varepsilon_h
+    \, \land \,
+    \eta^{i} \leq \varepsilon_\text{rel,u}
+    \\
+    \beta_{\mathrm{de}} \, c_h^{i}
+    & \text{else if } \bar h^{i} \leq \gamma_{\mathrm{de}} \, \varepsilon_h
+    \\
+    c_h^{i}
+    & \textrm{else} \,.
+    \end{cases}
+
+Similar update rules are used for the terminal equality and inequality
+constraints. In analogy to the multiplier update, the penalty parameters
+are restricted to upper and lower bounds :math:`c_\text{max} \gg
+c_\text{min} > 0` in order to avoid unlimited growth as well as
+negligible values.
+
+The following options can be used to adjust the update of the penalty
+parameters:
+
+-  ``PenaltyMax``: This option sets the upper bound :math:`c_\text{max}` of the
+   penalty parameters.
+
+-  ``PenaltyMin``: This option sets the lower bound :math:`c_\text{min}` of the
+   penalty parameters.
+
+-  ``PenaltyIncreaseFactor``: This option sets the factor :math:`\beta_\text{in}` by which
+   penalties are increased.
+
+-  ``PenaltyDecreaseFactor``: This option sets the factor :math:`\beta_\text{de}` by which
+   penalties are decreased.
+
+-  ``PenaltyIncreaseThreshold``: This option sets the factor :math:`\gamma_\text{in}` that rates the
+   progress in the constraints between the last two iterates.
+
+-  ``AugLagUpdateGradientRelTol``: Threshold :math:`\varepsilon_\text{rel,u}` for the maximum relative
+   gradient of the inner minimization problem.
+
+-  ``ConstraintsAbsTol``: Thresholds
+   :math:`(\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}`
+   for the equality, inequality, terminal equality, and terminal
+   inequality constraints.
+
+.. _sec:AlgOpt:EstimPenMin:
+
+Estimation of minimal penalty parameter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In real-time or embedded MPC applications, where only a limited number
+of iterations per step is computed, it is crucial that the penalty
+parameter is not decreased below a certain threshold
+:math:`c_\text{min}`. This lower bound should be large enough that an
+inactive constraint that becomes active is still sufficiently penalized
+in the augmented Lagrangian cost functional. However, it should not be
+chosen too high to prevent ill-conditioning. A suitable value of
+:math:`c_\text{min}` tailored to the given MPC problem therefore is of
+importance to ensure a high performance of GRAMPC.
+
+In order to support the user, GRAMPC offers the routine ``grampc_estim_penmin`` to compute a
+problem-specific estimate of :math:`c_\text{min}`. The basic idea behind
+this estimation is to determine :math:`c_\text{min}` such that the
+actual costs :math:`J` are in the same order of magnitude as the squared
+constraints multiplied by :math:`c_\text{min}`, see
+equation :math:numref:`eq:AlgOpt:AugLag`. This approach
+requires initial values for the states :math:`\mb{x}`, controls
+:math:`\mb{u}`, and cost :math:`J`. If the GRAMPC structure
+includes only default values, i.e. zeros, (cold start) the estimation
+function ``grampc_estim_penmin`` can be called with the argument ``rungrampc=1`` to perform one optimization
+or MPC step, where the possible maximum numbers of gradient iterations ``MaxGradIter``
+and augmented Lagrangian iterations ``MaxMultIter`` are limited to 20. Afterwards, the
+estimated value for ``PenaltyMin`` is set as detailed below and, if ``rungrampc=1``, the initial
+states :math:`\mb{x}`, controls :math:`\mb{u}` and costs
+:math:`J` are reset.
+
+Based on the initial values, a first estimate of the minimal penalty
+parameter is computed according to
+
+.. math::
+    :label: eq:AlgOpt:C1
+
+    \hat{c}_\text{min}^\text{I} 
+    %= \frac{\tfrac{1}{2}\,|J|\,(N_{\vm{g}}+N_{\vm{h}})}
+    %{\|\vm g(\vm x(t), \vm u(t), \vm p, t)\|_{L_1}^2+\|\vm h(\vm x(t), \vm u(t), \vm p, t)\|_{L_1}^2 }
+    %+ \frac{\tfrac{1}{2}\,|J|\,(N_{\vm{g}_T}+N_{\vm{h}_T})} {\|\vm g_T(\vm x(T), \vm p, T)\|_{1}^2+\|\vm h_T(\vm x(T), \vm p, T)\|_{1}^2}
+    = \frac{2\,|J| %\,(N_{\vm{g}} + N_{\vm{h}} + N_{\vm{g}_T} + N_{\vm{h}_T})
+    }
+    {\|\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\|_{L_2}^2 + \|\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\|_{L_2}^2 + \|\mb{g}_T(\mb{x}(T), \mb{p}, T)\|_{2}^2 + \|\mb{h}_T(\mb{x}(T), \mb{p}, T)\|_{2}^2}
+
+However, if the inequality constraints are initially inactive and are
+far away from their bounds (i.e. large negative values are returned),
+the estimate :math:`\hat{c}_\text{min}^\text{I}` may be too small.
+
+To deal with these cases, a second estimate for the minimal penalty
+parameter
+
+.. math::
+    :label: eq:AlgOpt:C2
+
+    \hat{c}_\text{min}^\text{II} 
+    %= \kappa \left(\frac{\tfrac{1}{2}\,|J|}
+    %{T \max\{\|\vm{\varepsilon}_{\vm{g}}\|_1,\,\|\vm{\varepsilon}_{\vm{h}}\|_1\}^2}
+    %+ \frac{\tfrac{1}{2}\,|J|} 
+    %{\max\{\|\vm{\varepsilon}_{\vm{g}_T}\|_1,\,\|\vm{\varepsilon}_{\vm{h}_T}\|_1\}^2}\right)
+    = \frac{2\,|J|}
+    {
+    T \left(\|\mb{\varepsilon}_{\mb{g}}\|_2^2 +
+    \|\mb{\varepsilon}_{\mb{h}}\|_2^2\right) +
+    \|\mb{\varepsilon}_{\mb{g}_T}\|_2^2 +
+    \|\mb{\varepsilon}_{\mb{h}_T}\|_2^2}
+
+is computed in the same spirit using the constraint tolerances (see ``ConstraintsAbsTol``,
+:math:`\mb{\varepsilon}_{\mb{g}}`,
+:math:`\mb{\varepsilon}_{\mb{h}}`,
+:math:`\mb{\varepsilon}_{\mb{g}_T}` and
+:math:`\mb{\varepsilon}_{\mb{h}_T}`) instead of the
+constraint values [2]_. Since the norms of the tolerances are summed,
+more conservative values for :math:`c_\text{min}` are estimated and
+therefore instabilities can be avoided. Note that it is recommended to
+scale all constraints so that they are in the same order of magnitude,
+see e.g. the PMSM example in :ref:`sec:TUT:PMSM`.
+
+Finally, the minimal penalty parameter
+
+.. math::
+
+   \hat{c}_\text{min} = \min\left\{
+   \max\left\{\hat{c}_\text{min}^\text{I} ,\,
+   \kappa \, \hat{c}_\text{min}^\text{II} \right\} ,\, 
+   \frac{c_\text{max}}{500}\right\}
+
+is chosen as the maximum of :math:numref:`eq:AlgOpt:C1` and
+:math:numref:`eq:AlgOpt:C2` and additionally limited to
+:math:`0.2\%` of the maximum penalty parameter :math:`c_\text{max}`.
+This limitation ensures reasonable values even with very small
+constraint tolerances. The relation factor :math:`\kappa` has been
+determined to :math:`10^{-6}` on the basis of various example systems.
+Please note that this estimation is intended to assist the user in
+making an initial guess. Problem-specific tuning of ``PenaltyMin`` can lead to further
+performance improvements and is therefore recommended. All MPC example
+problems in ``<grampc_root>/examples`` contain an initial call of ``grampc_estim_penmin`` to estimate
+:math:`\hat{c}_\text{min}` and, as alternative, manually tuned values
+that can further enhance the performance of GRAMPC for fixed numbers
+of iterations.
+
+.. _sec:AlgOpt:ConvCheck:
+
+Convergence criterion
+---------------------
+
+While the usage of fixed iteration counts :math:`i_\text{max}` and
+:math:`j_\text{max}` for the outer and inner loops is typical in
+real-time MPC or MHE applications, GRAMPC also provides an optional
+convergence check that is useful for solving optimal control or
+parameter optimization problems, or if the computation time in MPC is of
+minor importance.
+
+The inner gradient loop in:prf:ref:`alg:AlgOpt:GrampcAlgorithm`
+evaluates the maximum relative gradient
+
+.. math::
+
+    \label{eq:AlgOpt:RelGrad}
+   \eta^{i|j+1} = 
+   \max\left\{
+   \frac{ \|\mb{u}^{i|j+1} - \mb{u}^{i|j}\|_{L_2} }
+        { \|\mb{u}^{i|j+1}\|_{L_2} } \,,
+   \frac{ \left\| \mb{p}^{i|j+1} - \mb{p}^{i|j} \right\|_2 }
+        { \left\| \mb{p}^{i|j+1} \right\|_2 } \,,
+   \frac{ |T^{i|j+1} - T^{i|j}| }
+        { T^{i|j+1} } 
+   \right\} 
+
+in each iteration :math:`i|j` and terminates if
+
+.. math::
+    :label: eq:AlgOpt:ConvGradient
+
+    \eta^{i|j} \leq \varepsilon_\text{rel,c} \,. 
+
+Otherwise, the inner loop is continued until the maximum number of
+iterations :math:`j_\text{max}` is reached. The last value
+:math:`\eta^{i} = \eta^{i|j+1}` is returned to the outer loop and used
+for the convergence check as well as for the update of multipliers and
+penalties.
+
+The augmented Lagrangian loop is terminated in iteration :math:`i` if
+the inner loop is converged, that is
+:math:`\eta^{i} \leq \varepsilon_\text{rel,c}`, and all constraints are
+sufficiently satisfied, i.e.
+
+.. math::
+    :label: eq:AlgOpt:ConvConstraints
+
+    \begin{bmatrix}
+    \thicknorm{\mb{g}^{i}(t)} \\ \mb{\max}\{\mb{0}, \mb{\bar h}^{i}(t)\}
+    \end{bmatrix} 
+    \leq
+    \begin{bmatrix}
+    \mb{\varepsilon}_g \\ \mb{\varepsilon}_h
+    \end{bmatrix}
+    \, \forall t \in [0, T]
+    \quad \land \quad
+    \begin{bmatrix}
+    \thicknorm{\mb{g}_T^{i}} \\ \mb{\max}\{\mb{0}, \mb{\bar h}_T^{i}\}
+    \end{bmatrix} 
+    \leq
+    \begin{bmatrix}
+    \mb{\varepsilon}_{g_T} \\ \mb{\varepsilon}_{h_T}
+    \end{bmatrix} \,,
+
+whereby the notation :math:`\thicknorm{\cdot}` denotes the
+component-wise absolute value. Otherwise, the outer loop is continued
+until the maximum number of iterations :math:`i_\text{max}` is reached.
+The thresholds
+:math:`\mb{\varepsilon}_g, \mb{\varepsilon}_h, \mb{\varepsilon}_{g_T}, \mb{\varepsilon}_{h_T}`
+are vector-valued in order to rate each constraint individually.
+
+The following options can be used to adjust the convergence criterion:
+
+-  ``ConvergenceCheck``: This option activates the convergence criterion. Otherwise, the
+   inner and outer loops always perform the maximum number of
+   iterations, see the options ``MaxGradIter`` and ``MaxMultIter``.
+
+-  ``ConvergenceGradientRelTol``: This option sets the threshold :math:`\varepsilon_\text{rel,c}` for
+   the maximum relative gradient of the inner minimization problem that
+   is used in the convergence criterion. Note that this threshold is
+   different from the one that is used in the update of multipliers and
+   penalties.
+
+-  ``ConstraintsAbsTol``: Thresholds
+   :math:`(\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}`
+   for the equality, inequality, terminal equality, and terminal
+   inequality constraints.
+
+.. _sec:AlgOpt:Scaling:
+
+Scaling
+-------
+
+Scaling is recommended for improving the numerical conditioning when the
+states :math:`\mb{x}` and the optimization variables
+:math:`(\mb{u}, \mb{p}, T)` of the given optimization
+problem differ in several orders of magnitude. Although GRAMPC allows
+one to scale a specific problem automatically using the option
+``ScaleProblem=1``, it should be noted that this typically increases the
+computational load due to the additional multiplications in the
+algorithm, cf. the tutorial on controlling a permanent magnet
+synchronous machine in :ref:`sec:TUT:PMSM`. This issue can
+be avoided by directly formulating the scaled problem within the C file
+template ``probfct_TEMPLATE.c`` included in the folder
+``examples/TEMPLATE``, also see :ref:`sec:ProblemImplementation`.
+
+The scaling in GRAMPC is performed according to
+
+.. math::
+    :label: eq:AlgOpt:Scaling
+
+    \bar{\mb{x}}(t) & = (\mb{x}(t) - \mb{x}_{\text{offset}}) \,./\, \mb{x}_{\text{scale}} \\
+    \bar{\mb{u}}(t) & = (\mb{u}(t) - \mb{u}_{\text{offset}}) \,./\, \mb{u}_{\text{scale}} \\ 
+    \bar{\mb{p}} & = (\mb{p} - \mb{p}_{\text{offset}}) \,./\, \mb{p}_{\text{scale}} \\
+    \bar T & = \frac{T - T_{\text{offset}}}{T_{\text{scale}}} \,,
+
+where :math:`\mb{x}_{\text{offset}} \in \mathbb{R}^x`,
+:math:`\mb{u}_{\text{offset}} \in \mathbb{R}^u`,
+:math:`\mb{p}_{\text{offset}} \in \mathbb{R}^p` and
+:math:`\mb{T}_\text{offset} \in \mathbb{R}` denote offset values
+and :math:`\mb{x}_{\text{scale}} \in \mathbb{R}^x`,
+:math:`\mb{u}_{\text{scale}} \in \mathbb{R}^u`,
+:math:`\mb{p}_{\text{scale}} \in \mathbb{R}^p` and
+:math:`\mb{T}_\text{scale} \in \mathbb{R}` are scaling values.
+The symbol :math:`./` in :math:numref:`eq:AlgOpt:Scaling`
+denotes element-wise division by the scaling vectors.
+
+Furthermore, GRAMPC provides a scaling factor :math:`J_\text{scale}`
+for the cost functional as well as scaling factors
+:math:`\mb{c}_\text{scale} = [\mb{c}_{\text{scale},\mb{g}}, \mb{c}_{\text{scale},\mb{h}}, \mb{c}_{\text{scale},\mb{g}_T}, \mb{c}_{\text{scale},\mb{h}_T}] \in \mathbb{R}^{N_c}`
+for the constraints. The scaling of the cost functional is relevant as
+the constraints are adjoined to the cost functional by means of
+Lagrangian multipliers and penalty parameters and the original cost
+functional should be of the same order of magnitude as these additional
+terms.
+
+The following options can be used to adjust the scaling:
+
+-  ``ScaleProblem``: Activates or deactivates scaling. Note that GRAMPC requires more
+   computation time if scaling is active.
+
+-  ``xScale``, ``xOffset``: Scaling factors :math:`\mb{x}_\text{scale}` and offsets
+   :math:`\mb{x}_\text{offset}` for each state variable.
+
+-  ``uScale``, ``uOffset``: Scaling factors :math:`\mb{u}_\text{scale}` and offsets
+   :math:`\mb{u}_\text{offset}` for each control variable.
+
+-  ``pScale``, ``pOffset``: Scaling factors :math:`\mb{p}_\text{scale}` and offsets
+   :math:`\mb{p}_\text{offset}` for each parameter.
+
+-  ``TScale``, ``TOffset``: Scaling factor :math:`\mb{T}_\text{scale}` and offset
+   :math:`\mb{T}_\text{offset}` for the horizon length.
+
+-  ``JScale``: Scaling factor :math:`J_\text{scale}` for the cost functional.
+
+-  ``cScale``: Scaling factors :math:`\mb{c}_\text{scale}` for each state
+   constraint. The elements of the vector refer to the equality,
+   inequality, terminal equality and terminal inequality constraints.
+
+.. _sec:AlgOpt:ControlShift:
+
+Control shift
+-------------
+
+The principle of optimality for an infinite horizon MPC problem
+motivates to shift the control trajectory :math:`\mb{u}(t)`,
+:math:`t\in[0,T]` from the previous MPC step :math:`k-1` by the sampling
+time :math:`\Delta t` before the first GRAMPC iteration in the current
+MPC step :math:`k`,
+cf. :prf:ref:`alg:AlgOpt:GrampcAlgorithm`.
+The last time segment of the shifted trajectory is hold on the last
+value of the trajectory. Shifting the control will lead to a faster
+convergence behavior of the gradient algorithm for most MPC problems.
+
+If the control shift is activated for a problem with free end time
+:math:`T`, GRAMPC assumes a shrinking horizon problem, because time
+optimization is unusual in classical model predictive control. The
+principle of optimality then motivates to subtract the sampling time
+from the horizon :math:`T` after each MPC step, which corresponds to a
+control shift for the end time.
+
+-  ``ShiftControl``: Activates or deactivates the shifting of the control trajectory and
+   the adaptation of :math:`T` in case of a free end time, i.e., if ``OptimTime`` is
+   active.
+
+.. _sec:AlgOpt:StatusFlags:
+
+Status flags
+------------
+
+Several status flags are set in the solution structure
+``grampc.sol.status`` during the execution of
+:prf:ref:`alg:AlgOpt:GrampcAlgorithm`.
+These flags can be printed as short messages by the function
+``grampc_printstatus`` for the levels error, warn, info and debug.
+
+The following status flags are printed on the level
+``STATUS_LEVEL_ERROR`` and require immediate action:
+
+-  ``STATUS_INTEGRATOR_INPUT_NOT_CONSISTENT``: This flag is set by the integrator ``rodas`` if the input values
+   are not consistent. See :footcite:`Rodas:Webpage:2018` for
+   further details.
+
+-  ``STATUS_INTEGRATOR_MAXSTEPS``: This flag is set by the integrators ``ruku45`` or ``rodas`` if too
+   many steps are required.
+
+-  ``STATUS_INTEGRATOR_STEPS_TOO_SMALL``: This flag is set by the integrator ``rodas`` if the step size
+   becomes too small.
+
+-  ``STATUS_INTEGRATOR_MATRIX_IS_SINGULAR``: This flag is set by the integrator ``rodas`` if a singular Jacobian
+   :math:`\frac{\partial \mb{f}}{\partial \mb{x}}` or
+   :math:`\left(\frac{\partial \mb{f}}{\partial \mb{x}}\right)^\mathsf{T}`
+   is detected. See :footcite:`Rodas:Webpage:2018` for further
+   details.
+
+-  ``STATUS_INTEGRATOR_H_MIN``: This flag is set by the integrator ``ruku45`` if a smaller step
+   size than the minimal allowed value is required.
+
+The following flags are printed in addition to the previous ones on the
+level ``STATUS_LEVEL_WARN``:
+
+-  ``STATUS_MULTIPLIER_MAX``: This flag is set if one of the multipliers
+   :math:`\mb{\bar \mu}` reaches the upper limit
+   :math:`\mu_\text{max}` or the lower limit :math:`-\mu_\text{max}`.
+   The situation may occur for example if the problem is infeasible or
+   ill-conditioned or if the penalty parameters are too high.
+
+-  ``STATUS_PENALTY_MAX``: This flag is set if one of the penalty parameters
+   :math:`\mb{\bar c}` reaches the upper limit
+   :math:`c_\text{max}`. The situation may occur for example if the
+   problem is infeasible or ill-conditioned or if the penalty increase
+   factor :math:`\beta_{\mathrm{in}}` is too high.
+
+-  ``STATUS_INFEASIBLE``: This flag is set if the constraints are not satisfied and one run
+   of :prf:ref:`alg:AlgOpt:GrampcAlgorithm`
+   does not reduce the norm of the constraints. The situation may occur
+   in single runs, if few iterations :math:`i_\text{max}` and
+   :math:`j_\text{max}` are used for a suboptimal solution. However, if
+   the flag is set in multiple successive runs, it is a strong indicator
+   for an infeasible optimization problem.
+
+The following flags are printed in addition to the previous ones on the
+level ``STATUS_LEVEL_INFO``:
+
+-  ``STATUS_GRADIENT_CONVERGED``: This flag is set if the convergence check is activated and the
+   relative tolerance :math:`\varepsilon_\text{rel,c}` is satisfied for
+   the controls :math:`\mb{u}`, the parameters
+   :math:`\mb{p}`, and the end time :math:`T`.
+
+-  ``STATUS_CONSTRAINTS_CONVERGED``: This flag is set if the convergence check is activated and the
+   absolute tolerances
+   :math:`\mb{\varepsilon}_g, \mb{\varepsilon}_h, \mb{\varepsilon}_{g_T}, \mb{\varepsilon}_{h_T}`
+   are satisfied for all constraints.
+
+-  ``STATUS_LINESEARCH_INIT``: This flag is set if the gradient algorithm uses the initial step
+   size :math:`\alpha_\text{init}` as fallback for the explicit line
+   search strategy in one iteration.
+
+The following flags are printed in addition to the previous ones on the
+level ``STATUS_LEVEL_DEBUG``:
+
+-  ``STATUS_LINESEARCH_MAX``: This flag is set if the gradient algorithm uses the maximum step
+   size :math:`\alpha_\text{max}` in one iteration.
+
+-  ``STATUS_LINESEARCH_MIN``: This flag is set if the gradient algorithm uses the minimum step
+   size :math:`\alpha_\text{min}` in one iteration.
+
+-  ``STATUS_MULTIPLIER_UPDATE``: This flag is set if the relative tolerance
+   :math:`\varepsilon_\text{rel,u}` is satisfied for the controls
+   :math:`\mb{u}`, the parameters :math:`\mb{p}` and the
+   end time :math:`T` and therefore the update of the multipliers
+   :math:`\mb{\bar \mu}` and the penalty parameters
+   :math:`\mb{\bar c}` is performed, cf. :ref:`sec:AlgOpt:UpdateMultPen`.
+
+.. footbibliography::
+
+.. rubric:: Footnotes
+
+.. [1] It can be shown in the one-dimensional case that the step size :math:`\alpha` is negative if the cost function is locally non-convex.
+.. [2] The integration behind the :math:`L^2`-norm can be replaced by a multiplication by the horizon length :math:`T`, as the constraint tolerances :math:`\epsilon_g` and :math:`\epsilon_h` are no functions of time.

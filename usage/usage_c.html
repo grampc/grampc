@@ -1,0 +1,787 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Using GRAMPC in C &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/usage_c';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using GRAMPC in C++" href="usage_cpp.html" />
+    <link rel="prev" title="Usage of GRAMPC" href="usage.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="usage.html">Usage of GRAMPC</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/usage/usage_c.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Using GRAMPC in C</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-components-of-grampc">Main components of GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization-of-grampc">Initialization of GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-options-and-parameters">Setting options and parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#config-reader">Config Reader</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiling-and-calling-grampc">Compiling and calling GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-grampc-without-dynamic-memory-allocation">Using GRAMPC without dynamic memory allocation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="using-grampc-in-c">
+<span id="chap-usagec"></span><h1>Using GRAMPC in C<a class="headerlink" href="#using-grampc-in-c" title="Link to this heading">#</a></h1>
+<p>A high level of portability is provided by GRAMPC in view of different operating systems and hardware devices.
+The main components are written in plain C without the use of external libraries, also see the discussion in <a class="reference internal" href="../install.html#sec-structure"><span class="std std-ref">Structure of GRAMPC</span></a>.
+This section describes the usage of GRAMPC in C including initialization, compilation and running the MPC framework.</p>
+<section id="main-components-of-grampc">
+<span id="sec-maincomponents"></span><h2>Main components of GRAMPC<a class="headerlink" href="#main-components-of-grampc" title="Link to this heading">#</a></h2>
+<p>As illustrated in Figure <a class="reference internal" href="#fig-grampcmaincomponents"><span class="std std-numref">Fig. 4</span></a>, GRAMPC
+contains initializing as well as running files, different integrators
+for the system and adjoint dynamics (<a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and <a class="reference internal" href="../algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>) and
+functions to alter the options and parameters (also see <a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and <a class="reference internal" href="../algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>).</p>
+<p>In more detail, GRAMPC comprises the following main files (see also Appendix <a class="reference internal" href="../appendix.html#appendix-functioninterface"><span class="std std-ref">GRAMPC function interface</span></a> for the function interface):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_init.c</span></code>: Functions for initializing GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_alloc.c</span></code>: Functions for memory allocation and deallocation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_fixedsize.c</span></code>: Replaces the functions in <code class="docutils literal notranslate"><span class="pre">grampc_alloc.c</span></code> in the fixed-size mode without dynamic memory allocation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_run.c</span></code>: Functions for running GRAMPC including the implemented augmented Lagrangian algorithm and the underlying gradient algorithm. Further functions of this file are concerned with the line search strategies and the update steps of the primal and dual variables as described in <a class="reference internal" href="../algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_setparam.c</span></code>: Provides several functions for setting problem-related parameters, see the description in <a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and the list of parameters in Table <a class="reference internal" href="../appendix.html#tab-listofparameters"><span class="std std-numref">Table 3</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_setopt.c</span></code>: Provides several functions for setting algorithmic options, see the description in <a class="reference internal" href="../algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a> and the list of options in Table <a class="reference internal" href="../appendix.html#tab-listofoptions"><span class="std std-numref">Table 4</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_configreader.c</span></code>: Provides an alternative method for reading parameters and options from a text file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_mess.c</span></code>: Function for printing information regarding the initialization as well as execution of GRAMPC (e.g. errors, convergence behavior of the augmented Lagrangian algorithm or status of integrators).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_util.c</span></code>: Auxiliary functions for the GRAMPC toolbox such as memory management and trajectory interpolation. It also contains the function <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> to compute an estimate of the minimal penalty parameter, cf. <a class="reference internal" href="../algorithm/multiplier_update.html#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpson.c</span></code>: Function for integrating the integral cost by means of the Simpson rule.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trapezoidal.c</span></code>: Function for integrating the integral cost by means of the trapezoidal rule.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_erk.c</span></code>: Explicit Runge-Kutta methods of order 1, 2, 3, 4 with fixed step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rodas.c</span></code>: Semi-implicit Rosenbrock integration scheme with variable step size. The code follows from an f2c conversion of the original Fortran files of RODAS <a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and are directly included in the GRAMPC source files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ruku45.c</span></code>: Runge-Kutta integration scheme of order 4 with variable step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discrete.c</span></code>: Discrete integrator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timing.c</span></code>: Optional functions for measuring the execution time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">finite_diff.c</span></code>: Finite difference utility functions and gradient checker.</p></li>
+</ul>
+<figure class="align-default" id="fig-grampcmaincomponents">
+<img alt="../_images/MainComponents.svg" src="../_images/MainComponents.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Main components of GRAMPC</span><a class="headerlink" href="#fig-grampcmaincomponents" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="initialization-of-grampc">
+<span id="sec-grampcstructure-initialization"></span><h2>Initialization of GRAMPC<a class="headerlink" href="#initialization-of-grampc" title="Link to this heading">#</a></h2>
+<p>The global initialization of GRAMPC is done via the routine</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">grampc_init</span><span class="p">(</span><span class="n">typeGRAMPC</span> <span class="o">**</span><span class="n">grampc</span><span class="p">,</span> <span class="n">typeUSERPARAM</span> <span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where the overall structure variable contains the following
+substructures (see <a class="reference internal" href="../appendix.html#appendix-datatypes"><span class="std std-ref">GRAMPC data types</span></a> for the
+definition of the data type):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sol</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCsol</span></code>): Contains the optimization variables
+<span class="math notranslate nohighlight">\((\mb{u}^{i+1},\mb{p}^{i+1},T^{i+1})\)</span> and the
+interpolated state <span class="math notranslate nohighlight">\(\mb{x}^{i+1}\)</span> in the next MPC step
+as well as the corresponding cost values
+<span class="math notranslate nohighlight">\(\bar J(\mb{u}^{i+1}, \mb{p}^{i+1}, T^{i+1}, \mb{\mu}^{i+1}, \mb{c}^{i+1};\mb{x}_0)\)</span> and
+<span class="math notranslate nohighlight">\(J(\mb{u}^{i+1}, \mb{p}^{i+1}, T^{i+1};\mb{x}_0)\)</span>,
+respectively. The control <span class="math notranslate nohighlight">\(\mb{u}^{i+1}\)</span> and the state
+<span class="math notranslate nohighlight">\(\mb{x}^{i+1}\)</span> refer to the corresponding trajectories
+evaluated at the sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span>. In addition, the
+substructure <code class="docutils literal notranslate"><span class="pre">sol</span></code> contains the evaluated functions of the defined
+state constraints, some status information, and an array in which the
+number of gradient iterations are stored in each augmented Lagrangian
+step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">param</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCparam</span></code>): Contains the parameter structure of GRAMPC.
+A detailed description of all parameters is given in <a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opt</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCopt</span></code>): Contains the option structure of GRAMPC.
+A detailed description of all options is given in <a class="reference internal" href="../algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rws</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCrws</span></code>): Contains the real-time workspace of GRAMPC including calculations of the augmented Lagrangian algorithm and the gradient algorithm along the prediction horizon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeUSERPARAM</span></code>): Can be used to define parameters, e.g. to parametrize the cost functional, the system dynamics or the state constraints.</p></li>
+</ul>
+<p>The definition of these data types is given in Appendix <a class="reference internal" href="../appendix.html#appendix-datatypes"><span class="std std-ref">GRAMPC data types</span></a>.
+The deallocation of is done by means of the function</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_free</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">**</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="setting-options-and-parameters">
+<span id="sec-setting-opt-par"></span><h2>Setting options and parameters<a class="headerlink" href="#setting-options-and-parameters" title="Link to this heading">#</a></h2>
+<p>The single options in Table <a class="reference internal" href="../appendix.html#tab-listofoptions"><span class="std std-ref">Algorithmic Options.</span></a> are set via the functions</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">optValue</span><span class="p">)</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_int</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">optValue</span><span class="p">)</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_int_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_string</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>for option values with floating point, integer and string type, respectively.
+An overview of the current options can be displayed by using</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_printopt</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Setting options in C)</strong></div>
+</div>
+<p>The number of gradient iterations, the integration scheme, and the relative tolerance of the integrator can be set in the following way:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="cm">/********* declaration *********/</span>
+<span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="cm">/********* option definition *********/</span>
+<span class="cm">/* Basic algorithmic options */</span>
+<span class="n">ctypeInt</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+
+<span class="cm">/* System integration */</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">Integrator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ruku45&quot;</span><span class="p">;</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">IntegratorRelTol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="cm">/********* grampc init *********/</span>
+<span class="n">grampc_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">userparam</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/********* setting options *********/</span>
+<span class="n">grampc_setopt_int</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MaxGradIter&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="p">);</span>
+
+<span class="n">grampc_setopt_string</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Integrator&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Integrator</span><span class="p">);</span>
+<span class="n">grampc_setopt_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IntegratorRelTol&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">IntegratorRelTol</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>Similar to setting the GRAMPC options, the parameters in Table <a class="reference internal" href="../appendix.html#tab-listofparameters"><span class="std std-ref">Problem-specific parameters.</span></a> are set according to their data type with the following functions:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">paramValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">paramValue</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>An overview of the parameters can be displayed by using</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_printparam</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Setting parameters in C)</strong></div>
+</div>
+<p>The sampling time, the prediction horizon, and the initial conditions for a system with two states and one control input can be set in the following way:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="cm">/********* parameter definition *********/</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)</span><span class="mf">0.001</span><span class="p">;</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">Thor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.0</span><span class="p">;</span>
+
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">x0</span><span class="p">[</span><span class="n">NX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">-1</span><span class="p">,</span><span class="mi">-1</span><span class="p">};</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">u0</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+
+
+<span class="cm">/********* setting parameters *********/</span>
+<span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span>
+<span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Thor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Thor</span><span class="p">);</span>
+<span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">);</span>
+<span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;u0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<section id="config-reader">
+<h3>Config Reader<a class="headerlink" href="#config-reader" title="Link to this heading">#</a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version v2.3.</span></p>
+</div>
+<p>GRAMPC also supplies a config reader which reads <code class="docutils literal notranslate"><span class="pre">.cfg</span></code> files for setting the parameters and options inside the <code class="docutils literal notranslate"><span class="pre">grampc</span></code> struct.
+The config file looks like this</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-number">Listing 6 </span><span class="caption-text">Config file for Crane-2D example</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># GRAMPC configuration file for example CRANE_2D</span>
+<span class="c1">################################################</span>
+
+<span class="c1"># GRAMPC parameter</span>
+<span class="p">[</span><span class="n">GRAMPC</span> <span class="n">parameter</span><span class="p">]</span>
+
+<span class="c1"># Initial values and setpoints of the states</span>
+<span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">2.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">]</span>
+<span class="n">xdes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">2.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">]</span>
+
+<span class="c1"># Initial values, setpoints and limits of the inputs 	</span>
+<span class="n">u0</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">]</span>
+<span class="n">udes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.000</span><span class="p">,</span><span class="mf">0.000</span><span class="p">]</span>
+<span class="n">umax</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.000</span><span class="p">,</span><span class="mf">2.000</span><span class="p">]</span>
+<span class="n">umin</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.000</span><span class="p">,</span><span class="o">-</span><span class="mf">2.000</span><span class="p">]</span>
+
+<span class="c1"># Time variables	</span>
+<span class="n">Thor</span> <span class="o">=</span> <span class="mf">2.00</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.002</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="mf">0.000</span>
+
+
+<span class="c1"># GRAMPC options</span>
+<span class="p">[</span><span class="n">GRAMPC</span> <span class="n">options</span><span class="p">]</span>
+
+<span class="c1"># Basic algorithmic options</span>
+<span class="n">Nhor</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># Cost integration</span>
+<span class="n">TerminalCost</span> <span class="o">=</span> <span class="n">off</span>
+
+<span class="c1"># Type of constraints&#39; consideration</span>
+<span class="n">ConstraintsAbsTol</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>The structure is as follows:
+Whitespace or tabs are trimmed.
+Therefore one can indent the parameter names or include spaces in the <code class="docutils literal notranslate"><span class="pre">.cfg</span></code> file.
+A parameter name follows a <code class="docutils literal notranslate"><span class="pre">=</span></code> sign, which then follows the parameter value.
+String values are plain text without whitespace.
+Vectors are specified with square brackets.
+The delimiter for the values is either a <code class="docutils literal notranslate"><span class="pre">,</span></code> or whitespace.</p>
+<p>The parameters must be listed under <code class="docutils literal notranslate"><span class="pre">[GRAMPC</span> <span class="pre">parameter]</span></code>.
+However the order is not important.
+The same applies for the options which must be listed under <code class="docutils literal notranslate"><span class="pre">[GRAMPC</span> <span class="pre">option]</span></code>.</p>
+<p>Calling the config reader is simple with</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/********* Get and set options and parameter from configuration file *********/</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">fileName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;config_CRANE_2D.cfg&quot;</span><span class="p">;</span>
+<span class="n">grampc_get_config_from_file</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>and it sets all defined parameters and options for GRAMPC.
+For further examples please see the Crane-2D, Crane-3D, DAE-Integrator, Double-Integrator and the Template folder.</p>
+</section>
+</section>
+<section id="compiling-and-calling-grampc">
+<span id="sec-compilerun"></span><h2>Compiling and calling GRAMPC<a class="headerlink" href="#compiling-and-calling-grampc" title="Link to this heading">#</a></h2>
+<p>GRAMPC can be integrated into an executable program after the problem formulation (cf. <a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>) as well as options and parameters are provided.
+A Makefile for compilation purposes is provided in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code>. The main calling routine for GRAMPC is</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_run</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following code demonstrates how to integrate GRAMPC within an MPC loop.
+For a full implementation please refer to the examples inside <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/</span></code>.</p>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(C code for running GRAMPC within an MPC loop)</strong></div>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="cm">/*initialize grampc struct and set parameters and options*/</span>
+<span class="p">...</span>
+<span class="c1">// estimate minimum penalty parameter</span>
+<span class="n">grampc_estim_penmin</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="cm">/* MPC loop */</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">iMPC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">iMPC</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">MaxSimIter</span><span class="p">;</span><span class="w"> </span><span class="n">iMPC</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">grampc_run</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+
+<span class="w">    </span><span class="cm">/* check solver status */</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">grampc</span><span class="o">-&gt;</span><span class="n">sol</span><span class="o">-&gt;</span><span class="n">status</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">grampc_printstatus</span><span class="p">(</span><span class="n">grampc</span><span class="o">-&gt;</span><span class="n">sol</span><span class="o">-&gt;</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">STATUS_LEVEL_ERROR</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">myPrint</span><span class="p">(</span><span class="s">&quot;at iteration %i:</span><span class="se">\n</span><span class="s"> -----</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iMPC</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="cm">/* reference integration or interface to real world measurements */</span>
+<span class="w">    </span><span class="n">get_new_state</span><span class="p">(</span><span class="n">xnext</span><span class="p">);</span>
+
+<span class="w">    </span><span class="cm">/* update state and time */</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dt</span><span class="p">;</span>
+<span class="w">    </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xnext</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>GRAMPC is repetitively executed until a defined simulation time is reached.
+Note that the estimate of the minimal penalty value <span class="math notranslate nohighlight">\(c_\text{min}\)</span> is determined via the function <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> before the augmented Lagrangian algorithm is executed, also see the discussion in <a class="reference internal" href="../algorithm/multiplier_update.html#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a>.</p>
+<p>For a more convenience MPC design, there are several status flags that can be printed after each MPC step.
+As shown in the above example, the variable <code class="docutils literal notranslate"><span class="pre">grampc-&gt;sol-&gt;status</span></code> is used to check whether new status informations are available.
+Subsequently, the function <code class="docutils literal notranslate"><span class="pre">grampc_printstatus</span></code> is used to visualize the corresponding informations on the console.
+In the current GRAMPC version, there are status informations concerning the integration scheme, the update of Lagrange multipliers, convergence properties of the augmented Lagrangian and gradient algorithm, and the line search method, see <a class="reference internal" href="../algorithm/misc.html#sec-algopt-statusflags"><span class="std std-ref">Status flags</span></a> for more details.
+In addition, the GRAMPC examples provide functions to print key variables such as the system state or the controls into text files.</p>
+<p>The examples can be compiled by running the following commands in a (Cygwin) terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/examples/*
+$ make
+</pre></div>
+</div>
+<p>The make command compiles the file <code class="docutils literal notranslate"><span class="pre">main_*.c</span></code> and links it against the GRAMPC toolbox, i.e., against the GRAMPC library within <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/libs</span></code>.
+Note that compiling an application example in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/examples/</span></code> requires the previous compilation of the GRAMPC toolbox as described in <a class="reference internal" href="../install.html#chap-install"><span class="std std-ref">Installation and structure of GRAMPC</span></a>.
+As a result, the executable <code class="docutils literal notranslate"><span class="pre">startMPC</span></code> is generated, which can now be used to solve and/or design the MPC problem.</p>
+<p>With CMake, one can specify the build target with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">.</span> <span class="o">--</span><span class="n">target</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>Note that CMake outputs the executables for the examples inside <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/build/examples/</span></code>.</p>
+</section>
+<section id="using-grampc-without-dynamic-memory-allocation">
+<h2>Using GRAMPC without dynamic memory allocation<a class="headerlink" href="#using-grampc-without-dynamic-memory-allocation" title="Link to this heading">#</a></h2>
+<p>GRAMPC restricts the usage of dynamic memory allocation, i.e. <code class="docutils literal notranslate"><span class="pre">calloc</span></code> and <code class="docutils literal notranslate"><span class="pre">realloc</span></code>, to initialization and option setting, such that no allocations are performed while the MPC is running.
+However, some microcontrollers and embedded devices do not support dynamic memory allocation at all.
+Using GRAMPC on these devices requires to replace all dynamically-sized arrays by fixed-size arrays and to remove all functions that involve dynamic memory allocation.</p>
+<p>To this end, a header file <code class="docutils literal notranslate"><span class="pre">fixedsize_settings.h</span></code> must be placed in the search path of the compiler.
+This header file defines several constant parameters such as the number of states <code class="docutils literal notranslate"><span class="pre">NX</span></code>, the number of controls <code class="docutils literal notranslate"><span class="pre">NU</span></code>, as well as several constant options, e.g. the number of discretization steps <code class="docutils literal notranslate"><span class="pre">NHOR</span></code>, the number of gradient iterations <code class="docutils literal notranslate"><span class="pre">MAXGRADITER</span></code>, and the number of multiplier iterations <code class="docutils literal notranslate"><span class="pre">MAXMULTITER</span></code>.
+Note that these options cannot be changed during run-time, but are fixed at compile-time.
+A template file is provided in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code>.</p>
+<p>In addition, the GRAMPC structures must be created on the stack instead of the heap.
+To this end, the macro <code class="docutils literal notranslate"><span class="pre">TYPE_GRAMPC_POINTER</span></code> is provided that allows to use the same code both with and without dynamic memory allocation:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">TYPE_GRAMPC_POINTER</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="n">grampc_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">userparam</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="n">grampc_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The makefile can be called with the parameter <code class="docutils literal notranslate"><span class="pre">FIXEDSIZE=1</span></code>, which automatically defines the required preprocessor macro <code class="docutils literal notranslate"><span class="pre">FIXEDSIZE</span></code>.
+Thus compiling and running the ball-on-plate example without dynamic memory allocation is done by executing the following commands in the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/examples/*
+$ make FIXEDSIZE=1
+$ ./startMPC_fixedsize
+</pre></div>
+</div>
+<p>Note that in this case a separate GRAMPC library is created in the problem folder that depends on the constants defined in <code class="docutils literal notranslate"><span class="pre">fixedsize_settings.h</span></code>.
+Changing these settings requires to recompile both the library and the application.</p>
+<p>With CMake one can directly specify a fixed-size target in the respective <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file.
+For the GRAMPC examples a <code class="docutils literal notranslate"><span class="pre">_fixedsize</span></code> is appended to the target name like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">.</span> <span class="o">--</span><span class="n">target</span> <span class="o">*</span><span class="n">_fixedsize</span>
+</pre></div>
+</div>
+<p>which directly compiles the main and GRAMPC library with the fixed-size settings.</p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-rodas-webpage-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>RODAS. Webpage. <a class="reference external" href="http://www.unige.ch/~hairer/software.html">http://www.unige.ch/~hairer/software.html</a>, Accessed 01-December-2018.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="usage.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Usage of GRAMPC</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="usage_cpp.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Using GRAMPC in C++</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-components-of-grampc">Main components of GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initialization-of-grampc">Initialization of GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-options-and-parameters">Setting options and parameters</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#config-reader">Config Reader</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiling-and-calling-grampc">Compiling and calling GRAMPC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-grampc-without-dynamic-memory-allocation">Using GRAMPC without dynamic memory allocation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

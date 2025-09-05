@@ -1,0 +1,634 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Model predictive control of a PMSM &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/PMSM';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Optimal control of a double integrator" href="DoubleIntegrator.html" />
+    <link rel="prev" title="Tutorials" href="tutorials.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/PMSM.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Model predictive control of a PMSM</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constraints-scaling">Constraints scaling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-of-the-penalty-update">Optimization of the penalty update</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="model-predictive-control-of-a-pmsm">
+<span id="sec-tut-pmsm"></span><h1>Model predictive control of a PMSM<a class="headerlink" href="#model-predictive-control-of-a-pmsm" title="Link to this heading">#</a></h1>
+<p>The torque or current control of a permanent magnet synchronous machine
+(PMSM) is a challenging example for nonlinear constrained model
+predictive control. The following subsections illustrate the problem
+formulation as well as useful options of GRAMPC to improve the control
+performance. Corresponding m and C files can be found in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/PMSM</span></code>.</p>
+<section id="problem-formulation">
+<h2>Problem formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-pmsm-constr-unscaled">
+<img alt="../_images/PMSM_constr_unscaled.svg" src="../_images/PMSM_constr_unscaled.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Simulated MPC trajectories for the PMSM example with default settings.</span><a class="headerlink" href="#fig-pmsm-constr-unscaled" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The system dynamics of a PMSM <a class="footnote-reference brackets" href="#footcite-englert-cep-2018" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-eq-tut-pmsm-model">
+<span class="eqno">(21)<a class="headerlink" href="#equation-eq-tut-pmsm-model" title="Link to this equation">#</a></span>\[\begin{split}L_\text{d}\tfrac{{\rm d}}{{\rm d}t}i_\text{d} &amp;= -R i_\text{d}+L_\text{q}\omega i_\text{q}+u_\text{d}\\
+L_\text{q}\tfrac{{\rm d}}{{\rm d}t}i_\text{q} &amp;= -R i_\text{q}-L_\text{d}\omega i_\text{d}-\omega\psi_\text{p}+u_\text{q} \\
+J\tfrac{{\rm d}}{{\rm d}t}\omega &amp;= \left(\tfrac{3}{2}z_\text{p}\left(\psi_\text{p}i_\text{q} +
+i_\text{d}i_\text{q}(L_\text{d} - L_\text{q})\right)-\tfrac{\mu_\text{f}}{z_\text{p}}\omega-T_\text{L}\right)z_\text{p}\\
+\tfrac{{\rm d}}{{\rm d}t}\phi &amp;= \omega\end{split}\]</div>
+<p>is given in the dq-coordinates. The system state
+<span class="math notranslate nohighlight">\(\mb{x} = [i_\text{d},i_\text{q},\omega,\phi]^\mathsf{T}\)</span>
+comprises the dq-currents, the electrical rotor speed as well as the
+electrical angle. The dq-voltages serve as controls
+<span class="math notranslate nohighlight">\(\mb{u} = [u_\text{d},u_\text{q}]^\mathsf{T}\)</span>. Further
+system parameters are the stator resistance <span class="math notranslate nohighlight">\(R = 3.5\,\Omega\)</span>,
+the number of pole-pairs <span class="math notranslate nohighlight">\(z_\text{p} = 3\)</span>, the permanent magnet
+flux <span class="math notranslate nohighlight">\(\psi_p = 0.17\,\mathrm{V\,s}\)</span>, the dq-inductivities
+<span class="math notranslate nohighlight">\(L_\text{d}=L_\text{q}=17.5\,\mathrm{mH}\)</span>, the moment of
+inertia <span class="math notranslate nohighlight">\(J= 0.9\,\mathrm{g\,m^2}\)</span> as well as the friction
+coefficient <span class="math notranslate nohighlight">\(\mu_\text{f}=0.4\,\mathrm{mN\,m\,s}\)</span>.</p>
+<p>The magnitude of the dq-currents is limited by the maximum current
+<span class="math notranslate nohighlight">\(I_\text{max}=10\,A\)</span>, i.e.</p>
+<div class="math notranslate nohighlight" id="equation-eq-tut-pmsm-stateconstr">
+<span class="eqno">(22)<a class="headerlink" href="#equation-eq-tut-pmsm-stateconstr" title="Link to this equation">#</a></span>\[i_\text{abs} =i_\text{d}^2+i_\text{q}^2 \leq I_\text{max}^2\,,\]</div>
+<p>in order prevent damage of the electrical components. Another constraint
+concerns the dq-voltages. Through the modulation stage between the
+controller and the voltage source inverter, the dq-voltages are limited
+inside the circle</p>
+<div class="math notranslate nohighlight" id="equation-eq-tut-pmsm-inputconstr">
+<span class="eqno">(23)<a class="headerlink" href="#equation-eq-tut-pmsm-inputconstr" title="Link to this equation">#</a></span>\[u_\text{abs} = u_\text{d}^2+u_\text{q}^2 \leq U_\text{max}^2\]</div>
+<p>with the maximum voltage <span class="math notranslate nohighlight">\(U_\text{max}=323\,\mathrm{V}\)</span>.</p>
+<p>The optimal control problem</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\min_{\mb{u}} \quad &amp; J(\mb{u};\mb{x}_k) = \int_0^T l(\mb{x}(\tau), \mb{u}(\tau)) \, {\rm d}\tau\\\textrm{s.t.} \quad &amp; \mb{\dot x}(\tau) = \mb{f}(\mb{x}(\tau), \mb{u}(\tau)) \,, \quad \mb{x}(0) = \mb{x}_k\\&amp; h_1(\mb{x} (\tau)) = x_1(\tau)^2 +  x_2(\tau)^2 - I_\text{max}^2 \leq 0\\&amp; h_2(\mb{u} (\tau)) = u_1(\tau)^2 +  u_2(\tau)^2 - U_\text{max}^2 \leq 0\\&amp; \mb{u}(\tau) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]\end{aligned}\end{align} \]</div>
+<p>is subject to the system dynamics given by <a class="reference internal" href="#equation-eq-tut-pmsm-model">(21)</a> and the
+constraints given by <a class="reference internal" href="#equation-eq-tut-pmsm-stateconstr">(22)</a> and
+<a class="reference internal" href="#equation-eq-tut-pmsm-inputconstr">(23)</a>.
+The control constraints <a class="reference internal" href="#equation-eq-tut-pmsm-inputconstr">(23)</a> are
+nonlinear and are therefore handled by the augmented Lagrangian
+framework and not by the projection gradient method itself. It is
+therefore reasonable to add the box constraints for <span class="math notranslate nohighlight">\(\mb{u}\)</span> with <span class="math notranslate nohighlight">\(\mb{u}_\text{min} = [-U_\text{max},-U_\text{max}]^\mathsf{T}\)</span> and
+<span class="math notranslate nohighlight">\(\mb{u} _\text{max} = [U_\text{max},U_\text{max}]^\mathsf{T}\)</span> to the OCP formulation to enhance the overall robustness of the
+algorithm. The cost functional consists of the integral part</p>
+<div class="math notranslate nohighlight">
+\[l(\mb{x}, \mb{u}) = q_1 (\mb{i}_\text{d} -  i_\text{d,des} )^2 + q_2 (\mb{i}_\text{q} -  i_\text{q,des} )^2 + (\mb{u} - \mb{u}_\text{des} ) ^\mathsf{T}\mb{R}  (\mb{u} - \mb{u}_\text{des} )\,,\]</div>
+<p>with the setpoints for the states <span class="math notranslate nohighlight">\(i_\text{d,des}\)</span>,
+<span class="math notranslate nohighlight">\(i_\text{q,des}\)</span> and controls
+<span class="math notranslate nohighlight">\(\mb{u}_\mathrm{des} \in \mathbb{R}^2\)</span> respectively. The
+weights are set to <span class="math notranslate nohighlight">\(q_1 = 8\,\mathrm{A^{-2}}\)</span>,
+<span class="math notranslate nohighlight">\(q_2=200\,\mathrm{A^{-2}}\)</span> and <span class="math notranslate nohighlight">\(\mb{R} ={\rm diag}(0.001\,\mathrm{V^{-2}},0.001\,\mathrm{V^{-2}})\)</span>. The example considers a
+startup of the motor from standstill by defining the setpoints
+<span class="math notranslate nohighlight">\(i_\text{d,des}=0\,\mathrm{A}\)</span> and
+<span class="math notranslate nohighlight">\(i_\text{q,des}=10\,\mathrm{A}\)</span>, corresponding to a constant
+torque demand of <span class="math notranslate nohighlight">\(7.65\,\mathrm{N\,m}\)</span>. The desired controls are set to
+<span class="math notranslate nohighlight">\(\mb{u}_\text{d,des}=[0\,\mathrm{V}, 0\,\mathrm{V}]^\mathsf{T}\)</span>.</p>
+<p>The resulting OCP is solved by GRAMPC with the sampling time
+<span class="math notranslate nohighlight">\(\Delta t = 125\,\mathrm{\mu s}\)</span> (parameter <code class="docutils literal notranslate"><span class="pre">dt</span></code>) and the horizon
+<span class="math notranslate nohighlight">\(T = 5\,\mathrm{ms}\)</span> (parameter <code class="docutils literal notranslate"><span class="pre">Thor</span></code>) using standard options
+almost exclusively. Only the number of discretization points <code class="docutils literal notranslate"><span class="pre">Nhor=11</span></code> , the
+number of gradient iterations <code class="docutils literal notranslate"><span class="pre">MaxGradIter=3</span></code>  and the number of augmented
+Lagrangian iterations <code class="docutils literal notranslate"><span class="pre">MaxMultIter=3</span></code>  are adapted to the problem. In addition, the
+constraints tolerances <code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code> are set to 0.1% of the respective limit, i.e.
+<span class="math notranslate nohighlight">\(0.1\,\mathrm{A^2}\)</span> and <span class="math notranslate nohighlight">\(104.5\,\mathrm{V^2}\)</span>. <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code> is set to 2.5 x 10<sup>-7</sup> by
+the estimation method of GRAMPC, see <a class="reference internal" href="../algorithm/multiplier_update.html#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a>.</p>
+<p><a class="reference internal" href="#fig-pmsm-constr-unscaled"><span class="std std-numref">Fig. 7</span></a> illustrates the simulation
+results. The setpoints are reached very fast and are stabilized almost
+exactly. However, an overshoot can be observed, which also leads to a
+small violation of the dq-current constraint by <span class="math notranslate nohighlight">\(0.45\,\mathrm{A}\)</span>. With increasing
+rotor speed, the voltage also increases until the voltage constraint
+becomes active. While the voltage constraint is almost exactly hold, the
+dq-current constraint is clearly violated. The figure shows that at the
+end of the simulation the dq-current constraint violation is more than
+<span class="math notranslate nohighlight">\(1\,\mathrm{A}\)</span> or 10%. Though a larger number of iterations might be used to reduce
+the constraint violation, the main reason for this deviation is that the
+nonlinear voltage and current constraints differ in several orders of
+magnitude. The next section therefore shows how to scale the problem in
+GRAMPC.</p>
+<p>Also note that the increase of the cost functional does not indicate
+instability, but can be explained by the increasing speed, which affects
+the control term in the cost with the control setpoints
+<span class="math notranslate nohighlight">\((\mb{u}_\text{d,des}=[0\,\mathrm{V}, 0\,\mathrm{V}]^\mathsf{T})\)</span>.
+Moreover, the current setpoints
+<span class="math notranslate nohighlight">\((i_\text{d,des}=0\,\mathrm{A},\,i_\text{q,des}=10\,\mathrm{A})\)</span>
+cannot be hold due to the
+constraints <a class="reference internal" href="#equation-eq-tut-pmsm-stateconstr">(22)</a> and
+<a class="reference internal" href="#equation-eq-tut-pmsm-inputconstr">(23)</a>, which leads to
+an additional cost increase.</p>
+</section>
+<section id="constraints-scaling">
+<h2>Constraints scaling<a class="headerlink" href="#constraints-scaling" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-pmsm-constr-scaled">
+<img alt="../_images/PMSM_constr_scaled.svg" src="../_images/PMSM_constr_scaled.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">Simulated MPC trajectories for the PMSM example with scaled constraints.</span><a class="headerlink" href="#fig-pmsm-constr-scaled" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The two spherical constraints <a class="reference internal" href="#equation-eq-tut-pmsm-stateconstr">(22)</a> and
+<a class="reference internal" href="#equation-eq-tut-pmsm-inputconstr">(23)</a> lie in very
+different orders of magnitude, i.e. <span class="math notranslate nohighlight">\(I_\text{max}^2 =100\,\mathrm{A^2}\)</span>
+and <span class="math notranslate nohighlight">\(U_\text{max}^2 =104329\,\mathrm{V^2}\)</span>.
+Consequently, the two constraints should be scaled by the maximum value</p>
+<div class="math notranslate nohighlight">
+\[\frac{i_\text{d}^2+i_\text{q}^2}{I_\text{max}^2}-1 \leq 0\,,\qquad  \frac{u_\text{d}^2+u_\text{q}^2}{U_\text{max}^2}-1 \leq 0\,.\]</div>
+<p>This scaling can either be done by hand directly in the problem function
+or by activating the option <code class="docutils literal notranslate"><span class="pre">ScaleProblem</span></code> and setting <code class="docutils literal notranslate"><span class="pre">cScale</span></code> <span class="math notranslate nohighlight">\(=[I_\text{max}^2, U_\text{max}^2]\)</span>.
+The scaling option of GRAMPC, however, causes
+additional computing effort (approx. 45% for the PMSM problem). Hence,
+this option is suitable for testing the scaling, but eventually should
+be done manually in the problem formulation to achieve the highest
+computational efficiency. In accordance with the scaling of the
+constraints, the tolerances are also adapted to 1 x 10<sup>-3</sup>
+corresponding to 0.1% of the scaled constraints limits.</p>
+<p>Besides the scaling and <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code> that is set to 2 x 10<sup>3</sup> by the
+estimation routine of GRAMPC, all parameters and options are the same
+as in the last subsection. Please note that the estimation method for <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code>
+strongly depends on reasonable constraint tolerances. In general, the
+method returns rather conservative values, which may lead to constraint
+violations if the order of magnitude of the constraints is very
+different.</p>
+<p><a class="reference internal" href="#fig-pmsm-constr-scaled"><span class="std std-numref">Fig. 8</span></a> shows a clear improvement in
+terms of the dq-current constraint that is now fully exploited. The only
+violation results from the overshoot at the beginning, which is in the
+same range as in the unscaled case (approx. 0.35 A). Further
+improvements, e.g. reduction of the overshoot, can be achieved by
+optimizing the penalty update as described in the next subsection.</p>
+</section>
+<section id="optimization-of-the-penalty-update">
+<h2>Optimization of the penalty update<a class="headerlink" href="#optimization-of-the-penalty-update" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-pmsm-penalty-opt">
+<img alt="../_images/PMSM_penalty_opt.svg" src="../_images/PMSM_penalty_opt.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 9 </span><span class="caption-text">Simulated MPC trajectories for the PMSM example with scaled constraints and optimized penalty update.</span><a class="headerlink" href="#fig-pmsm-penalty-opt" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In order to improve compliance with the dq-current constraint at the
+beginning of the simulation, the number of augmented Lagrangian updates
+is increased. To this end <code class="docutils literal notranslate"><span class="pre">AugLagUpdateGradientRelTol</span></code> is raised to 1, which means that in every
+outer iteration an update of the multipliers and penalties is performed,
+even if the inner minimization is not converged. Furthermore <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code> , is raised
+to 1 x 10<sup>4</sup> compared to the estimated value of 2 x 10<sup>3</sup>.
+In addition, the plot of the step size, see the plot functions described
+in <a class="reference internal" href="../usage/usage_matlab.html#sec-plotfunctions"><span class="std std-ref">Plot functions</span></a>, shows that the maximum value
+<span class="math notranslate nohighlight">\(\alpha_\text{max}\)</span> is often used. Consequently, setting the
+maximum step size <code class="docutils literal notranslate"><span class="pre">LineSearchMax</span></code> to 10 allows larger optimization steps, especially at
+the beginning and at the end of the simulation. All other parameters and
+options, in particular the scaling options, are the same as in the
+previous subsection.</p>
+<p><a class="reference internal" href="#fig-pmsm-penalty-opt"><span class="std std-numref">Fig. 9</span></a> illustrates the simulation result
+with the optimized penalty update. The initial dq-current overshoot is
+further reduced and the constraint is only violated by less than 0.07 A.
+Furthermore, no oscillations occur in the costs and the augmented and
+original cost are almost the same, which indicates that GRAMPC is well
+tuned.</p>
+<p>The computation time on a Windows 10 machine with Intel(R) Core(TM)
+i5-5300U CPU running at 2.3 GHz using the Microsoft Visual C++ 2013
+Professional (C) compiler amounts to 0.032 ms. On the dSpace real-time
+hardware DS1202, the computation time is 0.13 ms.</p>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-englert-cep-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>T. Englert and K. Graichen. Nonlinear model predictive torque control of PMSMs for high performance applications. <em>Control Engineering Practice</em>, 81:43 – 54, 2018.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorials.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="DoubleIntegrator.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Optimal control of a double integrator</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constraints-scaling">Constraints scaling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-of-the-penalty-update">Optimization of the penalty update</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

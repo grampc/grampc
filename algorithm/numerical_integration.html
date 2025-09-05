@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Numerical Integration &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'algorithm/numerical_integration';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Line search" href="line_search.html" />
+    <link rel="prev" title="Optimization algorithm" href="optimization_algorithm.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/algorithm/numerical_integration.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Numerical Integration</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-of-cost-functional-and-explicit-odes">Integration of cost functional and explicit ODEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-of-semi-implicit-odes-and-daes-rodas">Integration of semi-implicit ODEs and DAEs (RODAS)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="numerical-integration">
+<span id="sec-algopt-integration"></span><h1>Numerical Integration<a class="headerlink" href="#numerical-integration" title="Link to this heading">#</a></h1>
+<p>GRAMPC employs a continuous-time formulation of the optimization
+problem. However, internally, all time-dependent functions are stored in
+discretized form with <span class="math notranslate nohighlight">\(N_\text{hor}\)</span> elements and numerical
+integration is performed to compute the cost functional and to solve the
+differential equations.</p>
+<section id="integration-of-cost-functional-and-explicit-odes">
+<span id="sec-algopt-integrationcostode"></span><h2>Integration of cost functional and explicit ODEs<a class="headerlink" href="#integration-of-cost-functional-and-explicit-odes" title="Link to this heading">#</a></h2>
+<p>The approximate line search method requires the evaluation of the cost
+functional. To this end, the integral cost is integrated numerically
+with the trapezoidal rule, Simpson rule or discrete summation and the
+terminal cost is added. Note that the discrete summation does not
+compute the Riemann sum but the plain sum with
+<span class="math notranslate nohighlight">\(\sum_k l(\mb{x}_k, \mb{u}_k, \mb{p}, t_k)\)</span>.
+The cost values are additionally evaluated at the end of the
+optimization as an add-on information for the user.</p>
+<p>The gradient algorithm involves the sequential forward integration of
+the system dynamics and backward integration of the adjoint dynamics.
+To this end, GRAMPC provides the following four explicit Runge-Kutta (ERK) methods with fixed step size and the Butcher tableaus</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{erk1 (Euler's first-order method)}: \quad
+\begin{array}{c|c}
+   0 &amp; \\
+   \hline
+   &amp; 1 \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{erk2 (Heun's second-order method)}: \quad
+\begin{array}{c|cc}
+   0 &amp; &amp; \\
+   1 &amp; 1 &amp; \\
+   \hline
+   &amp; 1/2 &amp; 1/2 \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{erk3 (Kutta's third-order method)}: \quad
+\begin{array}{c|ccc}
+   0 &amp; &amp; &amp; \\
+   1/2 &amp; 1/2 &amp; &amp; \\
+   1 &amp; -1 &amp; 2 &amp; \\
+   \hline
+   &amp; 1/6 &amp; 2/3 &amp; 1/6 \\
+\end{array}\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{erk4 (Kutta's fourth-order method)}: \quad
+\begin{array}{c|cccc}
+   0 &amp; &amp; &amp; &amp; \\
+   1/2 &amp; 1/2 &amp; &amp; &amp; \\
+   1/2 &amp; 0 &amp; 1/2 &amp; &amp; \\
+   1 &amp; 0 &amp; 0 &amp; 1 &amp; \\
+   \hline
+   &amp; 1/6 &amp; 1/3 &amp; 1/3 &amp; 1/6 \\
+\end{array}\end{split}\]</div>
+<p>In addition, a 4th-order explicit Runge-Kutta method with variable step size is available (option value <code class="docutils literal notranslate"><span class="pre">ruku45</span></code>).
+For discrete-time system dynamics, the integrator is set to <code class="docutils literal notranslate"><span class="pre">discrete</span></code>.
+For semi-implicit ODEs and DAEs, the Rosenbrock solver RODAS <a class="footnote-reference brackets" href="#footcite-hairer-book-1996-stiff" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> with variable step size has to be used (option value <code class="docutils literal notranslate"><span class="pre">rodas</span></code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For discrete-time systems the option <code class="docutils literal notranslate"><span class="pre">Integrator</span></code> is set to <code class="docutils literal notranslate"><span class="pre">discrete</span></code>, the settings <code class="docutils literal notranslate"><span class="pre">Nhor</span></code>, <code class="docutils literal notranslate"><span class="pre">Thor</span></code> and <code class="docutils literal notranslate"><span class="pre">dt</span></code> need to satisfy the relation <code class="docutils literal notranslate"><span class="pre">Thor</span> <span class="pre">=</span> <span class="pre">(Nhor-1)*dt</span></code> and the option <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> must be set to <code class="docutils literal notranslate"><span class="pre">off</span></code>.
+See also <a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation-discrete"><span class="std std-ref">Problems with discrete-time systems</span></a>.</p>
+</div>
+<p>The following options can be used to adjust the numerical integrations:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Nhor</span></code>: Number of discretization points within the time interval <span class="math notranslate nohighlight">\([0,T]\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegralCost</span></code>, <code class="docutils literal notranslate"><span class="pre">TerminalCost</span></code>: Indicate if the integral and/or terminal cost functions are defined.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorCost</span></code>: This option specifies the integration scheme for the cost
+functionals. Possible values are <code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code>, <code class="docutils literal notranslate"><span class="pre">simpson</span></code> and <code class="docutils literal notranslate"><span class="pre">discrete</span></code>.</p></li>
+</ul>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version v2.3: </span>Fixed typo in <code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code> option.
+Renamed <code class="docutils literal notranslate"><span class="pre">euler</span></code> to <code class="docutils literal notranslate"><span class="pre">erk1</span></code> and <code class="docutils literal notranslate"><span class="pre">heun</span></code> to <code class="docutils literal notranslate"><span class="pre">erk2</span></code>.
+Removed <code class="docutils literal notranslate"><span class="pre">modeuler</span></code>.
+Added <code class="docutils literal notranslate"><span class="pre">erk3</span></code> and <code class="docutils literal notranslate"><span class="pre">erk4</span></code>.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Integrator</span></code>: This option specifies the integration scheme for the system and adjoint dynamics.
+Possible values are <code class="docutils literal notranslate"><span class="pre">erk1</span></code>, <code class="docutils literal notranslate"><span class="pre">erk2</span></code>, <code class="docutils literal notranslate"><span class="pre">erk3</span></code>, <code class="docutils literal notranslate"><span class="pre">erk4</span></code>, <code class="docutils literal notranslate"><span class="pre">discrete</span></code> with fixed step size and <code class="docutils literal notranslate"><span class="pre">ruku45</span></code>, <code class="docutils literal notranslate"><span class="pre">rodas</span></code> with variable step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorMinStepSize</span></code>: Minimum step size for RODAS and the Runge-Kutta integrator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorMaxSteps</span></code>: Maximum number of steps for RODAS and the Runge-Kutta integrator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorRelTol</span></code>: Relative tolerance for RODAS and the Runge-Kutta integrator with
+variable step size. Note that this option may be insignificant if the
+minimum step size is chosen too high or the maximum number of steps
+is set too low.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorAbsTol</span></code>: Absolute tolerance for RODAS and the Runge-Kutta integrator with
+variable step size. Note that this option may be insignificant if the
+minimum step size is chosen too high or the maximum number of steps
+is set too low.</p></li>
+</ul>
+</section>
+<section id="integration-of-semi-implicit-odes-and-daes-rodas">
+<span id="sec-algopt-integrationrodas"></span><h2>Integration of semi-implicit ODEs and DAEs (RODAS)<a class="headerlink" href="#integration-of-semi-implicit-odes-and-daes-rodas" title="Link to this heading">#</a></h2>
+<p>GRAMPC supports problem descriptions with ordinary differential
+equations in semi-implicit form as well as differential algebraic
+equations using the solver RODAS for numerical integration (see
+<a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation-implicit"><span class="std std-ref">Problems involving semi-implicit ODEs and DAEs</span></a>). If a
+semi-implicit problem or differential algebraic equations are
+considered, the mass matrix <span class="math notranslate nohighlight">\(\mb{M}\)</span> and its transposed
+version <span class="math notranslate nohighlight">\(\mb{M}^\mathsf{T}\)</span> must be defined by the C
+functions <code class="docutils literal notranslate"><span class="pre">Mfct</span></code> and <code class="docutils literal notranslate"><span class="pre">Mtrans</span></code>. The numerical integration can be accelerated by
+additionally providing the C functions <code class="docutils literal notranslate"><span class="pre">dfdx</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdxtrans</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdt</span></code> and <code class="docutils literal notranslate"><span class="pre">dHdxdt</span></code>. See
+<a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a> for a detailed description of the problem implementation.</p>
+<p>The integration with RODAS is configured by a number of flags that are
+passed to the solver using the vector <code class="docutils literal notranslate"><span class="pre">FlagsRodas</span></code> with the elements
+<code class="docutils literal notranslate"><span class="pre">[IFCN,</span> <span class="pre">IDFX,</span> <span class="pre">IJAC,</span> <span class="pre">IMAS,</span> <span class="pre">MLJAC,</span> <span class="pre">MUJAC,</span> <span class="pre">MLMAS,</span> <span class="pre">MUMAS]</span></code>.
+See <a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-hairer-book-1996-stiff" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for a
+detailed description of these flags. The default values
+<span class="math notranslate nohighlight">\([0,0,0,0,N_x,N_x,N_x,N_x]\)</span> correspond to an autonomous system
+with an identity matrix as mass matrix. The following options can be
+adjusted via <code class="docutils literal notranslate"><span class="pre">FlagsRodas</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">IFCN</span></code>: Specifies if the right hand side of the system dynamics
+<span class="math notranslate nohighlight">\(\mb{f} (\mb{x},\mb{u},\mb{p},t)\)</span>
+explicitly depends on time <span class="math notranslate nohighlight">\(t\)</span> (<code class="docutils literal notranslate"><span class="pre">IFCN</span></code> = <span class="math notranslate nohighlight">\(1\)</span>) or if
+the problem is autonomous (<code class="docutils literal notranslate"><span class="pre">IFCN</span></code> = <span class="math notranslate nohighlight">\(0\)</span>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IDFX</span></code>: Specifies how the computation of the partial derivatives
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial t^{}}\)</span> and
+<span class="math notranslate nohighlight">\(\frac{\partial^{2} H}{\partial x\partial t}\)</span> is carried out.
+The partial derivatives are computed internally by finite differences
+(<code class="docutils literal notranslate"><span class="pre">IDFX</span></code> = <span class="math notranslate nohighlight">\(0\)</span>) or are provided by the functions <code class="docutils literal notranslate"><span class="pre">dfdt</span></code> and <code class="docutils literal notranslate"><span class="pre">dHdxdt</span></code>
+(<code class="docutils literal notranslate"><span class="pre">IDFX</span></code> = <span class="math notranslate nohighlight">\(1\)</span>) as described in <a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IJAC</span></code>: Specifies how the computation of the Jacobians
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span>
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}=\frac{\partial^{2} H}{\partial x\partial \lambda}\)</span>
+is carried out for numerically solving the canonical equations. The
+Jacobians are computed internally by finite differences
+(<code class="docutils literal notranslate"><span class="pre">IJAC</span></code> = <span class="math notranslate nohighlight">\(0\)</span>) or are provided by the functions <code class="docutils literal notranslate"><span class="pre">dfdx</span></code> and <code class="docutils literal notranslate"><span class="pre">dfdxtrans</span></code>
+(<code class="docutils literal notranslate"><span class="pre">IJAC</span></code> = <span class="math notranslate nohighlight">\(1\)</span>), also see <a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IMAS</span></code>: Gives information on the mass matrix <span class="math notranslate nohighlight">\(\mb{M}\)</span>, which
+is either an identity matrix (<code class="docutils literal notranslate"><span class="pre">IMAS</span></code> = <span class="math notranslate nohighlight">\(0\)</span>) or is specified
+by the function <code class="docutils literal notranslate"><span class="pre">Mfct</span></code> (<code class="docutils literal notranslate"><span class="pre">IMAS</span></code> = <span class="math notranslate nohighlight">\(1\)</span>). Note that the
+adjoint dynamics requires the transposed mass matrix that has to be
+provided by the function <code class="docutils literal notranslate"><span class="pre">Mtrans</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLJAC</span></code>: Gives information on the banded structure of the Jacobian
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span>
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\)</span>,
+respectively. The Jacobian is either a full matrix
+(<code class="docutils literal notranslate"><span class="pre">MLJAC</span></code> = <span class="math notranslate nohighlight">\(N_x\)</span>) or is of banded structure. In the latter
+case, the number of non-zero diagonals below the main diagonal are
+specified by <span class="math notranslate nohighlight">\(0\leq\,\)</span><code class="docutils literal notranslate"><span class="pre">MLJAC</span></code><span class="math notranslate nohighlight">\(\,&lt;N_x\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MUJAC</span></code>: Specifies the number of non-zero diagonals above the main diagonal
+of the Jacobian
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span>.
+This flag needs not to to be defined if <code class="docutils literal notranslate"><span class="pre">MLJAC</span></code> = <span class="math notranslate nohighlight">\(N_x\)</span>.
+Since the partial derivative of the right hand side of the adjoint
+dynamics with respect to the adjoint state
+<span class="math notranslate nohighlight">\(\mb{\lambda}\)</span> is given by
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\)</span>,
+the meaning of the flags <code class="docutils literal notranslate"><span class="pre">MLJAC</span></code> and <code class="docutils literal notranslate"><span class="pre">MUJAC</span></code> switches in this
+case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MLMAS</span></code> and <code class="docutils literal notranslate"><span class="pre">MUMAS</span></code> : Both options have the same meaning as <code class="docutils literal notranslate"><span class="pre">MLJAC</span></code> and
+<code class="docutils literal notranslate"><span class="pre">MUJAC</span></code>, but refer to the mass matrix <span class="math notranslate nohighlight">\(\mb{M}\)</span>.</p></li>
+</ul>
+<p>If a semi-implicit problem (option <code class="docutils literal notranslate"><span class="pre">IMAS</span></code> = <span class="math notranslate nohighlight">\(1\)</span>) with Mayer term (option
+<code class="docutils literal notranslate"><span class="pre">TerminalCost</span></code> = <code class="docutils literal notranslate"><span class="pre">on</span></code>) is considered, the terminal conditions of the adjoint system
+must be specified in a specific form. To provide
+RODAS <a class="footnote-reference brackets" href="#footcite-hairer-book-1996-stiff" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> the
+proper terminal condition <span class="math notranslate nohighlight">\(\mb{\lambda}(T)\)</span>, the function <code class="docutils literal notranslate"><span class="pre">dVdx</span></code>
+must be specified as follows</p>
+<div class="math notranslate nohighlight">
+\[\mb{\lambda}(T) = \underbrace{\left(\mb{M}^\mathsf{T}\right)^{-1}\bar{ V}_{\mb{x}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T)}_{\texttt{dVdx}}\]</div>
+<p>cf. Equation <a class="reference internal" href="optimization_algorithm.html#equation-eq-algopt-optcondlambda">(5)</a>.
+In the case of a DAE system, the mass matrix is singular and therefore
+only the elements of the mass matrix for the differential equations are
+inverted. For an example of using RODAS and the respective options, take
+a look at the MPC problem <code class="docutils literal notranslate"><span class="pre">Reactor_PDE</span></code> in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples</span></code>.</p>
+<div class="docutils container" id="id7">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-hairer-book-1996-stiff" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id4">2</a>,<a role="doc-backlink" href="#id5">3</a>)</span>
+<p>E. Hairer and G. Wanner. <em>Solving Ordinary Differential Equations: Stiff and Differential-Algebraic Problems</em>. Springer, Heidelberg, Germany, 1996.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-rodas-webpage-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id6">3</a>)</span>
+<p>RODAS. Webpage. <a class="reference external" href="http://www.unige.ch/~hairer/software.html">http://www.unige.ch/~hairer/software.html</a>, Accessed 01-December-2018.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="optimization_algorithm.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Optimization algorithm</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="line_search.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Line search</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-of-cost-functional-and-explicit-odes">Integration of cost functional and explicit ODEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#integration-of-semi-implicit-odes-and-daes-rodas">Integration of semi-implicit ODEs and DAEs (RODAS)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

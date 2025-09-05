@@ -1,0 +1,1403 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Appendix &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=6fea359b"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'appendix';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Constraint Tuning" href="tutorials/Constraints.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/appendix.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Appendix</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-parameters">List of parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-options">List of options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grampc-data-types">GRAMPC data types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grampc-function-interface">GRAMPC function interface</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="appendix">
+<span id="chap-appendix"></span><h1>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">#</a></h1>
+<p>In addition to a list of all parameters and algorithmic options of GRAMPC, this appendix contains a short description of the structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code>.
+Essential C functions of the GRAMPC project are also listed.</p>
+<section id="list-of-parameters">
+<span id="sec-listofparameters"></span><h2>List of parameters<a class="headerlink" href="#list-of-parameters" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#tab-listofparameters"><span class="std std-numref">Table 3</span></a> gives an overview of the problem-specific parameters of GRAMPC in terms of the parameter name and type as well as the admissible range and default values (if available), whereby the symbol <span class="math notranslate nohighlight">\(\text{e}_n = [1,\ldots,1]^\mathsf{T}\in \mathbb{R}^n\)</span> denotes an <span class="math notranslate nohighlight">\(n\)</span>-dimensional column vector.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="tab-listofparameters">
+<caption><span class="caption-number">Table 3 </span><span class="caption-text">Problem-specific parameters.</span><a class="headerlink" href="#tab-listofparameters" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Allowed values</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">x0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xdes</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">u0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">udes</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">umax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(+\infty\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">umin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\infty\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">p0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pmax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(+\infty\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pmin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\infty\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Thor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p>To be provided</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Tmax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^8\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Tmin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-8}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p>To be provided</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">t0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\)</span></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code> (in C)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">void*</span></code></p></td>
+<td><p>User-defined</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code> (in MATLAB)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A description of all parameters is as follows (see also <a class="reference internal" href="problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x0</span></code>: Initial state vector <span class="math notranslate nohighlight">\(\mb{x}(t_0)=\mb{x}_0\)</span> at the corresponding sampling time <span class="math notranslate nohighlight">\(t_0\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xdes</span></code>: Desired (constant) setpoint vector for the state variables <span class="math notranslate nohighlight">\(\mb{x}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">u0</span></code>: Initial value of the control vector <span class="math notranslate nohighlight">\(\mb{u}(t) = \mb{u}_0 = \text{const.}\)</span>, <span class="math notranslate nohighlight">\(t \in [0,T]\)</span> that is used in the first iteration of GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">udes</span></code>: Desired (constant) setpoint vector for the control variables <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umin</span></code>, <code class="docutils literal notranslate"><span class="pre">umax</span></code> : Lower and upper bounds for the control variables <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: Initial value of the parameter vector <span class="math notranslate nohighlight">\(\mb{p} = \mb{p}_0\)</span> that is used in the first iteration of GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pmin</span></code>, <code class="docutils literal notranslate"><span class="pre">pmax</span></code>: Lower and upper bounds for the parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Thor</span></code>: Prediction horizon <span class="math notranslate nohighlight">\(T\)</span> or initial value if the end time is optimized.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tmin</span></code>, <code class="docutils literal notranslate"><span class="pre">Tmax</span></code>: Lower and upper bound for the prediction horizon <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dt</span></code>: Sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span> of the considered system for model predictive control or moving horizon estimation. Required for prediction of next state <code class="docutils literal notranslate"><span class="pre">grampc.sol.xnext</span></code> and for the control shift, see <a class="reference internal" href="algorithm/misc.html#sec-algopt-controlshift"><span class="std std-ref">Control shift</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t0</span></code>: Current sampling instance <span class="math notranslate nohighlight">\(t_0\)</span> that is provided in the <code class="docutils literal notranslate"><span class="pre">grampc.param</span></code> structure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code>: Further problem-specific parameters, e.g. system parameters or weights in the cost functions that are passed to the problem functions via a <code class="docutils literal notranslate"><span class="pre">void</span></code>-pointer in C or <code class="docutils literal notranslate"><span class="pre">typeRNum</span></code> array in MATLAB.</p></li>
+</ul>
+</section>
+<section id="list-of-options">
+<span id="sec-listofoptions"></span><h2>List of options<a class="headerlink" href="#list-of-options" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="#tab-listofoptions"><span class="std std-numref">Table 4</span></a> gives an overview of the algorithmic options of GRAMPC in terms of the option name and type as well as the allowed and the default values (if available).</p>
+<div class="pst-scrollable-table-container"><table class="table" id="tab-listofoptions">
+<caption><span class="caption-number">Table 4 </span><span class="caption-text">Algorithmic Options.</span><a class="headerlink" href="#tab-listofoptions" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option name</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Allowed values</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Nhor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeInt</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([2, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(30\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeInt</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([1, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeInt</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([1, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ShiftControl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IntegralCost</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TerminalCost</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IntegratorCost</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code>/ <code class="docutils literal notranslate"><span class="pre">simpson</span></code>/ <code class="docutils literal notranslate"><span class="pre">discrete</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Integrator</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">erk1</span></code>/ <code class="docutils literal notranslate"><span class="pre">erk2</span></code>/ <code class="docutils literal notranslate"><span class="pre">erk3</span></code>/ <code class="docutils literal notranslate"><span class="pre">erk4</span></code>/ <code class="docutils literal notranslate"><span class="pre">discrete</span></code>/ <code class="docutils literal notranslate"><span class="pre">ruku45</span></code>/ <code class="docutils literal notranslate"><span class="pre">rodas</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">erk2</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IntegratorRelTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-6}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IntegratorAbsTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-8}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">IntegratorMinStepSize</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><em>eps</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">IntegratorMaxSteps</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeInt</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([1, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{8}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FlagsRodas</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeInt*</span></code></p></td>
+<td><p>see description</p></td>
+<td><p>see description</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchType</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">adaptive</span></code>/ <code class="docutils literal notranslate"><span class="pre">explicit1</span></code>/ <code class="docutils literal notranslate"><span class="pre">explicit2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">explicit2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchExpAutoFallback</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchMax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.75\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchMin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchInit</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-4}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptAbsTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-6}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((1, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, 0.5)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.1\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, 1)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.85\)</span></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OptimControl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OptimParam</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OptimParamLineSearchFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OptimTime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">OptimTimeLineSearchFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ScaleProblem</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">xOffset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nx}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{e}_{Nu}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">uOffset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Nu}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{e}_{Np}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pOffset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0\cdot \mathrm{e}_{Np}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TOffset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.0\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">JScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cScale</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((-\infty, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathrm{e}_{Nc}\)</span></p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EqualityConstraints</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">InequalityConstraints</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TerminalEqualityConstraints</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TerminalInequalityConstraints</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ConstraintsHandling</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">extpen</span></code>/ <code class="docutils literal notranslate"><span class="pre">auglag</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">auglag</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum*</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-4}\mathrm{e}_{Nc}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MultiplierMax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{6}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MultiplierDampingFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.0\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PenaltyMax</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^6\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\((0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^0\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([1, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.05\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(0.95\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseThreshold</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, \infty)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(1.0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AugLagUpdateGradientRelTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-2}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeChar*</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">on</span></code>/ <code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">off</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ConvergenceGradientRelTol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">typeRNum</span></code></p></td>
+<td><p><span class="math notranslate nohighlight">\([0, 1]\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^{-6}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A description of all options is as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Nhor</span></code>: Number of discretization points within the time interval <span class="math notranslate nohighlight">\([0,T]\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code>: Sets the maximum number of augmented Lagrangian iterations
+<span class="math notranslate nohighlight">\(i_\text{max} \geq 1\)</span>. If the option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is activated, the
+algorithm evaluates the convergence criterion and terminates if the
+inner minimization converged and all constraints are satisfied within
+the tolerance defined by <code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code>: If the option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is activated, the algorithm terminates the inner loop
+as soon as the convergence criterion is fulfilled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ShiftControl</span></code>: Activates or deactivates the shifting of the control trajectory and
+the adaptation of <span class="math notranslate nohighlight">\(T\)</span> in case of a free end time, i.e., if <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> is
+active.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegralCost</span></code>, <code class="docutils literal notranslate"><span class="pre">TerminalCost</span></code>: Indicate if the integral and/or terminal cost functions are defined.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorCost</span></code>: This option specifies the integration scheme for the cost
+functionals. Possible values are <code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code>, <code class="docutils literal notranslate"><span class="pre">simpson</span></code> and <code class="docutils literal notranslate"><span class="pre">discrete</span></code>.</p></li>
+</ul>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version v2.3: </span>Fixed typo in <code class="docutils literal notranslate"><span class="pre">trapezoidal</span></code> option.
+Renamed <code class="docutils literal notranslate"><span class="pre">euler</span></code> to <code class="docutils literal notranslate"><span class="pre">erk1</span></code> and <code class="docutils literal notranslate"><span class="pre">heun</span></code> to <code class="docutils literal notranslate"><span class="pre">erk2</span></code>.
+Removed <code class="docutils literal notranslate"><span class="pre">modeuler</span></code>.
+Added <code class="docutils literal notranslate"><span class="pre">erk3</span></code> and <code class="docutils literal notranslate"><span class="pre">erk4</span></code>.</p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Integrator</span></code>: This option specifies the integration scheme for the system and adjoint dynamics.
+Possible values are <code class="docutils literal notranslate"><span class="pre">erk1</span></code>, <code class="docutils literal notranslate"><span class="pre">erk2</span></code>, <code class="docutils literal notranslate"><span class="pre">erk3</span></code>, <code class="docutils literal notranslate"><span class="pre">erk4</span></code>, <code class="docutils literal notranslate"><span class="pre">discrete</span></code> with fixed step size and <code class="docutils literal notranslate"><span class="pre">ruku45</span></code>, <code class="docutils literal notranslate"><span class="pre">rodas</span></code> with variable step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorMinStepSize</span></code>: Minimum step size for RODAS and the Runge-Kutta integrator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorMaxSteps</span></code>: Maximum number of steps for RODAS and the Runge-Kutta integrator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorRelTol</span></code>: Relative tolerance for RODAS and the Runge-Kutta integrator with
+variable step size. Note that this option may be insignificant if the
+minimum step size is chosen too high or the maximum number of steps
+is set too low.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">IntegratorAbsTol</span></code>: Absolute tolerance for RODAS and the Runge-Kutta integrator with
+variable step size. Note that this option may be insignificant if the
+minimum step size is chosen too high or the maximum number of steps
+is set too low.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FlagsRodas</span></code>: Vector with the elements
+<code class="docutils literal notranslate"><span class="pre">[IFCN,</span> <span class="pre">IDFX,</span> <span class="pre">IJAC,</span> <span class="pre">IMAS,</span> <span class="pre">MLJAC,</span> <span class="pre">MUJAC,</span> <span class="pre">MLMAS,</span> <span class="pre">MUMAS]</span></code>
+that is passed to the integrator RODAS, see
+<a class="reference internal" href="algorithm/numerical_integration.html#sec-algopt-integrationrodas"><span class="std std-ref">Integration of semi-implicit ODEs and DAEs (RODAS)</span></a> for a description of the single entries.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchType</span></code>: This option selects either the adaptive line search strategy (value
+<code class="docutils literal notranslate"><span class="pre">adaptive</span></code>) or the explicit approach (value <code class="docutils literal notranslate"><span class="pre">explicit1</span></code> or <code class="docutils literal notranslate"><span class="pre">explicit2</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchExpAutoFallback</span></code>: If this option is activated, the automatic fallback strategy is
+used in the case that the explicit formulas result in negative step sizes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchMax</span></code>: This option sets the maximum value <span class="math notranslate nohighlight">\(\alpha_{\max}\)</span> of the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchMin</span></code>: This option sets the minimum value <span class="math notranslate nohighlight">\(\alpha_{\min}\)</span> of the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchInit</span></code>: Indicates the initial value <span class="math notranslate nohighlight">\(\alpha_{\text{init}}&gt;0\)</span> for the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>. If the adaptive line search is used, the
+sample point <span class="math notranslate nohighlight">\(\alpha_2\)</span> is set
+to <span class="math notranslate nohighlight">\(\alpha_2 = \alpha_{\text{init}}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptAbsTol</span></code>: This option sets the absolute tolerance <span class="math notranslate nohighlight">\(\varepsilon_{\phi}\)</span>
+of the difference in costs at the interval bounds <span class="math notranslate nohighlight">\(\alpha_1\)</span>
+and <span class="math notranslate nohighlight">\(\alpha_2\)</span>. If the difference in the (scaled) costs on
+these bounds falls below <span class="math notranslate nohighlight">\(\varepsilon_{\phi}\)</span>, the adaption of
+the interval is stopped in order to avoid oscillations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptFactor</span></code>: This option sets the adaptation factor <span class="math notranslate nohighlight">\(\kappa &gt; 1\)</span> in
+<a class="reference internal" href="algorithm/line_search.html#equation-eq-algopt-intervaladaptation">(8)</a>
+that determines how much the line search interval can be adapted from
+one gradient iteration to the next.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalTol</span></code>: This option sets the interval tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_{\alpha} \in (0,0.5)\)</span> in
+<a class="reference internal" href="algorithm/line_search.html#equation-eq-algopt-intervaladaptation">(8)</a>
+that determines for which values of <span class="math notranslate nohighlight">\(\alpha\)</span> the adaption is
+performed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalFactor</span></code>: This option sets the interval factor <span class="math notranslate nohighlight">\(\beta \in (0,1)\)</span> that
+specifies the interval bounds <span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> according
+to <span class="math notranslate nohighlight">\(\alpha_1 = \alpha_2 (1 - \beta)\)</span> and
+<span class="math notranslate nohighlight">\(\alpha_3 = \alpha_2 (1 + \beta)\)</span>, whereby the mid sample point
+is initialized as <span class="math notranslate nohighlight">\(\alpha_2 = \alpha_\text{init}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimControl</span></code>: Specifies whether the cost functional should be minimized with
+respect to the control variable <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimParam</span></code>: Specifies whether the cost functional should be minimized with
+respect to the optimization parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimParamLineSearchFactor</span></code>: This option sets the adaptation factor
+<span class="math notranslate nohighlight">\(\gamma_{\mb{p}}\)</span> that weights the update of the
+parameter vector <span class="math notranslate nohighlight">\(\mb{p}\)</span> against the update of the
+control <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimTime</span></code>: Specifies whether the cost functional should be minimized with
+respect the horizon length <span class="math notranslate nohighlight">\(T\)</span> (free end time problem) or if
+<span class="math notranslate nohighlight">\(T\)</span> is kept constant.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimTimeLineSearchFactor</span></code>: This option sets the adaptation factor <span class="math notranslate nohighlight">\(\gamma_{T}\)</span> that
+weights the update of the end time <span class="math notranslate nohighlight">\(T\)</span> against the update of
+the control <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ScaleProblem</span></code>: Activates or deactivates scaling. Note that GRAMPC requires more
+computation time if scaling is active.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xScale</span></code>, <code class="docutils literal notranslate"><span class="pre">xOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{x}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{x}_\text{offset}\)</span> for each state variable.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uScale</span></code>, <code class="docutils literal notranslate"><span class="pre">uOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{u}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{u}_\text{offset}\)</span> for each control variable.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pScale</span></code>, <code class="docutils literal notranslate"><span class="pre">pOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{p}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{p}_\text{offset}\)</span> for each parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TScale</span></code>, <code class="docutils literal notranslate"><span class="pre">TOffset</span></code>: Scaling factor <span class="math notranslate nohighlight">\(T_\text{scale}\)</span> and offset
+<span class="math notranslate nohighlight">\(T_\text{offset}\)</span> for the horizon length.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JScale</span></code>: Scaling factor <span class="math notranslate nohighlight">\(J_\text{scale}\)</span> for the cost functional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cScale</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{c}_\text{scale}\)</span> for each state
+constraint. The elements of the vector refer to the equality,
+inequality, terminal equality and terminal inequality constraints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">EqualityConstraints</span></code>: Equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}\)</span>
+can be disabled by the option value <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InequalityConstraints</span></code>: To disable inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TerminalEqualityConstraints</span></code>: To disable terminal equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TerminalInequalityConstraints</span></code>: To disable terminal inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsHandling</span></code>: State constraints are handled either by means of the augmented
+Lagrangian approach (option value <code class="docutils literal notranslate"><span class="pre">auglag</span></code>) or as soft constraints by outer
+penalty functions (option value <code class="docutils literal notranslate"><span class="pre">extpen</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>: Thresholds
+<span class="math notranslate nohighlight">\((\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}\)</span>
+for the equality, inequality, terminal equality, and terminal
+inequality constraints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MultiplierMax</span></code>: Upper bound <span class="math notranslate nohighlight">\(\mu_\text{max}\)</span> and lower bound
+<span class="math notranslate nohighlight">\(-\mu_\text{max}\)</span> for the Lagrangian multpliers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MultiplierDampingFactor</span></code>:Damping factor <span class="math notranslate nohighlight">\(\rho \in [0,1)\)</span> for the multiplier update.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyMax</span></code>: This option sets the upper bound <span class="math notranslate nohighlight">\(c_\text{max}\)</span> of the
+penalty parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code>: This option sets the lower bound <span class="math notranslate nohighlight">\(c_\text{min}\)</span> of the
+penalty parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseFactor</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\beta_\text{in}\)</span> by which
+penalties are increased.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\beta_\text{de}\)</span> by which
+penalties are decreased.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseThreshold</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\gamma_\text{in}\)</span> that rates the
+progress in the constraints between the last two iterates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AugLagUpdateGradientRelTol</span></code>: Threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span> for the maximum relative
+gradient of the inner minimization problem.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code>: This option activates the convergence criterion. Otherwise, the
+inner and outer loops always perform the maximum number of
+iterations, see the options <code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code> and <code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConvergenceGradientRelTol</span></code>: This option sets the threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,c}\)</span> for
+the maximum relative gradient of the inner minimization problem that
+is used in the convergence criterion. Note that this threshold is
+different from the one that is used in the update of multipliers and
+penalties.</p></li>
+</ul>
+</section>
+<section id="grampc-data-types">
+<span id="appendix-datatypes"></span><h2>GRAMPC data types<a class="headerlink" href="#grampc-data-types" title="Link to this heading">#</a></h2>
+<p>The following lines list the data types of GRAMPC. Note that these
+data types define the structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code> including the
+substructures <code class="docutils literal notranslate"><span class="pre">sol</span></code>, <code class="docutils literal notranslate"><span class="pre">param</span></code>, <code class="docutils literal notranslate"><span class="pre">opt</span></code>, <code class="docutils literal notranslate"><span class="pre">rws</span></code>, and <code class="docutils literal notranslate"><span class="pre">userparam</span></code>, also see
+<a class="reference internal" href="usage/usage_c.html#sec-grampcstructure-initialization"><span class="std std-ref">Initialization of GRAMPC</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-number">Listing 10 </span><span class="caption-text">GRAMPC main structure.</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeGRAMPCopt</span><span class="w"> </span><span class="o">*</span><span class="n">opt</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeGRAMPCsol</span><span class="w"> </span><span class="o">*</span><span class="n">sol</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeGRAMPCrws</span><span class="w"> </span><span class="o">*</span><span class="n">rws</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-number">Listing 11 </span><span class="caption-text">GRAMPC parameter structure.</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Nx</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Nu</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Np</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Ng</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Nh</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">NgT</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">NhT</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Nc</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">xdes</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">udes</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">umax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">umin</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pmax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pmin</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">Thor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">Tmax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">Tmin</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">dt</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">t0</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-number">Listing 12 </span><span class="caption-text">GRAMPC option structure.</span><a class="headerlink" href="#id3" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">Nhor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">MaxMultIter</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">ShiftControl</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">TimeDiscretization</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">IntegralCost</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">TerminalCost</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">IntegratorCost</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">Integrator</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">IntegratorRelTol</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">IntegratorAbsTol</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">IntegratorMinStepSize</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">IntegratorMaxSteps</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="o">*</span><span class="n">FlagsRodas</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">LineSearchType</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">LineSearchExpAutoFallback</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchMax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchMin</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchInit</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchIntervalFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchAdaptFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">LineSearchIntervalTol</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">OptimControl</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">OptimParam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">OptimParamLineSearchFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">OptimTime</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">OptimTimeLineSearchFactor</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">ScaleProblem</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">xScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">xOffset</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">uScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">uOffset</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pOffset</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">TScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">TOffset</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">JScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">cScale</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">EqualityConstraints</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">InequalityConstraints</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">TerminalEqualityConstraints</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">TerminalInequalityConstraints</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">ConstraintsHandling</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">ConstraintsAbsTol</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">MultiplierMax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">MultiplierDampingFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">PenaltyMax</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">PenaltyMin</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">PenaltyIncreaseFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">PenaltyDecreaseFactor</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">PenaltyIncreaseThreshold</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">AugLagUpdateGradientRelTol</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">ConvergenceCheck</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">ConvergenceGradientRelTol</span><span class="p">;</span>
+
+<span class="p">}</span><span class="w"> </span><span class="n">typeGRAMPCopt</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-number">Listing 13 </span><span class="caption-text">GRAMPC solution structure.</span><a class="headerlink" href="#id4" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">xnext</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">unext</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pnext</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">Tnext</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">J</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">cfct</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">pen</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">iter</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">typeGRAMPCsol</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-number">Listing 14 </span><span class="caption-text">GRAMPC real workspace structure.</span><a class="headerlink" href="#id5" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">t</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">tls</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">adj</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">dcdx</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">uls</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">uprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">gradu</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">graduprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">dcdu</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pls</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">gradp</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">gradpprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">dcdp</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">Tprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">gradT</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">gradTprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">dcdt</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">mult</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">pen</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">cfct</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">cfctprev</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">cfctAbsTol</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">lsAdapt</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">lsExplicit</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">rwsScale</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">lrwsGeneral</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">rwsGeneral</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">lworkRodas</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="n">liworkRodas</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">rparRodas</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="o">*</span><span class="n">iparRodas</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">workRodas</span><span class="p">;</span>
+<span class="w">    </span><span class="n">typeInt</span><span class="w">  </span><span class="o">*</span><span class="n">iworkRodas</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">typeGRAMPCrws</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="grampc-function-interface">
+<span id="appendix-functioninterface"></span><h2>GRAMPC function interface<a class="headerlink" href="#grampc-function-interface" title="Link to this heading">#</a></h2>
+<p>The main C functions for the usage of GRAMPC are listed below.</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-number">Listing 15 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_init</span></code>:</span><a class="headerlink" href="#id6" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_init</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">**</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_free</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">**</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-number">Listing 16 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_run</span></code>:</span><a class="headerlink" href="#id7" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_run</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-number">Listing 17 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_setparam</span></code>:</span><a class="headerlink" href="#id8" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">paramValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">paramValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_printparam</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-number">Listing 18 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_setopt</span></code>:</span><a class="headerlink" href="#id9" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setopt_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">optValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setopt_int</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">optValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setopt_string</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setopt_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setopt_int_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_printopt</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-number">Listing 19 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_mess</span></code>:</span><a class="headerlink" href="#id10" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** estimates PenaltyMin on basis of the first MPC iteration **/</span>
+<span class="n">typeInt</span><span class="w"> </span><span class="nf">grampc_printstatus</span><span class="p">(</span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">level</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-number">Listing 20 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">grampc_util</span></code>:</span><a class="headerlink" href="#id11" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** estimates PenaltyMin on basis of the first MPC iteration **/</span>
+<span class="n">typeInt</span><span class="w"> </span><span class="nf">grampc_estim_penmin</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">rungrampc</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-number">Listing 21 </span><span class="caption-text"><strong>File</strong> <code class="docutils literal notranslate"><span class="pre">probfct</span></code>:</span><a class="headerlink" href="#id12" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** OCP dimensions: states (Nx), controls (Nu), parameters (Np), equalities (Ng), </span>
+<span class="cm">    inequalities (Nh), terminal equalities (NgT), terminal inequalities (NhT) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ocp_dim</span><span class="p">(</span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nx</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nu</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Np</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Ng</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nh</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">NgT</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">NhT</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** System function f(t,x,u,p,param,userparam) </span>
+<span class="cm">    ------------------------------------ **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ffct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian df/dx multiplied by vector vec, i.e. (df/dx)^T*vec or vec^T*(df/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian df/du multiplied by vector vec, i.e. (df/du)^T*vec or vec^T*(df/du) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdu_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian df/dp multiplied by vector vec, i.e. (df/dp)^T*vec or vec^T*(df/dp) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdp_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Integral cost l(t,x(t),u(t),p,param,userparam) </span>
+<span class="cm">    -------------------------------------------------- **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">lfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dl/dx **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dldx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dl/du **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dldu</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dl/dp **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dldp</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Terminal cost V(T,x(T),p,param,userparam) </span>
+<span class="cm">    ---------------------------------------- **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">Vfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dV/dx **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dVdx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dV/dp **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dVdp</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Gradient dV/dT **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dVdT</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Equality constraints g(t,x(t),u(t),p,param,userparam) = 0 </span>
+<span class="cm">    --------------------------------------------------- **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">gfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dg/dx multiplied by vector vec, i.e. (dg/dx)^T*vec or vec^T*(dg/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dg/du multiplied by vector vec, i.e. (dg/du)^T*vec or vec^T*(dg/du) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgdu_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dg/dp multiplied by vector vec, i.e. (dg/dp)^T*vec or vec^T*(dg/dp) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgdp_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Inequality constraints h(t,x(t),u(t),p,param,userparam) &lt;= 0 </span>
+<span class="cm">    ------------------------------------------------------ **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">hfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dh/dx multiplied by vector vec, i.e. (dh/dx)^T*vec or vec^T*(dg/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dh/du multiplied by vector vec, i.e. (dh/du)^T*vec or vec^T*(dg/du) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhdu_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dh/dp multiplied by vector vec, i.e. (dh/dp)^T*vec or vec^T*(dg/dp) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhdp_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Terminal equality constraints gT(T,x(T),p,param,userparam) = 0 </span>
+<span class="cm">    -------------------------------------------------------- **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">gTfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dgT/dx multiplied by vector vec, i.e. (dgT/dx)^T*vec or vec^T*(dgT/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgTdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dgT/dp multiplied by vector vec, i.e. (dgT/dp)^T*vec or vec^T*(dgT/dp) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgTdp_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dgT/dT multiplied by vector vec, i.e. (dgT/dT)^T*vec or vec^T*(dgT/dT) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dgTdT_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Terminal inequality constraints hT(T,x(T),p,param,userparam) &lt;= 0 </span>
+<span class="cm">    ----------------------------------------------------------- **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">hTfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dhT/dx multiplied by vector vec, i.e. (dhT/dx)^T*vec or vec^T*(dhT/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhTdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dhT/dp multiplied by vector vec, i.e. (dhT/dp)^T*vec or vec^T*(dhT/dp) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhTdp_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian dhT/dT multiplied by vector vec, i.e. (dhT/dT)^T*vec or vec^T*(dhT/dT) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhTdT_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+
+
+<span class="cm">/** Additional functions required for semi-implicit systems </span>
+<span class="cm">    M*dx/dt(t) = f(t,x(t),u(t),p,param,userparam) using the solver RODAS </span>
+<span class="cm">    ------------------------------------------------------- **/</span>
+<span class="cm">/** Jacobian df/dx in vector form (column-wise) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian df/dx in vector form (column-wise) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdxtrans</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian df/dt **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdt</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Jacobian d(dH/dx)/dt  **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dHdxdt</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Mass matrix in vector form (column-wise, either banded or full matrix) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">Mfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+<span class="cm">/** Transposed mass matrix in vector form (column-wise, either banded or full matrix) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">Mtrans</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tutorials/Constraints.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Constraint Tuning</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-parameters">List of parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#list-of-options">List of options</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grampc-data-types">GRAMPC data types</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grampc-function-interface">GRAMPC function interface</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

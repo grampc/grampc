@@ -1,0 +1,46 @@
+Introduction
+============
+
+This manual describes the model predictive control tool GRAMPC
+(gradient-based MPC - [græmp’si:]) for nonlinear
+continuous-time systems subject to (possibly nonlinear) state and
+control constraints. The optimization algorithm underlying GRAMPC
+consists of an augmented Lagrangian scheme in connection with a tailored
+gradient method. GRAMPC is implemented as C code with an additional
+user interface to C++, Matlab/Simulink, and dSpace. GRAMPC
+allows one to cope with (embedded) MPC problems of nonlinear and highly
+dynamical systems with sampling times in the (sub)millisecond range.
+
+The presented framework is a fundamental revision of version 1.0 of the
+MPC toolbox GRAMPC :footcite:p:`Kaepernick2014` that was
+originally presented for nonlinear systems with pure input constraints.
+Beside “classical” nonlinear MPC, GRAMPC can be used for MPC on
+shrinking horizon, general optimal control problems, moving horizon
+estimation, and parameter optimization problems.
+
+The documentation is outlined as follows. :ref:`chap:install`
+describes the installation of GRAMPC for use in C and M\ atlab and
+gives a brief overview on the software structure. The formulation of the
+optimization problem is shown in :ref:`chap:ProblemFormulation`.
+Furthermore, the chapter describes the available parameters and the
+implementation of the problem as C functions.
+:ref:`chap:AlgOpt` summarizes the optimization algorithm and
+provides a detailed description of the available options. The usage of
+GRAMPC in C and Matlab is explained in
+:ref:`chap:grampcStructure`, which includes initialization,
+setting of parameters and options, compiling and running as well as the
+interfaces to Matlab and Simulink. :ref:`chap:Tutorials`
+describes several example problems illustrating the application of
+GRAMPC to model predictive control, optimal control and moving horizon
+estimation. Valuable hints for tuning the software to a specific
+optimization problem are given at multiple places in the documentation,
+see especially the description of the options in :ref:`chap:AlgOpt`, the provided plot functions in 
+:ref:`sec:Plotfunctions` and the tutorials in the last chapter.
+
+Note that the PDF version of this documentation provides many hyperlinks
+to quickly jump to the definition of parameters, options and functions.
+In addition, the descriptions of parameters and options are repeated in
+the :ref:`chap:Appendix`.
+
+
+.. footbibliography::

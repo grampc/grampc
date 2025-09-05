@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Optimal control of a double integrator &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/DoubleIntegrator';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Moving horizon estimation of a CSTR" href="CSTR.html" />
+    <link rel="prev" title="Model predictive control of a PMSM" href="PMSM.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/DoubleIntegrator.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Optimal control of a double integrator</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-with-fixed-end-time">Optimization with fixed end time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-with-free-end-time">Optimization with free end time</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="optimal-control-of-a-double-integrator">
+<span id="sec-tut-doubleintegrator"></span><h1>Optimal control of a double integrator<a class="headerlink" href="#optimal-control-of-a-double-integrator" title="Link to this heading">#</a></h1>
+<figure class="align-default" id="fig-doubleint">
+<img alt="../_images/DoubleInt.svg" src="../_images/DoubleInt.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">Numerical OCP solution of the double integrator problem with fixed end time.</span><a class="headerlink" href="#fig-doubleint" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>This section describes how GRAMPC can be used to solve OCPs by
+considering the example of a double integrator problem. The problem
+formulation includes equality and inequality constraints. Both the
+control variable <span class="math notranslate nohighlight">\(u\)</span> and the end time <span class="math notranslate nohighlight">\(T\)</span> serve as
+optimization variables. In addition to the problem formulation of the
+OCP, one focus of the following discussion will be the appropriate
+convergence check of the augmented Lagrangian and gradient method, and
+the optimization of the end time.</p>
+<section id="problem-formulation">
+<span id="problem-formulation-1"></span><h2>Problem formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">#</a></h2>
+<p>The double integrator problems reads as</p>
+<div class="math notranslate nohighlight" id="equation-eq-ocp-doubleint">
+<span class="eqno">(24)<a class="headerlink" href="#equation-eq-ocp-doubleint" title="Link to this equation">#</a></span>\[\begin{split}\min_{u, T} \quad &amp; J(u, T;\mb{x}_0) = T + \int_0^T q_1u^2(t) \, {\rm d}t \\
+\textrm{s.t.} \quad &amp; {\dot x_1}(t) = x_2(t) \,, \quad x_1(0) = x_{1,0} \\
+&amp; {\dot x_2}(t) = u(t) \,, \quad x_2(0) = x_{2,0} \\
+&amp; \mb{g}_{T}(\mb{x}(T))  = [x_1(T)\,, x_2(T)]^\mathsf{T}= \mb{0} \\
+&amp; h(\mb{x} (t)) = x_2(t) - 0.5 \leq 0 \\
+&amp; u(t) \in \left[u_{\min}, u_{\max}\right] \,,\quad T \in \left[T_{\min}, T_{\max}\right]\end{split}\]</div>
+<p>including two terminal equality constraints <span class="math notranslate nohighlight">\(\mb{g}_{T}(\mb{x}(T))\)</span>
+and one general inequality constraint <span class="math notranslate nohighlight">\(h(\mb{x} (t))\)</span>.
+The control task consists in a setpoint transition from the initial
+state <span class="math notranslate nohighlight">\(x_{1,0}=x_{2,0}=-1\)</span> to the origin <span class="math notranslate nohighlight">\(x_1(T)=x_2(T)=0\)</span>.
+The cost functional <span class="math notranslate nohighlight">\(J(u, T;\mb{x}_0)\)</span> represents a
+trade-off between time and energy optimality depending on the weight <span class="math notranslate nohighlight">\(q_1=0.1\)</span>.</p>
+<p>The problem is formulated in GRAMPC using the C file
+<code class="docutils literal notranslate"><span class="pre">probfct_DOUBLE_INTEGRATOR</span></code>, which can be found in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Double_Integrator</span></code>. In particular,
+the terminal equality constraints are formulated in GRAMPC via the functions <code class="docutils literal notranslate"><span class="pre">gTfct</span></code> , <code class="docutils literal notranslate"><span class="pre">dgTdx_vec</span></code> and <code class="docutils literal notranslate"><span class="pre">dgTdT_vec</span></code>.
+The number of terminal equality constraints is set to <code class="docutils literal notranslate"><span class="pre">NgT</span></code> =2 in the function <code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code>. Similarly,
+the inequality constraint is formulated by means of the functions <code class="docutils literal notranslate"><span class="pre">hfct</span></code> , <code class="docutils literal notranslate"><span class="pre">dhdx_vec</span></code> and <code class="docutils literal notranslate"><span class="pre">dhdu_vec</span></code> and setting to <code class="docutils literal notranslate"><span class="pre">Nh</span></code> =1 in <code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code>.
+More details on implementing the OCP can be found in
+<a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a> and in the example provided in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/examples/Double</span> <span class="pre">Integrator</span></code>.</p>
+<p>The options <code class="docutils literal notranslate"><span class="pre">OptimControl</span></code> and <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> are activated to optimize not only the control
+variable <span class="math notranslate nohighlight">\(u\)</span> but also the end time <span class="math notranslate nohighlight">\(T\)</span>. The lower and upper
+bounds of the optimzation variables are set to <span class="math notranslate nohighlight">\(u\in[-1,1]\)</span> and
+<span class="math notranslate nohighlight">\(T\in[1,10]\)</span> using the parameters <code class="docutils literal notranslate"><span class="pre">umin</span></code> , <code class="docutils literal notranslate"><span class="pre">umax</span></code> , <code class="docutils literal notranslate"><span class="pre">Tmin</span></code> and <code class="docutils literal notranslate"><span class="pre">Tmax</span></code> ,
+cf. <a class="reference internal" href="../problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>. Note that the option <code class="docutils literal notranslate"><span class="pre">ShiftControl</span></code> is
+deactivated, as the shifting of the control trajectory typically only
+applies to MPC problems.</p>
+<p>The option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is activated to terminate the augmented Lagrangian algorithm
+as soon as the state constraints are fulfilled with sufficient accuracy
+and the optimization variable has converged to an optimal value. To this
+end, the convergence
+criteria <a class="reference internal" href="../algorithm/misc.html#equation-eq-algopt-convgradient">(18)</a> and
+<a class="reference internal" href="../algorithm/misc.html#equation-eq-algopt-convconstraints">(19)</a> are
+evaluated after each gradient and augmented Lagrangian step using the
+thresholds
+<span class="math notranslate nohighlight">\(\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}\)</span>
+and <span class="math notranslate nohighlight">\(\varepsilon_{\mb{h}}=1e-6\)</span>, cf. the option <code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code> .
+The threshold for checking convergence of the optimization variable
+<span class="math notranslate nohighlight">\(\varepsilon_\text{rel,c}\)</span> is set to <span class="math notranslate nohighlight">\(1e-9\)</span> via the
+option <code class="docutils literal notranslate"><span class="pre">ConvergenceGradientRelTol</span></code> . Note that the activation of the convergence check using the
+option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> causes the gradient method to be aborted when the convergence
+condition <span class="math notranslate nohighlight">\(\eta^{i|j+1} \leq \varepsilon_\text{rel,c}\)</span> defined by
+<a class="reference internal" href="../algorithm/misc.html#equation-eq-algopt-convconstraints">(19)</a> is reached.</p>
+</section>
+<section id="optimization-with-fixed-end-time">
+<h2>Optimization with fixed end time<a class="headerlink" href="#optimization-with-fixed-end-time" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-doubleint-constr">
+<img alt="../_images/DoubleInt_constr.svg" src="../_images/DoubleInt_constr.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Numerical OCP solution of the double integrator problem with fixed end time and state constraint.</span><a class="headerlink" href="#fig-doubleint-constr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In a first scenario, the OCP <a class="reference internal" href="#equation-eq-ocp-doubleint">(24)</a> is numerically solved with the fixed end time <span class="math notranslate nohighlight">\(T=4\,\mathrm{s}\)</span>,
+i.e., the option <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> is set <code class="docutils literal notranslate"><span class="pre">off</span></code> , and without the inequality
+constraint, i.e., the option <code class="docutils literal notranslate"><span class="pre">InequalityConstraints</span></code> is also set <code class="docutils literal notranslate"><span class="pre">off</span></code> . The time interval <span class="math notranslate nohighlight">\([0,T]\)</span> is
+discretized using <code class="docutils literal notranslate"><span class="pre">Nhor=50</span></code> discretization points. During the
+augmented Lagrangian iterations, a decrease of the penalty parameters is
+prevented by setting the adaptation factor <span class="math notranslate nohighlight">\(\beta_\text{de}=1\)</span>
+(see option <code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code>). The increase factor <span class="math notranslate nohighlight">\(\beta_\text{in}\)</span> of the
+penalty parameter update <a class="reference internal" href="../algorithm/multiplier_update.html#equation-eq-algopt-updatepenh">(14)</a> is set to the value
+<span class="math notranslate nohighlight">\(1.25\)</span>. These settings ensure a fast convergence, since the
+very low tolerances <span class="math notranslate nohighlight">\(\mb{\varepsilon_{\mb{g}_T}}\)</span>
+require high penalty parameters. However, starting with high penalties
+can lead to instabilities, as high penalties distort the optimization
+problem.</p>
+<p>As shown in <a class="reference internal" href="#fig-doubleint"><span class="std std-numref">Fig. 10</span></a>, the state variables
+<span class="math notranslate nohighlight">\(\mb{x}(t)\)</span> are transferred to the origin as specified by
+the terminal state constraints.
+Note that only 5 augmented Lagrangian steps are required in total for
+numerically solving the state constrained optimization problem in
+accordance with the formulated convergence criterion for the terminal
+equality constraints and the optimization variable <span class="math notranslate nohighlight">\(u\)</span>. The number
+of gradient iterations varies in each augmented Lagrangian step as shown
+in <a class="reference internal" href="#fig-doubleint"><span class="std std-numref">Fig. 10</span></a>. The violation of the formulated
+terminal equality constraints continuously decreases below the specified thresholds
+<span class="math notranslate nohighlight">\(\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}\)</span>.
+As a result, the augmented cost functional and the original cost
+functional converge to the same value, i.e. the so-called duality gap
+is zero.</p>
+<p>In a second scenario, <a class="reference internal" href="#fig-doubleint-constr"><span class="std std-numref">Fig. 11</span></a> shows the
+optimal solution of OCP <a class="reference internal" href="#equation-eq-ocp-doubleint">(24)</a> with
+activated inequality constraint using the fixed end time <span class="math notranslate nohighlight">\(T=5.25\,\mathrm{s}\)</span>. Further problem
+settings are identical to the first simulation scenario. Again, the
+terminal equality constraints are satisfied by the optimal solution and the state variables
+<span class="math notranslate nohighlight">\(\mb{x}(t)\)</span> are transferred to the origin. The control
+variable <span class="math notranslate nohighlight">\(u\)</span> is slightly adapted compared to the first simulation
+scenario in <a class="reference internal" href="#fig-doubleint"><span class="std std-numref">Fig. 10</span></a> in order to comply with the inequality constraint.
+In view of the additional inequality constraint, 17 augmented Lagrangian
+steps are required to be able to solve the optimization problem with
+sufficient accuracy.</p>
+<p>The number of gradient iterations varies in each augmented Lagrangian
+step as shown in <a class="reference internal" href="#fig-doubleint-constr"><span class="std std-numref">Fig. 11</span></a>. The
+violation of the state constraints is almost continuously decreased
+below the specified thresholds
+<span class="math notranslate nohighlight">\(\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}\)</span>
+and <span class="math notranslate nohighlight">\(\varepsilon_{\mb{h}}=1e-6\)</span>, respectively. As
+before, the augmented cost functional and the original cost functional
+converge to the same value. The computation time for solving the problem
+on a Windows 10 machine with an Intel(R) Core(TM) i5-5300U CPU running
+at 2.3GHz using the Microsoft Visual C++ 2013 Professional (C) compiler
+amounts to 1.1ms and 14.6ms, respectively.</p>
+</section>
+<section id="optimization-with-free-end-time">
+<h2>Optimization with free end time<a class="headerlink" href="#optimization-with-free-end-time" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-doubleint-timeopt-constr">
+<img alt="../_images/DoubleInt_Timeopt_constr.svg" src="../_images/DoubleInt_Timeopt_constr.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">Numerical OCP solution of the double integrator problem with free end time and state constraint.</span><a class="headerlink" href="#fig-doubleint-timeopt-constr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In a third simulation scenario, the
+OCP <a class="reference internal" href="#equation-eq-ocp-doubleint">(24)</a> is numerically solved in
+the free end time setting. The initial end time is set to
+<span class="math notranslate nohighlight">\(T=5.25\,\mathrm{s}\)</span> as given before. To weight the update of
+the end time <span class="math notranslate nohighlight">\(T\)</span> against the control update when updating the
+optimization variables according to <a class="reference internal" href="../algorithm/line_search.html#equation-eq-algopt-linesearchproblem">(6)</a>,
+the adaptation factor <span class="math notranslate nohighlight">\(\gamma_{T}\)</span> is set using the option <code class="docutils literal notranslate"><span class="pre">OptimTimeLineSearchFactor</span></code>.
+The value <span class="math notranslate nohighlight">\(\gamma_{T}=1.75\)</span> is used in the scenario. Note, however,
+that values <span class="math notranslate nohighlight">\(\gamma_{T}&lt;1\)</span> typically increase the algorithmic
+stability at the expense of the calculation time and vice versa.</p>
+<p>The numerical results for the free end time case are shown in
+<a class="reference internal" href="#fig-doubleint-timeopt-constr"><span class="std std-numref">Fig. 12</span></a>. In contrast to the first
+two simulation scenarios, the reduction of the end time below
+<span class="math notranslate nohighlight">\(4.6\,\mathrm{s}\)</span> allows one to carry out the setpoint
+transition with a significantly more aggressive control
+trajectory <span class="math notranslate nohighlight">\(u\)</span>. The free end time optimization is a more
+challenging problem than before and is accompanied by a higher
+computational effort. This can be observed both in the larger number of
+augmented Lagrangian steps and gradient steps as well as in terms of the
+slower improvement of the violation of the state constraints.</p>
+<p>Nevertheless, the state constraints are fulfilled at the last augmented
+Lagrangian step in accordance with the thresholds
+<span class="math notranslate nohighlight">\(\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}\)</span>
+and <span class="math notranslate nohighlight">\(\varepsilon_{\mb{h}}=1e-6\)</span>. The improvement of
+the control performance when optimizing the end time compared to a fixed
+end time can be specified by the lower value of the cost functional,
+cf. <a class="reference internal" href="#fig-doubleint-constr"><span class="std std-numref">Fig. 11</span></a> and <a class="reference internal" href="#fig-doubleint-timeopt-constr"><span class="std std-numref">Fig. 12</span></a>.
+However, this results in a slightly increased computation time of 21.96ms compared to 14.66ms
+with a fixed end time on the same Windows 10 machine.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="PMSM.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Model predictive control of a PMSM</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="CSTR.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Moving horizon estimation of a CSTR</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-with-fixed-end-time">Optimization with fixed end time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-with-free-end-time">Optimization with free end time</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

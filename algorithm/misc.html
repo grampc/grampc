@@ -1,0 +1,693 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Convergence criterion &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'algorithm/misc';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Usage of GRAMPC" href="../usage/usage.html" />
+    <link rel="prev" title="Update of multipliers and penalties" href="multiplier_update.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/algorithm/misc.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Convergence criterion</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Convergence criterion</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling">Scaling</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#control-shift">Control shift</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#status-flags">Status flags</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="convergence-criterion">
+<span id="sec-algopt-convcheck"></span><h1>Convergence criterion<a class="headerlink" href="#convergence-criterion" title="Link to this heading">#</a></h1>
+<p>While the usage of fixed iteration counts <span class="math notranslate nohighlight">\(i_\text{max}\)</span> and
+<span class="math notranslate nohighlight">\(j_\text{max}\)</span> for the outer and inner loops is typical in
+real-time MPC or MHE applications, GRAMPC also provides an optional
+convergence check that is useful for solving optimal control or
+parameter optimization problems, or if the computation time in MPC is of
+minor importance.</p>
+<p>The inner gradient loop in <a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>
+evaluates the maximum relative gradient</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-relgrad">
+<span class="eqno">(17)<a class="headerlink" href="#equation-eq-algopt-relgrad" title="Link to this equation">#</a></span>\[\eta^{i|j+1} =
+\max\left\{
+\frac{ \|\mb{u}^{i|j+1} - \mb{u}^{i|j}\|_{L_2} }
+     { \|\mb{u}^{i|j+1}\|_{L_2} } \,,
+\frac{ \left\| \mb{p}^{i|j+1} - \mb{p}^{i|j} \right\|_2 }
+     { \left\| \mb{p}^{i|j+1} \right\|_2 } \,,
+\frac{ |T^{i|j+1} - T^{i|j}| }
+     { T^{i|j+1} }
+\right\}\]</div>
+<p>in each iteration <span class="math notranslate nohighlight">\(i|j\)</span> and terminates if</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-convgradient">
+<span class="eqno">(18)<a class="headerlink" href="#equation-eq-algopt-convgradient" title="Link to this equation">#</a></span>\[\eta^{i|j} \leq \varepsilon_\text{rel,c} \,.\]</div>
+<p>Otherwise, the inner loop is continued until the maximum number of
+iterations <span class="math notranslate nohighlight">\(j_\text{max}\)</span> is reached. The last value
+<span class="math notranslate nohighlight">\(\eta^{i} = \eta^{i|j+1}\)</span> is returned to the outer loop and used
+for the convergence check as well as for the update of multipliers and
+penalties.</p>
+<p>The augmented Lagrangian loop is terminated in iteration <span class="math notranslate nohighlight">\(i\)</span> if
+the inner loop is converged, that is
+<span class="math notranslate nohighlight">\(\eta^{i} \leq \varepsilon_\text{rel,c}\)</span>, and all constraints are
+sufficiently satisfied, i.e.</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-convconstraints">
+<span class="eqno">(19)<a class="headerlink" href="#equation-eq-algopt-convconstraints" title="Link to this equation">#</a></span>\[\begin{split}\begin{bmatrix}
+|\mb{g}^{i}(t)| \\ \mb{\max}\{\mb{0}, \mb{\bar h}^{i}(t)\}
+\end{bmatrix}
+\leq
+\begin{bmatrix}
+\mb{\varepsilon}_g \\ \mb{\varepsilon}_h
+\end{bmatrix}
+\, \forall t \in [0, T]
+\quad \land \quad
+\begin{bmatrix}
+|\mb{g}_T^{i}| \\ \mb{\max}\{\mb{0}, \mb{\bar h}_T^{i}\}
+\end{bmatrix}
+\leq
+\begin{bmatrix}
+\mb{\varepsilon}_{g_T} \\ \mb{\varepsilon}_{h_T}
+\end{bmatrix} \,,\end{split}\]</div>
+<p>whereby the notation <span class="math notranslate nohighlight">\(|\cdot|\)</span> denotes the
+component-wise absolute value. Otherwise, the outer loop is continued
+until the maximum number of iterations <span class="math notranslate nohighlight">\(i_\text{max}\)</span> is reached.
+The thresholds
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_g, \mb{\varepsilon}_h, \mb{\varepsilon}_{g_T}, \mb{\varepsilon}_{h_T}\)</span>
+are vector-valued in order to rate each constraint individually.</p>
+<p>The following options can be used to adjust the convergence criterion:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code>: This option activates the convergence criterion. Otherwise, the
+inner and outer loops always perform the maximum number of
+iterations, see the options <code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code> and <code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConvergenceGradientRelTol</span></code>: This option sets the threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,c}\)</span> for
+the maximum relative gradient of the inner minimization problem that
+is used in the convergence criterion. Note that this threshold is
+different from the one that is used in the update of multipliers and
+penalties.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>: Thresholds
+<span class="math notranslate nohighlight">\((\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}\)</span>
+for the equality, inequality, terminal equality, and terminal
+inequality constraints.</p></li>
+</ul>
+</section>
+<section id="scaling">
+<span id="sec-algopt-scaling"></span><h1>Scaling<a class="headerlink" href="#scaling" title="Link to this heading">#</a></h1>
+<p>Scaling is recommended for improving the numerical conditioning when the
+states <span class="math notranslate nohighlight">\(\mb{x}\)</span> and the optimization variables
+<span class="math notranslate nohighlight">\((\mb{u}, \mb{p}, T)\)</span> of the given optimization
+problem differ in several orders of magnitude. Although GRAMPC allows
+one to scale a specific problem automatically using the option
+<code class="docutils literal notranslate"><span class="pre">ScaleProblem=1</span></code>, it should be noted that this typically increases the
+computational load due to the additional multiplications in the
+algorithm, cf. the tutorial on controlling a permanent magnet
+synchronous machine in <a class="reference internal" href="../tutorials/PMSM.html#sec-tut-pmsm"><span class="std std-ref">Model predictive control of a PMSM</span></a>. This issue can
+be avoided by directly formulating the scaled problem within the C file
+template <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> included in the folder
+<code class="docutils literal notranslate"><span class="pre">examples/TEMPLATE</span></code>, also see <a class="reference internal" href="../problem_formulation/implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>.</p>
+<p>The scaling in GRAMPC is performed according to</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-scaling">
+<span class="eqno">(20)<a class="headerlink" href="#equation-eq-algopt-scaling" title="Link to this equation">#</a></span>\[\begin{split}\bar{\mb{x}}(t) &amp; = (\mb{x}(t) - \mb{x}_{\text{offset}}) \,./\, \mb{x}_{\text{scale}} \\
+\bar{\mb{u}}(t) &amp; = (\mb{u}(t) - \mb{u}_{\text{offset}}) \,./\, \mb{u}_{\text{scale}} \\
+\bar{\mb{p}} &amp; = (\mb{p} - \mb{p}_{\text{offset}}) \,./\, \mb{p}_{\text{scale}} \\
+\bar T &amp; = \frac{T - T_{\text{offset}}}{T_{\text{scale}}} \,,\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mb{x}_{\text{offset}} \in \mathbb{R}^x\)</span>,
+<span class="math notranslate nohighlight">\(\mb{u}_{\text{offset}} \in \mathbb{R}^u\)</span>,
+<span class="math notranslate nohighlight">\(\mb{p}_{\text{offset}} \in \mathbb{R}^p\)</span> and
+<span class="math notranslate nohighlight">\(\mb{T}_\text{offset} \in \mathbb{R}\)</span> denote offset values
+and <span class="math notranslate nohighlight">\(\mb{x}_{\text{scale}} \in \mathbb{R}^x\)</span>,
+<span class="math notranslate nohighlight">\(\mb{u}_{\text{scale}} \in \mathbb{R}^u\)</span>,
+<span class="math notranslate nohighlight">\(\mb{p}_{\text{scale}} \in \mathbb{R}^p\)</span> and
+<span class="math notranslate nohighlight">\(\mb{T}_\text{scale} \in \mathbb{R}\)</span> are scaling values.
+The symbol <span class="math notranslate nohighlight">\(./\)</span> in <a class="reference internal" href="#equation-eq-algopt-scaling">(20)</a>
+denotes element-wise division by the scaling vectors.</p>
+<p>Furthermore, GRAMPC provides a scaling factor <span class="math notranslate nohighlight">\(J_\text{scale}\)</span>
+for the cost functional as well as scaling factors
+<span class="math notranslate nohighlight">\(\mb{c}_\text{scale} = [\mb{c}_{\text{scale},\mb{g}}, \mb{c}_{\text{scale},\mb{h}}, \mb{c}_{\text{scale},\mb{g}_T}, \mb{c}_{\text{scale},\mb{h}_T}] \in \mathbb{R}^{N_c}\)</span>
+for the constraints. The scaling of the cost functional is relevant as
+the constraints are adjoined to the cost functional by means of
+Lagrangian multipliers and penalty parameters and the original cost
+functional should be of the same order of magnitude as these additional
+terms.</p>
+<p>The following options can be used to adjust the scaling:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ScaleProblem</span></code>: Activates or deactivates scaling. Note that GRAMPC requires more
+computation time if scaling is active.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xScale</span></code>, <code class="docutils literal notranslate"><span class="pre">xOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{x}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{x}_\text{offset}\)</span> for each state variable.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">uScale</span></code>, <code class="docutils literal notranslate"><span class="pre">uOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{u}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{u}_\text{offset}\)</span> for each control variable.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pScale</span></code>, <code class="docutils literal notranslate"><span class="pre">pOffset</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{p}_\text{scale}\)</span> and offsets
+<span class="math notranslate nohighlight">\(\mb{p}_\text{offset}\)</span> for each parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TScale</span></code>, <code class="docutils literal notranslate"><span class="pre">TOffset</span></code>: Scaling factor <span class="math notranslate nohighlight">\(T_\text{scale}\)</span> and offset
+<span class="math notranslate nohighlight">\(T_\text{offset}\)</span> for the horizon length.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">JScale</span></code>: Scaling factor <span class="math notranslate nohighlight">\(J_\text{scale}\)</span> for the cost functional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cScale</span></code>: Scaling factors <span class="math notranslate nohighlight">\(\mb{c}_\text{scale}\)</span> for each state
+constraint. The elements of the vector refer to the equality,
+inequality, terminal equality and terminal inequality constraints.</p></li>
+</ul>
+</section>
+<section id="control-shift">
+<span id="sec-algopt-controlshift"></span><h1>Control shift<a class="headerlink" href="#control-shift" title="Link to this heading">#</a></h1>
+<p>The principle of optimality for an infinite horizon MPC problem
+motivates to shift the control trajectory <span class="math notranslate nohighlight">\(\mb{u}(t)\)</span>,
+<span class="math notranslate nohighlight">\(t\in[0,T]\)</span> from the previous MPC step <span class="math notranslate nohighlight">\(k-1\)</span> by the sampling
+time <span class="math notranslate nohighlight">\(\Delta t\)</span> before the first GRAMPC iteration in the current
+MPC step <span class="math notranslate nohighlight">\(k\)</span>,
+cf. <a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>.
+The last time segment of the shifted trajectory is hold on the last
+value of the trajectory. Shifting the control can lead to a faster
+convergence behavior of the gradient algorithm for many MPC problems.</p>
+<p>If the control shift is activated for a problem with free end time
+<span class="math notranslate nohighlight">\(T\)</span>, GRAMPC assumes a shrinking horizon problem, because time
+optimization is unusual in classical model predictive control. The
+principle of optimality then motivates to subtract the sampling time
+from the horizon <span class="math notranslate nohighlight">\(T\)</span> after each MPC step, which corresponds to a
+control shift for the end time.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ShiftControl</span></code>: Activates or deactivates the shifting of the control trajectory and
+the adaptation of <span class="math notranslate nohighlight">\(T\)</span> in case of a free end time, i.e., if <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> is
+active.</p></li>
+</ul>
+</section>
+<section id="status-flags">
+<span id="sec-algopt-statusflags"></span><h1>Status flags<a class="headerlink" href="#status-flags" title="Link to this heading">#</a></h1>
+<p>Several status flags are set in the solution structure
+<code class="docutils literal notranslate"><span class="pre">grampc.sol.status</span></code> during the execution of
+<a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>.
+These flags can be printed as short messages by the function
+<code class="docutils literal notranslate"><span class="pre">grampc_printstatus</span></code> for the levels error, warn, info and debug.</p>
+<p>The following status flags are printed on the level
+<code class="docutils literal notranslate"><span class="pre">STATUS_LEVEL_ERROR</span></code> and require immediate action:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INTEGRATOR_INPUT_NOT_CONSISTENT</span></code>: This flag is set by the integrator <code class="docutils literal notranslate"><span class="pre">rodas</span></code> if the input values
+are not consistent. See <a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for
+further details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INTEGRATOR_MAXSTEPS</span></code>: This flag is set by the integrators <code class="docutils literal notranslate"><span class="pre">ruku45</span></code> or <code class="docutils literal notranslate"><span class="pre">rodas</span></code> if too
+many steps are required.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INTEGRATOR_STEPS_TOO_SMALL</span></code>: This flag is set by the integrator <code class="docutils literal notranslate"><span class="pre">rodas</span></code> if the step size
+becomes too small.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INTEGRATOR_MATRIX_IS_SINGULAR</span></code>: This flag is set by the integrator <code class="docutils literal notranslate"><span class="pre">rodas</span></code> if a singular Jacobian
+<span class="math notranslate nohighlight">\(\frac{\partial \mb{f}}{\partial \mb{x}}\)</span> or
+<span class="math notranslate nohighlight">\(\left(\frac{\partial \mb{f}}{\partial \mb{x}}\right)^\mathsf{T}\)</span>
+is detected. See <a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for further
+details.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INTEGRATOR_H_MIN</span></code>: This flag is set by the integrator <code class="docutils literal notranslate"><span class="pre">ruku45</span></code> if a smaller step
+size than the minimal allowed value is required.</p></li>
+</ul>
+<p>The following flags are printed in addition to the previous ones on the
+level <code class="docutils literal notranslate"><span class="pre">STATUS_LEVEL_WARN</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_MULTIPLIER_MAX</span></code>: This flag is set if one of the multipliers
+<span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span> reaches the upper limit
+<span class="math notranslate nohighlight">\(\mu_\text{max}\)</span> or the lower limit <span class="math notranslate nohighlight">\(-\mu_\text{max}\)</span>.
+The situation may occur for example if the problem is infeasible or
+ill-conditioned or if the penalty parameters are too high.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_PENALTY_MAX</span></code>: This flag is set if one of the penalty parameters
+<span class="math notranslate nohighlight">\(\mb{\bar c}\)</span> reaches the upper limit
+<span class="math notranslate nohighlight">\(c_\text{max}\)</span>. The situation may occur for example if the
+problem is infeasible or ill-conditioned or if the penalty increase
+factor <span class="math notranslate nohighlight">\(\beta_{\mathrm{in}}\)</span> is too high.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_INFEASIBLE</span></code>: This flag is set if the constraints are not satisfied and one run
+of <a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>
+does not reduce the norm of the constraints. The situation may occur
+in single runs, if few iterations <span class="math notranslate nohighlight">\(i_\text{max}\)</span> and
+<span class="math notranslate nohighlight">\(j_\text{max}\)</span> are used for a suboptimal solution. However, if
+the flag is set in multiple successive runs, it is a strong indicator
+for an infeasible optimization problem.</p></li>
+</ul>
+<p>The following flags are printed in addition to the previous ones on the
+level <code class="docutils literal notranslate"><span class="pre">STATUS_LEVEL_INFO</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_GRADIENT_CONVERGED</span></code>: This flag is set if the convergence check is activated and the
+relative tolerance <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,c}\)</span> is satisfied for
+the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span>, the parameters
+<span class="math notranslate nohighlight">\(\mb{p}\)</span>, and the end time <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_CONSTRAINTS_CONVERGED</span></code>: This flag is set if the convergence check is activated and the
+absolute tolerances
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_g, \mb{\varepsilon}_h, \mb{\varepsilon}_{g_T}, \mb{\varepsilon}_{h_T}\)</span>
+are satisfied for all constraints.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_LINESEARCH_INIT</span></code>: This flag is set if the gradient algorithm uses the initial step
+size <span class="math notranslate nohighlight">\(\alpha_\text{init}\)</span> as fallback for the explicit line
+search strategy in one iteration.</p></li>
+</ul>
+<p>The following flags are printed in addition to the previous ones on the
+level <code class="docutils literal notranslate"><span class="pre">STATUS_LEVEL_DEBUG</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_LINESEARCH_MAX</span></code>: This flag is set if the gradient algorithm uses the maximum step
+size <span class="math notranslate nohighlight">\(\alpha_\text{max}\)</span> in one iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_LINESEARCH_MIN</span></code>: This flag is set if the gradient algorithm uses the minimum step
+size <span class="math notranslate nohighlight">\(\alpha_\text{min}\)</span> in one iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">STATUS_MULTIPLIER_UPDATE</span></code>: This flag is set if the relative tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span> is satisfied for the controls
+<span class="math notranslate nohighlight">\(\mb{u}\)</span>, the parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span> and the
+end time <span class="math notranslate nohighlight">\(T\)</span> and therefore the update of the multipliers
+<span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span> and the penalty parameters
+<span class="math notranslate nohighlight">\(\mb{\bar c}\)</span> is performed, cf. <a class="reference internal" href="multiplier_update.html#sec-algopt-updatemultpen"><span class="std std-ref">Update of multipliers and penalties</span></a>.</p></li>
+</ul>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-rodas-webpage-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>RODAS. Webpage. <a class="reference external" href="http://www.unige.ch/~hairer/software.html">http://www.unige.ch/~hairer/software.html</a>, Accessed 01-December-2018.</p>
+</aside>
+</aside>
+</div>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="multiplier_update.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Update of multipliers and penalties</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../usage/usage.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Usage of GRAMPC</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Convergence criterion</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#scaling">Scaling</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#control-shift">Control shift</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#status-flags">Status flags</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,920 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Problem implementation &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'problem_formulation/implementation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Optimization algorithm and options" href="../algorithm/algorithm.html" />
+    <link rel="prev" title="Problem formulation and implementation" href="problem_formulation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="problem_formulation.html">Problem formulation and implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/problem_formulation/implementation.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Problem implementation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-involving-explicit-odes">Problems involving explicit ODEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-with-discrete-time-systems">Problems with discrete-time systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-involving-semi-implicit-odes-and-daes">Problems involving semi-implicit ODEs and DAEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-differences-and-gradient-check">Finite differences and gradient check</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-ball-on-plate-system">Example: Ball-on-plate system</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="problem-implementation">
+<span id="sec-problemimplementation"></span><h1>Problem implementation<a class="headerlink" href="#problem-implementation" title="Link to this heading">#</a></h1>
+<p>Regardless of what kind of problem statement is considered (i.e. model predictive control, moving horizon estimation or parameter estimation), the optimization problem <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a> must be implemented in C, cf. <a class="reference internal" href="../install.html#fig-grampcgeneralstructure"><span class="std std-numref">Fig. 1</span></a>
+For this purpose, the C file template <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> is provided within the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATE</span></code>, which allows one to describe the structure of the optimization problem <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>, the cost functional <span class="math notranslate nohighlight">\(J\)</span> to be minimized, the system dynamics <span class="math notranslate nohighlight">\(f\)</span>, and the constraints <span class="math notranslate nohighlight">\(\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T}\)</span>.
+The number of C functions to be provided depends on the type of dynamics <span class="math notranslate nohighlight">\(f\)</span> of the specific problem at hand.</p>
+<section id="problems-involving-explicit-odes">
+<span id="sec-problemimplementation-explicit"></span><h2>Problems involving explicit ODEs<a class="headerlink" href="#problems-involving-explicit-odes" title="Link to this heading">#</a></h2>
+<p>A special case of the system dynamics <span class="math notranslate nohighlight">\(f\)</span> and certainly the most important one concerns ordinary differential equations (ODEs) with explicit appearance of the first-order derivatives</p>
+<div class="math notranslate nohighlight">
+\[\mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\,,\]</div>
+<p>corresponding to the identity mass matrix <span class="math notranslate nohighlight">\(\mb{M}=\mb{I}\)</span> in OCP <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.
+In this case, the following functions of the C template file <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> have to be provided:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code>: Definition of the dimensions of the considered problem, i.e. the
+number of state variables <span class="math notranslate nohighlight">\({N_{\mb{x}}}\)</span>, control
+variables <span class="math notranslate nohighlight">\({N_{\mb{u}}}\)</span>, parameters
+<span class="math notranslate nohighlight">\({N_{\mb{p}}}\)</span>, equality constraints
+<span class="math notranslate nohighlight">\({N_{\mb{g}}}\)</span>, inequality constraints
+<span class="math notranslate nohighlight">\({N_{\mb{h}}}\)</span>, terminal equality constraints
+<span class="math notranslate nohighlight">\({N_{{\mb{g}}_T}}\)</span>, and terminal inequality constraints
+<span class="math notranslate nohighlight">\(N_{{\mb{h}}_T}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ffct</span></code>: Formulation of the system dynamics function
+<span class="math notranslate nohighlight">\(\mb{f}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dfdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdp_vec</span></code>: Matrix vector products
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}\)</span>
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}\)</span>
+for the system dynamics with an arbitrary vector
+<span class="math notranslate nohighlight">\(\mb{v}\)</span> of dimension <span class="math notranslate nohighlight">\(N_x\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Vfct</span></code>, <code class="docutils literal notranslate"><span class="pre">lfct</span></code>: Terminal and integral cost functions <span class="math notranslate nohighlight">\(V\)</span> and <span class="math notranslate nohighlight">\(l\)</span> of
+the cost functional <span class="math notranslate nohighlight">\(J\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dVdx</span></code>, <code class="docutils literal notranslate"><span class="pre">dVdp</span></code>, <code class="docutils literal notranslate"><span class="pre">dVdT</span></code>, <code class="docutils literal notranslate"><span class="pre">dldx</span></code>, <code class="docutils literal notranslate"><span class="pre">dldu</span></code>, <code class="docutils literal notranslate"><span class="pre">dldp</span></code>: Gradients
+<span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial \mb{x}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial \mb{p}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial T^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{x}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{u}^{}}\)</span>, and
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{p}^{}}\)</span> of the cost
+functions <code class="docutils literal notranslate"><span class="pre">Vfct</span></code> and <code class="docutils literal notranslate"><span class="pre">lfct</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hfct</span></code>, <code class="docutils literal notranslate"><span class="pre">gfct</span></code>: Inequality and equality constraint functions
+<span class="math notranslate nohighlight">\(\mb{h}\)</span> and <span class="math notranslate nohighlight">\(\mb{g}\)</span> as defined in
+<a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hTfct</span></code>, <code class="docutils literal notranslate"><span class="pre">gTfct</span></code>: Terminal inequality and equality constraint functions
+<span class="math notranslate nohighlight">\(\mb{h}_T\)</span> and <span class="math notranslate nohighlight">\(\mb{g}_T\)</span> as defined in
+<a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dhdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhdp_vec</span></code>: Matrix products
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}\)</span>,
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}\)</span>
+for the inequality constraints with an arbitrary vector
+<span class="math notranslate nohighlight">\(\mb{v}\)</span> of dimension <span class="math notranslate nohighlight">\(N_h\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dgdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dgdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dgdp_vec</span></code>: Matrix product functions
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}\)</span>,
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}\)</span>
+for the equality constraints with an arbitrary vector
+<span class="math notranslate nohighlight">\(\mb{v}\)</span> of dimension <span class="math notranslate nohighlight">\(N_g\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dhTdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhTdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhTdp_vec</span></code>: Matrix product functions
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}_T}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}_T}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}\)</span>,
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}_T}{\partial T^{}})^\mathsf{T}\mb{v}\)</span>
+for the terminal inequality constraints with an arbitrary vector
+<span class="math notranslate nohighlight">\(\mb{v}\)</span> of dimension <span class="math notranslate nohighlight">\(N_{h_T}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dgTdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dgTdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dgTdp_vec</span></code>: Matrix product functions
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}_T}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}_T}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}\)</span>,
+and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{g}_T}{\partial T^{}})^\mathsf{T}\mb{v}\)</span>
+for the terminal equality constraints with an arbitrary vector
+<span class="math notranslate nohighlight">\(\mb{v}\)</span> of dimension <span class="math notranslate nohighlight">\(N_{g_T}\)</span>.</p></li>
+</ul>
+<p>The respective problem function templates only have to be filled in if the corresponding constraints and cost functions are defined for the problem at hand and depending on the actual choice of optimization variables (<span class="math notranslate nohighlight">\({\mb{u}}\)</span>, <span class="math notranslate nohighlight">\({\mb{p}}\)</span>, and/or <span class="math notranslate nohighlight">\({T}\)</span>).
+For example, if only the control <span class="math notranslate nohighlight">\(\mb{u}\)</span> is optimized, the partial derivatives with respect to <span class="math notranslate nohighlight">\(\mb{p}\)</span> and <span class="math notranslate nohighlight">\(T\)</span> are not required.</p>
+<p>The gradients <span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial \mb{x}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial \mb{p}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} V}{\partial T^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{x}^{}}\)</span>,
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{u}^{}}\)</span>, and
+<span class="math notranslate nohighlight">\(\frac{\partial^{} l}{\partial \mb{p}^{}}\)</span> as well as the
+matrix product functions listed above appear in the partial derivatives
+<span class="math notranslate nohighlight">\(H_{\mb{x}}\)</span>, <span class="math notranslate nohighlight">\(H_{\mb{u}}\)</span> and
+<span class="math notranslate nohighlight">\(H_{\mb{p}}\)</span> of the Hamiltonian <span class="math notranslate nohighlight">\(H\)</span> within the
+gradient method (see <a class="reference internal" href="../algorithm/optimization_algorithm.html#sec-algopt-projgrad"><span class="std std-ref">Projected gradient method</span></a>). The
+matrix product formulation is chosen over the definition of Jacobians
+(e.g. <span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span> instead of <span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span>)
+in order to avoid unnecessary zero multiplications for sparse matrices or alternatively the usage of sparse numerics.</p>
+</section>
+<section id="problems-with-discrete-time-systems">
+<span id="sec-problemimplementation-discrete"></span><h2>Problems with discrete-time systems<a class="headerlink" href="#problems-with-discrete-time-systems" title="Link to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version v2.3.</span></p>
+</div>
+<p>GRAMPC also allows to consider discrete-time system dynamics of the form</p>
+<div class="math notranslate nohighlight">
+\[\mb{x}_{k+1} = \mb{f}(\mb{x}_k, \mb{u}_k, \mb{p}, t_k)\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mb{x}_k = \mb x(t_k)\)</span> and <span class="math notranslate nohighlight">\(\mb{u}_k = \mb u(t_k)\)</span>.
+For this case the same functions as in <a class="reference internal" href="#sec-problemimplementation-explicit"><span class="std std-ref">Problems involving explicit ODEs</span></a> are used to implement the problem description but the option <code class="docutils literal notranslate"><span class="pre">Integrator</span></code> is set to <code class="docutils literal notranslate"><span class="pre">discrete</span></code>.
+Since the discrete <code class="docutils literal notranslate"><span class="pre">ffct</span></code> computes the system dynamics for a fixed sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span> (Parameter <code class="docutils literal notranslate"><span class="pre">dt</span></code>), the end time <span class="math notranslate nohighlight">\(T\)</span> (Parameter <code class="docutils literal notranslate"><span class="pre">Thor</span></code>) of the optimization problem must satisfy</p>
+<div class="math notranslate nohighlight">
+\[T = (N_{\text{hor}} - 1) \Delta t\]</div>
+<p>with the number of discretization points along the horizon <span class="math notranslate nohighlight">\(N_{\text{hor}}\)</span> (Option <code class="docutils literal notranslate"><span class="pre">Nhor</span></code>).
+As a consequence it is no longer possible to consider a free end time, where <span class="math notranslate nohighlight">\(T\)</span> is an optimization variable, since this would change the sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span>.
+Note that for continuous-time system dynamics the sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span> can be chosen independently of the end time <span class="math notranslate nohighlight">\(T\)</span> and the number of discretizaton points <span class="math notranslate nohighlight">\(N_{\text{hor}}\)</span>, because it is only used for predicting the next state <code class="docutils literal notranslate"><span class="pre">grampc.sol.xnext</span></code> and for the control shift.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For discrete-time systems the option <code class="docutils literal notranslate"><span class="pre">Integrator</span></code> is set to <code class="docutils literal notranslate"><span class="pre">discrete</span></code>, the settings <code class="docutils literal notranslate"><span class="pre">Nhor</span></code>, <code class="docutils literal notranslate"><span class="pre">Thor</span></code> and <code class="docutils literal notranslate"><span class="pre">dt</span></code> need to satisfy the relation <code class="docutils literal notranslate"><span class="pre">Thor</span> <span class="pre">=</span> <span class="pre">(Nhor-1)*dt</span></code> and the option <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> must be set to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p>
+</div>
+<p>An MPC example that compares continuous-time and discrete-time versions of a double integrator is included in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Continuous_vs_Discrete</span></code>.
+Furthermore, a discrete-time formulation of the helicopter example is provided in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Continuous_vs_Discrete</span></code>.</p>
+</section>
+<section id="problems-involving-semi-implicit-odes-and-daes">
+<span id="sec-problemimplementation-implicit"></span><h2>Problems involving semi-implicit ODEs and DAEs<a class="headerlink" href="#problems-involving-semi-implicit-odes-and-daes" title="Link to this heading">#</a></h2>
+<p>Beside explicit ODEs, GRAMPC supports semi-implicit ODEs with mass
+matrix <span class="math notranslate nohighlight">\(\mb{M} \neq \mb{I}\)</span> and DAEs with
+<span class="math notranslate nohighlight">\(\mb{M}\)</span> being singular. The underlying numerical
+integrations of the dynamics <span class="math notranslate nohighlight">\(f\)</span> is
+carried out using the integrator
+RODAS <a class="footnote-reference brackets" href="#footcite-hairer-book-1996-stiff" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. In
+this case, additional C functions must be provided and several
+RODAS-specific options must be set, cf. <a class="reference internal" href="../algorithm/numerical_integration.html#sec-algopt-integrationrodas"><span class="std std-ref">Integration of semi-implicit ODEs and DAEs (RODAS)</span></a> and <a class="reference internal" href="../usage/usage_c.html#sec-setting-opt-par"><span class="std std-ref">Setting options and parameters</span></a>.
+Especially, the option
+<code class="docutils literal notranslate"><span class="pre">IMAS</span> <span class="pre">=</span> <span class="pre">1</span></code> must be set to indicate that a mass matrix is given. The
+numerical integrations performed with RODAS can be accelerated by
+providing partial derivatives. In summary, the following additional C
+functions are used by GRAMPC for semi-implicit ODEs and DAE systems:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Mfct</span></code>, <code class="docutils literal notranslate"><span class="pre">Mtrans</span></code>: Definition of the mass matrix <span class="math notranslate nohighlight">\(\mb{M}\)</span> and its
+transpose <span class="math notranslate nohighlight">\(\mb{M}^\mathsf{T}\)</span>, which is required for
+the adjoint dynamics, cf. <a class="reference internal" href="../algorithm/optimization_algorithm.html#sec-algopt-projgrad"><span class="std std-ref">Projected gradient method</span></a> in
+the projected gradient algorithm. The matrices must be specified
+column-wise. If the mass matrix has a band structure, only the
+respective elements above and below the main diagonal are specified.
+This only applies if the options <code class="docutils literal notranslate"><span class="pre">IMAS</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">MLJAC</span> <span class="pre">&lt;</span> <span class="pre">N_x</span></code> are
+selected. Non-existent elements above or below the main diagonal must
+be filled with zeros so that the same number of elements is specified
+for each column.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dfdx</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdxtrans</span></code>: The Jacobians
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span> and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}=\frac{\partial^{2} H}{\partial \mb{x}\partial \mb{\lambda}}\)</span>
+are provided by these functions if the option <code class="docutils literal notranslate"><span class="pre">IJAC</span> <span class="pre">=</span> <span class="pre">1</span></code> is set.
+This allows one to evaluate the right hand sides of the canonical
+equations time efficiently. The Jacobians must be implemented in
+vector form by arranging the successive columns for
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}\)</span> and
+<span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\)</span>.
+If the option <code class="docutils literal notranslate"><span class="pre">MLJAC</span> <span class="pre">&lt;</span> <span class="pre">N_x</span></code> is set to exploit the band structure of
+the Jacobians, only the corresponding elements above and below the
+main diagonal must be specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dfdt</span></code>, <code class="docutils literal notranslate"><span class="pre">dHdxdt</span></code>: The partial derivatives
+<span class="math notranslate nohighlight">\(\frac{\partial^{} \mb{f}}{\partial t^{}}\)</span> and
+<span class="math notranslate nohighlight">\(\frac{\partial^{2} H}{\partial \mb{x}\partial t}\)</span>
+allow for evaluating the right hand sides of the canonical equations
+time efficiently, if the problem explicitly depends on time
+<span class="math notranslate nohighlight">\(t\)</span>. These functions must only be provided if the options
+<code class="docutils literal notranslate"><span class="pre">IFCN</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">IDFX</span> <span class="pre">=</span> <span class="pre">1</span></code> are used.</p></li>
+</ul>
+<p>An MPC example with a semi-implicit system dynamics is included in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Reactor_PDE</span></code>.
+The problem formulation is derived from a quasi-linear
+diffusion-convection-reaction system that is spatially discretized using
+finite elements.</p>
+</section>
+<section id="finite-differences-and-gradient-check">
+<span id="sec-finite-diff"></span><h2>Finite differences and gradient check<a class="headerlink" href="#finite-differences-and-gradient-check" title="Link to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version v2.3.</span></p>
+</div>
+<p>For the purpose of rapid prototyping, the partial derivatives can also be approximated by forward finite differences.
+To this end, the header <code class="docutils literal notranslate"><span class="pre">finite_diff.h</span></code> provides a helper function</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">finite_diff_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">,</span>
+<span class="w">                     </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">memory</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">step_size</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeFiniteTarget</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">func_out_size</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeFiniteDiffFctPtr</span><span class="w"> </span><span class="n">func</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>where the first eight arguments are the same as for typical functions in <code class="docutils literal notranslate"><span class="pre">probfct.h</span></code> and the other arguments are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">memory</span></code>: Sufficient user-provided memory of size at most <span class="math notranslate nohighlight">\(3 \cdot \max\{ N_x, N_u, N_p, N_g, N_h, N_{g_T}, N_{h_T} \}\)</span> that is needed for storing intermediate values.
+If used within a probfct, this memory should be provided via the <code class="docutils literal notranslate"><span class="pre">userparam</span></code> pointer to avoid dynamic memory allocation during the optimization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">step_size</span></code>: Small value used as step size for the finite differences.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target</span></code>: Argument with respect to which the finite differences are computed. Options are <code class="docutils literal notranslate"><span class="pre">DX</span></code> for states, <code class="docutils literal notranslate"><span class="pre">DU</span></code> for inputs, <code class="docutils literal notranslate"><span class="pre">DP</span></code> for parameters and <code class="docutils literal notranslate"><span class="pre">DT</span></code> for time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">func_out_size</span></code>: Size of the function’s <code class="docutils literal notranslate"><span class="pre">out</span></code> argument, e.g. <code class="docutils literal notranslate"><span class="pre">Nh</span></code> for <code class="docutils literal notranslate"><span class="pre">hfct</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">func</span></code>: Pointer to the function that is differentiated. For <code class="docutils literal notranslate"><span class="pre">Vfct</span></code>, <code class="docutils literal notranslate"><span class="pre">gTfct</span></code> and <code class="docutils literal notranslate"><span class="pre">hTfct</span></code> wrappers are provided with an unused dummy argument in place of the control <code class="docutils literal notranslate"><span class="pre">u</span></code>.</p></li>
+</ul>
+<p>The intended usage is shown in the template file <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE_finite_diff.c</span></code>.
+In addition, the helper function</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">finite_diff_dfdx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">,</span>
+<span class="w">                      </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">memory</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">step_size</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">ml</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">mu</span><span class="p">,</span><span class="w"> </span><span class="n">typeBoolean</span><span class="w"> </span><span class="n">transpose</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>approximates the partial derivatives of the <code class="docutils literal notranslate"><span class="pre">ffct</span></code> for semi-implicit ODEs and DAEs with the arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">memory</span></code>: Sufficient allocated memory for storing intermediate values of size <span class="math notranslate nohighlight">\(3 \cdot N_x\)</span>. If used within a probfct, this memory should be provided via the <code class="docutils literal notranslate"><span class="pre">userparam</span></code> pointer to avoid dynamic memory allocation during the optimization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">step_size</span></code>: Small value used as step size for the finite differences.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ml</span></code>: Number of lower non-zero diagonals if banded. Set to <code class="docutils literal notranslate"><span class="pre">Nx</span></code> for full matrix.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mu</span></code>: Number of upper non-zero diagonals if banded. Set to <code class="docutils literal notranslate"><span class="pre">Nx</span></code> for full matrix.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transpose</span></code>: Set to <code class="docutils literal notranslate"><span class="pre">0</span></code> for approximating <code class="docutils literal notranslate"><span class="pre">dfdx</span></code> and to <code class="docutils literal notranslate"><span class="pre">1</span></code> for approximating <code class="docutils literal notranslate"><span class="pre">dfdxtrans</span></code>.</p></li>
+</ul>
+<p>Finally, it is recommended to validate the user-supplied analytic gradients by comparison to finite differences.
+For this task, GRAMPC provides a helper function</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_check_gradients</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">tolerance</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">step_size</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>that checks the gradients at the initial point defined by <code class="docutils literal notranslate"><span class="pre">t0</span></code>, <code class="docutils literal notranslate"><span class="pre">x0</span></code>, <code class="docutils literal notranslate"><span class="pre">u0</span></code> and <code class="docutils literal notranslate"><span class="pre">p0</span></code>.
+The tolerance is applied element-wise to the relative error</p>
+<div class="math notranslate nohighlight">
+\[\left| \frac{\nabla \mb{f}_{fd,i} - \nabla \mb{f}_i}{\max(1, \nabla \mb{f}_i)} \right|\]</div>
+<p>where <span class="math notranslate nohighlight">\(\nabla \mb{f}_{fd,i}\)</span> is the finite difference approximation and <span class="math notranslate nohighlight">\(\nabla \mb{f}_i\)</span> the user-supplied derivative.
+If the tolerance is violated, the function prints messages like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dfdx_vec</span><span class="p">:</span> <span class="n">element</span> <span class="p">(</span><span class="n">out_index</span><span class="p">,</span><span class="n">vec_index</span><span class="p">)</span> <span class="n">exceeds</span> <span class="n">supplied</span> <span class="n">tolerance</span> <span class="k">with</span> <span class="mf">4.234546e-5</span>
+</pre></div>
+</div>
+<p>so that one is able to correct the wrong derivative.
+Recommended settings for the gradient check include a step size of <span class="math notranslate nohighlight">\(\sqrt{\text{eps}}\)</span> where <em>eps</em> is the floating point machine precision, and a tolerance of 1e-6.
+Nevertheless, the gradient checker can produce false positives, so every flagged gradient should be carefully checked.</p>
+</section>
+<section id="example-ball-on-plate-system">
+<span id="sec-ball-on-plate"></span><h2>Example: Ball-on-plate system<a class="headerlink" href="#example-ball-on-plate-system" title="Link to this heading">#</a></h2>
+<p>The appropriate definition of the C functions of the template
+<code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE</span></code> is described for the example of a ball-on-plate
+system <a class="footnote-reference brackets" href="#footcite-richter2012" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> in the context of MPC.
+The problem is also included in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples(BallOnPlate)</span></code>.
+The underlying optimization problem reads as</p>
+<div class="math notranslate nohighlight" id="equation-ballonplate">
+<span class="eqno">(2)<a class="headerlink" href="#equation-ballonplate" title="Link to this equation">#</a></span>\[\begin{split}% cost
+\min_{u(\cdot)} \quad &amp;J(u;\mb{x}_0) = \frac{1}{2}\Delta\mb{x}^\mathsf{T}(T) \mb{P} \Delta \mb{x}(T)+\frac{1}{2}\int_{0}^{T} \Delta \mb{x}^\mathsf{T}(\tau) \mb{Q} \Delta\mb{x}(\tau) + R \Delta u^2 \,{\rm d}\tau \\
+% dynamics and intial condition
+\text{s.t.} \quad &amp; \begin{bmatrix} \dot x_1 \\ \dot x_2\end{bmatrix}
+= \begin{bmatrix} 0 &amp; 1 \\ 0 &amp; 0\end{bmatrix}
+\begin{bmatrix} x_1\\ x_2\end{bmatrix} +
+\begin{bmatrix} -0.04 \\ -7.01\end{bmatrix}u \,, \quad \begin{bmatrix} x_1(0)\\ x_2(0)\end{bmatrix} = \begin{bmatrix} x_{k,1}\\ x_{k,2}\end{bmatrix}\\
+% state constraints
+&amp; \begin{bmatrix} -0.2\\-0.1\end{bmatrix}\le\begin{bmatrix} x_1\\ x_2 \end{bmatrix}\le\begin{bmatrix} 0.01\\0.1\end{bmatrix} \,, \quad |u| \le 0.0524\end{split}\]</div>
+<p>The cost functional in <a class="reference internal" href="#equation-ballonplate">(2)</a> penalizes the state and input error <span class="math notranslate nohighlight">\(\Delta \mb{x}=\mb{x}-\mb{x}_\text{des}\)</span> and <span class="math notranslate nohighlight">\(\Delta u=u-u_\text{des}\)</span> in a quadratic manner using the weights</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mb{P}=\mb{Q} = \begin{bmatrix} 100 &amp; 0 \\ 0 &amp; 10\end{bmatrix}, \quad
+R = 1.\end{split}\]</div>
+<p>The system dynamics in <a class="reference internal" href="#equation-ballonplate">(2)</a>
+describes a simplified linear model of a single axis of a ball-on-plate
+system <a class="footnote-reference brackets" href="#footcite-richter2012" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. An optimal solution of the
+optimization problem has to satisfy the input and state
+constraints present in <a class="reference internal" href="#equation-ballonplate">(2)</a>.</p>
+<p>The user must provide the C functions and to describe the general
+structure and the system dynamics of the optimization problem, also see <a class="reference internal" href="#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>.
+As shown in <a class="reference internal" href="#lis-genstruct"><span class="std std-numref">Listing 1</span></a>, the C function <code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code> is used to
+define the number of states, control inputs, and number of (terminal)
+inequality and equality constraints. Note that GRAMPC uses the generic
+type <code class="docutils literal notranslate"><span class="pre">typeInt</span></code> for integer values. The word size of this integer type can be
+changed in the header file <code class="docutils literal notranslate"><span class="pre">grampc_macro.h</span></code> within the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/include</span></code>.
+This is particularly advantageous with regard to implementing GRAMPC on embedded hardware.</p>
+<div class="literal-block-wrapper docutils container" id="lis-genstruct">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">Settings of the general structure of optimization problem <a class="reference internal" href="#equation-ballonplate">(2)</a>.</span><a class="headerlink" href="#lis-genstruct" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** OCP dimensions **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ocp_dim</span><span class="p">(</span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nx</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nu</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Np</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Ng</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">Nh</span><span class="p">,</span>
+<span class="w">             </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">NgT</span><span class="p">,</span><span class="w"> </span><span class="n">typeInt</span><span class="w"> </span><span class="o">*</span><span class="n">NhT</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="o">*</span><span class="n">Nx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">Nu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">Np</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">Nh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">Ng</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">NhT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="o">*</span><span class="n">NgT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The system dynamics are described by the C function <code class="docutils literal notranslate"><span class="pre">ffct</span></code> shown in
+<a class="reference internal" href="#lis-sysdyn"><span class="std std-numref">Listing 2</span></a>. The example is given in explicit
+ODE form, for which the functions <code class="docutils literal notranslate"><span class="pre">Mfct</span></code> and <code class="docutils literal notranslate"><span class="pre">Mtrans</span></code> for the mass matrix <span class="math notranslate nohighlight">\(M\)</span> are
+not required. Similar to the generic integer type <code class="docutils literal notranslate"><span class="pre">typeInt</span></code>, the data type <code class="docutils literal notranslate"><span class="pre">typeRNum</span></code> is
+used to adress floating point numbers of different word sizes, e.g.
+float or double (cf. the header file <code class="docutils literal notranslate"><span class="pre">grampc_macro.h</span></code> included in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/include</span></code>).</p>
+<div class="literal-block-wrapper docutils container" id="lis-sysdyn">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">Formulation of the system dynamics of optimization problem <a class="reference internal" href="#equation-ballonplate">(2)</a>.</span><a class="headerlink" href="#lis-sysdyn" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** System function f(t,x,u,p,grampc.param,userparam) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">ffct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span>
+<span class="w">          </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="mf">-0.04</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w">     </span><span class="mf">-7.01</span><span class="o">*</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The cost functions are defined via the functions <code class="docutils literal notranslate"><span class="pre">lfct</span></code> and <code class="docutils literal notranslate"><span class="pre">Vfct</span></code>, cf. <a class="reference internal" href="#lis-cost"><span class="std std-numref">Listing 3</span></a>.
+Note that the input argument <code class="docutils literal notranslate"><span class="pre">userparam</span></code> is used to parametrize the cost functional in a generic way.</p>
+<div class="literal-block-wrapper docutils container" id="lis-cost">
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">Formulation of the cost functional of optimization problem <a class="reference internal" href="#equation-ballonplate">(2)</a>.</span><a class="headerlink" href="#lis-cost" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** Integral cost l(t,x(t),u(t),p,grampc.param,userparam) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">lfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span>
+<span class="w">          </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">xdes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">xdes</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">udes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">udes</span><span class="p">;</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">pCost</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">udes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">udes</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/** Terminal cost V(T,x(T),p,grampc.param,userparam) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">Vfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">xdes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">xdes</span><span class="p">;</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">pCost</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">            </span><span class="o">+</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="#lis-constraints"><span class="std std-numref">Listing 4</span></a> shows the formulation
+of the inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}\)</span>.
+For the sake of completeness,
+<a class="reference internal" href="#lis-constraints"><span class="std std-numref">Listing 4</span></a> also contains the
+corresponding functions for equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}\)</span>,
+terminal inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}\)</span>
+as well as terminal equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}\)</span>,
+which are not defined for the ball-on-plate example. Similar to the
+formulation of the cost functional, the input argument <code class="docutils literal notranslate"><span class="pre">userparam</span></code> is used to
+parametrize the inequality constraints.</p>
+<div class="literal-block-wrapper docutils container" id="lis-constraints">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">Formulation of the state constraints of optimization problem <a class="reference internal" href="#equation-ballonplate">(2)</a>.</span><a class="headerlink" href="#lis-constraints" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** Inequality constraints h(t,x(t),u(t),p,grampc.param,userparam) &lt;= 0 **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">hfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span>
+<span class="w">          </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">pSys</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">pSys</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">pSys</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">pSys</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="cm">/** Equality constraints g(t,x(t),u(t),p,grampc.param,userparam) = 0 **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">gfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span>
+<span class="w">          </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="cm">/** Terminal inequality constraints hT(T,x(T),p,grampc.param,userparam) &lt;= 0 **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">hTfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">           </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="cm">/** Terminal equality constraints gT(T,x(T),p,grampc.param,userparam) = 0 **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">gTfct</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">           </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The Jacobians of the single functions defined in
+<a class="reference internal" href="#lis-sysdyn"><span class="std std-numref">Listing 2</span></a> to <a class="reference internal" href="#lis-constraints"><span class="std std-numref">Listing 4</span></a>
+with respect to state <span class="math notranslate nohighlight">\(\mb{x}\)</span> and control
+<span class="math notranslate nohighlight">\(\mb{u}\)</span> are required for evaluating the optimality
+conditions of optimization problem
+<a class="reference internal" href="#equation-ballonplate">(2)</a> within the gradient
+algorithm, see <a class="reference internal" href="../algorithm/optimization_algorithm.html#sec-algopt-projgrad"><span class="std std-ref">Projected gradient method</span></a>. If applicable,
+the Jacobians of the above-mentioned functions are also required with
+respect to the optimization variables <span class="math notranslate nohighlight">\(\mb{p}\)</span> and
+<span class="math notranslate nohighlight">\(T\)</span>. <a class="reference internal" href="#lis-sysdynjacx"><span class="std std-numref">Listing 5</span></a> shows the
+corresponding Jacobians for the ball-on-plate example. For the matrix
+product functions <code class="docutils literal notranslate"><span class="pre">dfdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dfdu_vec</span></code>, and <code class="docutils literal notranslate"><span class="pre">dhdx_vec</span></code>, the pointer to a generic vector <code class="docutils literal notranslate"><span class="pre">vec</span></code> is
+passed as input argument that corresponds to the adjoint state,
+respectively a vector that accounts for the Lagrange multiplier and
+penalty term of state constraints,
+cf. <a class="reference internal" href="../algorithm/optimization_algorithm.html#sec-algopt-basicalgorithm"><span class="std std-ref">Optimization algorithm</span></a>. Note that <code class="docutils literal notranslate"><span class="pre">vec</span></code> is of
+appropriate dimension for the respective matrix product function,
+i.e. of dimension <span class="math notranslate nohighlight">\(N_{\mb{x}}\)</span> or
+<span class="math notranslate nohighlight">\(N_{\mb{h}}\)</span>. A complete C function template and further
+examples concerning the problem formulation are included in the GRAMPC
+software package.</p>
+<div class="literal-block-wrapper docutils container" id="lis-sysdynjacx">
+<div class="code-block-caption"><span class="caption-number">Listing 5 </span><span class="caption-text">Jacobians of the system dynamics and inequality constraint.</span><a class="headerlink" href="#lis-sysdynjacx" title="Link to this code">#</a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/** Jacobian df/dx multiplied by vector vec, i.e. (df/dx)^T*vec or vec^T*(df/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">              </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="cm">/** Jacobian df/du multiplied by vector vec, i.e. (df/du)^T*vec or vec^T*(df/du) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dfdu_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">              </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)(</span><span class="mf">-0.04</span><span class="p">)</span><span class="o">*</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)(</span><span class="mf">7.01</span><span class="p">)</span><span class="o">*</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="p">}</span>
+
+
+<span class="cm">/** Gradient dl/dx **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dldx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">xdes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">xdes</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="p">}</span>
+<span class="cm">/** Gradient dl/du **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dldu</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">udes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">udes</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">udes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="cm">/** Gradient dV/dx **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dVdx</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">pCost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">ctypeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="w">    </span><span class="n">ctypeRNum</span><span class="o">*</span><span class="w"> </span><span class="n">xdes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="o">-&gt;</span><span class="n">xdes</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pCost</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="cm">/** Jacobian dh/dx multiplied by vector vec, i.e. (dh/dx)^T*vec or vec^T*(dg/dx) **/</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">dhdx_vec</span><span class="p">(</span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="p">,</span>
+<span class="w">              </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">vec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPCparam</span><span class="w"> </span><span class="o">*</span><span class="n">param</span><span class="p">,</span><span class="w"> </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">vec</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+</div>
+<div class="docutils container" id="id5">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-hairer-book-1996-stiff" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>E. Hairer and G. Wanner. <em>Solving Ordinary Differential Equations: Stiff and Differential-Algebraic Problems</em>. Springer, Heidelberg, Germany, 1996.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-rodas-webpage-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>RODAS. Webpage. <a class="reference external" href="http://www.unige.ch/~hairer/software.html">http://www.unige.ch/~hairer/software.html</a>, Accessed 01-December-2018.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-richter2012" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>S. Richter. <em>Computational Complexity Certification of Gradient Methods for Real-Time Model Predictive Control</em>. PhD thesis, ETH Zürich, 2012.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="problem_formulation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Problem formulation and implementation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../algorithm/algorithm.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Optimization algorithm and options</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-involving-explicit-odes">Problems involving explicit ODEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-with-discrete-time-systems">Problems with discrete-time systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-involving-semi-implicit-odes-and-daes">Problems involving semi-implicit ODEs and DAEs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-differences-and-gradient-check">Finite differences and gradient check</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-ball-on-plate-system">Example: Ball-on-plate system</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

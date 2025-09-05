@@ -1,0 +1,945 @@
+.. _chap:Appendix:
+
+Appendix
+========
+
+In addition to a list of all parameters and algorithmic options of GRAMPC, this appendix contains a short description of the structure variable ``grampc``. 
+Essential C functions of the GRAMPC project are also listed.
+
+.. _sec:ListOfParameters:
+
+List of parameters
+------------------
+
+:numref:`tab:ListOfParameters` gives an overview of the problem-specific parameters of GRAMPC in terms of the parameter name and type as well as the admissible range and default values (if available), whereby the symbol :math:`\text{e}_n = [1,\ldots,1]^\mathsf{T}\in \mathbb{R}^n` denotes an :math:`n`-dimensional column vector.
+
+.. list-table:: Problem-specific parameters.
+    :name: tab:ListOfParameters
+    :widths: auto
+    :header-rows: 1
+
+    * - Parameter name
+      - Type
+      - Allowed values
+      - Default
+    * - ``x0``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - ``xdes``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``u0``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - ``udes``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - ``umax``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`+\infty\cdot \mathrm{e}_{Nx}`
+    * - ``umin``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`-\infty\cdot \mathrm{e}_{Nx}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``p0``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - ``pmax``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`+\infty\cdot \mathrm{e}_{Nx}`
+    * - ``pmin``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`-\infty\cdot \mathrm{e}_{Nx}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``Thor``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - To be provided
+    * - ``Tmax``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^8`
+    * - ``Tmin``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{-8}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``dt``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - To be provided
+    * - ``t0``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`0`
+    * - 
+      - 
+      - 
+      - 
+    * - ``userparam`` (in C)
+      - ``void*``
+      - User-defined
+      - ``NULL``
+    * - ``userparam`` (in MATLAB)
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - ``[]``
+
+
+A description of all parameters is as follows (see also :ref:`chap:ProblemFormulation`):
+
+-  ``x0``: Initial state vector :math:`\mb{x}(t_0)=\mb{x}_0` at the corresponding sampling time :math:`t_0`.
+
+-  ``xdes``: Desired (constant) setpoint vector for the state variables :math:`\mb{x}`.
+
+-  ``u0``: Initial value of the control vector :math:`\mb{u}(t) = \mb{u}_0 = \text{const.}`, :math:`t \in [0,T]` that is used in the first iteration of GRAMPC.
+
+-  ``udes``: Desired (constant) setpoint vector for the control variables :math:`\mb{u}`.
+
+-  ``umin``, ``umax`` : Lower and upper bounds for the control variables :math:`\mb{u}`.
+
+-  ``p0``: Initial value of the parameter vector :math:`\mb{p} = \mb{p}_0` that is used in the first iteration of GRAMPC.
+
+-  ``pmin``, ``pmax``: Lower and upper bounds for the parameters :math:`\mb{p}`.
+
+-  ``Thor``: Prediction horizon :math:`T` or initial value if the end time is optimized.
+
+-  ``Tmin``, ``Tmax``: Lower and upper bound for the prediction horizon :math:`T`.
+
+-  ``dt``: Sampling time :math:`\Delta t` of the considered system for model predictive control or moving horizon estimation. Required for prediction of next state ``grampc.sol.xnext`` and for the control shift, see :ref:`sec:AlgOpt:ControlShift`.
+
+-  ``t0``: Current sampling instance :math:`t_0` that is provided in the ``grampc.param`` structure.
+
+-  ``userparam``: Further problem-specific parameters, e.g. system parameters or weights in the cost functions that are passed to the problem functions via a ``void``-pointer in C or ``typeRNum`` array in MATLAB.
+
+.. _`sec:ListOfOptions`:
+
+List of options
+---------------
+
+:numref:`tab:ListOfOptions` gives an overview of the algorithmic options of GRAMPC in terms of the option name and type as well as the allowed and the default values (if available).
+
+.. list-table:: Algorithmic Options.
+    :name: tab:ListOfOptions
+    :widths: auto
+    :header-rows: 1
+
+    * - Option name
+      - Type
+      - Allowed values
+      - Default
+    * - ``Nhor``
+      - ``typeInt``
+      - :math:`[2, \infty)`
+      - :math:`30`
+    * - ``MaxGradIter``
+      - ``typeInt``
+      - :math:`[1, \infty)`
+      - :math:`2`
+    * - ``MaxMultIter``
+      - ``typeInt``
+      - :math:`[1, \infty)`
+      - :math:`1`
+    * - ``ShiftControl``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - 
+      - 
+      - 
+      - 
+    * - ``IntegralCost``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``TerminalCost``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``IntegratorCost``
+      - ``typeChar*``
+      - ``trapezoidal/simpson/discrete``
+      - ``trapezoidal``
+    * - 
+      - 
+      - 
+      - 
+    * - ``Integrator``
+      - ``typeChar*``
+      - ``euler/modeuler/heun/discrete/ruku45/rodas``
+      - ``heun``
+    * - ``IntegratorRelTol``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{-6}`
+    * - ``IntegratorAbsTol``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{-8}`
+    * - ``IntegratorMinStepSize``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - *eps*
+    * - ``IntegratorMaxSteps``
+      - ``typeInt``
+      - :math:`[1, \infty)`
+      - :math:`10^{8}`
+    * - ``FlagsRodas``
+      - ``typeInt*``
+      - see description
+      - see description
+    * - 
+      - 
+      - 
+      - 
+    * - ``LineSearchType``
+      - ``typeChar*``
+      - ``adaptive/explicit1/explicit2``
+      - ``explicit2``
+    * - ``LineSearchExpAutoFallback``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``LineSearchMax``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`0.75`
+    * - ``LineSearchMin``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{-10}`
+    * - ``LineSearchInit``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{-4}`
+    * - ``LineSearchAdaptAbsTol``
+      - ``typeRNum``
+      - :math:`[0, \infty)`
+      - :math:`10^{-6}`
+    * - ``LineSearchAdaptFactor``
+      - ``typeRNum``
+      - :math:`(1, \infty)`
+      - :math:`3/2`
+    * - ``LineSearchIntervalTol``
+      - ``typeRNum``
+      - :math:`(0, 0.5)`
+      - :math:`0.1`
+    * - ``LineSearchIntervalFactor``
+      - ``typeRNum``
+      - :math:`(0, 1)`
+      - :math:`0.85`
+    * - 
+      - 
+      - 
+      - 
+    * - ``OptimControl``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``OptimParam``
+      - ``typeChar*``
+      - ``on/off``
+      - ``off``
+    * - ``OptimParamLineSearchFactor``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`1.0`
+    * - ``OptimTime``
+      - ``typeChar*``
+      - ``on/off``
+      - ``off``
+    * - ``OptimTimeLineSearchFactor``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`1.0`
+    * - ``ScaleProblem``
+      - ``typeChar*``
+      - ``on/off``
+      - ``off``
+    * - ``xScale``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`\mathrm{e}_{Nx}`
+    * - ``xOffset``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nx}`
+    * - ``uScale``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`\mathrm{e}_{Nu}`
+    * - ``uOffset``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Nu}`
+    * - ``pScale``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`\mathrm{e}_{Np}`
+    * - ``pOffset``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`0\cdot \mathrm{e}_{Np}`
+    * - ``TScale``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`1.0`
+    * - ``TOffset``
+      - ``typeRNum``
+      - :math:`(-\infty, \infty)`
+      - :math:`0.0`
+    * - ``JScale``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`1.0`
+    * - ``cScale``
+      - ``typeRNum*``
+      - :math:`(-\infty, \infty)`
+      - :math:`\mathrm{e}_{Nc}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``EqualityConstraints``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``InequalityConstraints``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``TerminalEqualityConstraints``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``TerminalInequalityConstraints``
+      - ``typeChar*``
+      - ``on/off``
+      - ``on``
+    * - ``ConstraintsHandling``
+      - ``typeChar*``
+      - ``extpen/auglag``
+      - ``auglag``
+    * - ``ConstraintsAbsTol``
+      - ``typeRNum*``
+      - :math:`(0, \infty)`
+      - :math:`10^{-4}\mathrm{e}_{Nc}`
+    * - 
+      - 
+      - 
+      - 
+    * - ``MultiplierMax``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^{6}`
+    * - ``MultiplierDampingFactor``
+      - ``typeRNum``
+      - :math:`[0, 1]`
+      - :math:`0.0`
+    * - ``PenaltyMax``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^6`
+    * - ``PenaltyMin``
+      - ``typeRNum``
+      - :math:`(0, \infty)`
+      - :math:`10^0`
+    * - ``PenaltyIncreaseFactor``
+      - ``typeRNum``
+      - :math:`[1, \infty)`
+      - :math:`1.05`
+    * - ``PenaltyDecreaseFactor``
+      - ``typeRNum``
+      - :math:`[0, 1]`
+      - :math:`0.95`
+    * - ``PenaltyIncreaseThreshold``
+      - ``typeRNum``
+      - :math:`[0, \infty)`
+      - :math:`1.0`
+    * - ``AugLagUpdateGradientRelTol``
+      - ``typeRNum``
+      - :math:`[0, 1]`
+      - :math:`10^{-2}`
+    * - ``ConvergenceCheck``
+      - ``typeChar*``
+      - ``on/off``
+      - ``off``
+    * - ``ConvergenceGradientRelTol``
+      - ``typeRNum``
+      - :math:`[0, 1]`
+      - :math:`10^{-6}`
+
+A description of all options is as follows:
+
+-  ``Nhor``: Number of discretization points within the time interval :math:`[0,T]`.
+
+-  ``MaxMultIter``: Sets the maximum number of augmented Lagrangian iterations
+   :math:`i_\text{max} \geq 1`. If the option ``ConvergenceCheck`` is activated, the
+   algorithm evaluates the convergence criterion and terminates if the
+   inner minimization converged and all constraints are satisfied within
+   the tolerance defined by ``ConstraintsAbsTol``.
+
+-  ``MaxGradIter``: If the option ``ConvergenceCheck`` is activated, the algorithm terminates the inner loop
+   as soon as the convergence criterion is fulfilled.
+
+-  ``ShiftControl``: Activates or deactivates the shifting of the control trajectory and
+   the adaptation of :math:`T` in case of a free end time, i.e., if ``OptimTime`` is
+   active.
+
+-  ``IntegralCost``, ``TerminalCost``: Indicate if the integral and/or terminal cost functions are defined.
+
+-  ``IntegratorCost``: This option specifies the integration scheme for the cost
+   functionals. Possible values are ``trapezodial``, ``simpson`` and ``discrete``.
+
+-  ``Integrator``: This option specifies the integration scheme for the system and
+   adjoint dynamics. Possible values are ``euler``, ``modeuler``,
+   ``heun`` and ``discrete`` with fixed step size and ``ruku45`` and
+   ``rodas`` with variable step size.
+
+-  ``IntegratorMinStepSize``: Minimum step size for RODAS and the Runge-Kutta integrator.
+
+-  ``IntegratorMaxSteps``: Maximum number of steps for RODAS and the Runge-Kutta integrator.
+
+-  ``IntegratorRelTol``: Relative tolerance for RODAS and the Runge-Kutta integrator with
+   variable step size. Note that this option may be insignificant if the
+   minimum step size is chosen too high or the maximum number of steps
+   is set too low.
+
+-  ``IntegratorAbsTol``: Absolute tolerance for RODAS and the Runge-Kutta integrator with
+   variable step size. Note that this option may be insignificant if the
+   minimum step size is chosen too high or the maximum number of steps
+   is set too low.
+
+-  ``FlagsRodas``: Vector with the elements
+   ``[IFCN, IDFX, IJAC, IMAS, MLJAC, MUJAC, MLMAS, MUMAS]``
+   that is passed to the integrator RODAS, see
+   :ref:`sec:AlgOpt:IntegrationRodas` for a description of the single entries.
+
+-  ``LineSearchType``: This option selects either the adaptive line search strategy (value
+   ``adaptive``) or the explicit approach (value ``explicit1`` or ``explicit2``).
+
+-  ``LineSearchExpAutoFallback``: If this option is activated, the automatic fallback strategy is
+   used in the case that the explicit formulas result in negative step sizes.
+
+-  ``LineSearchMax``: This option sets the maximum value :math:`\alpha_{\max}` of the
+   step size :math:`\alpha`.
+
+-  ``LineSearchMin``: This option sets the minimum value :math:`\alpha_{\min}` of the
+   step size :math:`\alpha`.
+
+-  ``LineSearchInit``: Indicates the initial value :math:`\alpha_{\text{init}}>0` for the
+   step size :math:`\alpha`. If the adaptive line search is used, the
+   sample point :math:`\alpha_2` is set
+   to\ :math:`\alpha_2 = \alpha_{\text{init}}`.
+
+-  ``LineSearchAdaptAbsTol``: This option sets the absolute tolerance :math:`\varepsilon_{\phi}`
+   of the difference in costs at the interval bounds :math:`\alpha_1`
+   and :math:`\alpha_2`. If the difference in the (scaled) costs on
+   these bounds falls below :math:`\varepsilon_{\phi}`, the adaption of
+   the interval is stopped in order to avoid oscillations.
+
+-  ``LineSearchAdaptFactor``: This option sets the adaptation factor :math:`\kappa > 1` in
+   :math:numref:`eq:AlgOpt:IntervalAdaptation`
+   that determines how much the line search interval can be adapted from
+   one gradient iteration to the next.
+
+-  ``LineSearchIntervalTol``: This option sets the interval tolerance
+   :math:`\varepsilon_{\alpha} \in (0,0.5)` in
+   :math:numref:`eq:AlgOpt:IntervalAdaptation`
+   that determines for which values of :math:`\alpha` the adaption is
+   performed.
+
+-  ``LineSearchIntervalFactor``: This option sets the interval factor :math:`\beta \in (0,1)` that
+   specifies the interval bounds :math:`[\alpha_1,\alpha_3]` according
+   to :math:`\alpha_1 = \alpha_2 (1 - \beta)` and
+   :math:`\alpha_3 = \alpha_2 (1 + \beta)`, whereby the mid sample point
+   is initialized as :math:`\alpha_2 = \alpha_\text{init}`.
+
+-  ``OptimControl``: Specifies whether the cost functional should be minimized with
+   respect to the control variable :math:`\mb{u}`.
+
+-  ``OptimParam``: Specifies whether the cost functional should be minimized with
+   respect to the optimization parameters :math:`\mb{p}`.
+
+-  ``OptimParamLineSearchFactor``: This option sets the adaptation factor
+   :math:`\gamma_{\mb{p}}` that weights the update of the
+   parameter vector :math:`\mb{p}` against the update of the
+   control :math:`\mb{u}`.
+
+-  ``OptimTime``: Specifies whether the cost functional should be minimized with
+   respect the horizon length :math:`T` (free end time problem) or if
+   :math:`T` is kept constant.
+
+-  ``OptimTimeLineSearchFactor``: This option sets the adaptation factor :math:`\gamma_{T}` that
+   weights the update of the end time :math:`T` against the update of
+   the control :math:`\mb{u}`.
+
+-  ``ScaleProblem``: Activates or deactivates scaling. Note that GRAMPC requires more
+   computation time if scaling is active.
+
+-  ``xScale``, ``xOffset``: Scaling factors :math:`\mb{x}_\text{scale}` and offsets
+   :math:`\mb{x}_\text{offset}` for each state variable.
+
+-  ``uScale``, ``uOffset``: Scaling factors :math:`\mb{u}_\text{scale}` and offsets
+   :math:`\mb{u}_\text{offset}` for each control variable.
+
+-  ``pScale``, ``pOffset``: Scaling factors :math:`\mb{p}_\text{scale}` and offsets
+   :math:`\mb{p}_\text{offset}` for each parameter.
+
+-  ``TScale``, ``TOffset``: Scaling factor :math:`\mb{T}_\text{scale}` and offset
+   :math:`\mb{T}_\text{offset}` for the horizon length.
+
+-  ``JScale``: Scaling factor :math:`J_\text{scale}` for the cost functional.
+
+-  ``cScale``: Scaling factors :math:`\mb{c}_\text{scale}` for each state
+   constraint. The elements of the vector refer to the equality,
+   inequality, terminal equality and terminal inequality constraints.
+
+-  ``EqualityConstraints``: Equality constraints
+   :math:`\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}`
+   can be disabled by the option value ``off``.
+
+-  ``InequalityConstraints``: To disable inequality constraints
+   :math:`\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}`,
+   set this option to ``off``.
+
+-  ``TerminalEqualityConstraints``: To disable terminal equality constraints
+   :math:`\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}`,
+   set this option to ``off``.
+
+-  ``TerminalInequalityConstraints``: To disable terminal inequality constraints
+   :math:`\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}`,
+   set this option to ``off``.
+
+-  ``ConstraintsHandling``: State constraints are handled either by means of the augmented
+   Lagrangian approach (option value ``auglag``) or as soft constraints by outer
+   penalty functions (option value ``extpen``).
+
+-  ``ConstraintsAbsTol``: Thresholds
+   :math:`(\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}`
+   for the equality, inequality, terminal equality, and terminal
+   inequality constraints.
+
+-  ``MultiplierMax``: Upper bound :math:`\mu_\text{max}` and lower bound
+   :math:`-\mu_\text{max}` for the Lagrangian multpliers.
+
+-  ``MultiplierDampingFactor``:Damping factor :math:`\rho \in [0,1)` for the multiplier update.
+
+-  ``PenaltyMax``: This option sets the upper bound :math:`c_\text{max}` of the
+   penalty parameters.
+
+-  ``PenaltyMin``: This option sets the lower bound :math:`c_\text{min}` of the
+   penalty parameters.
+
+-  ``PenaltyIncreaseFactor``: This option sets the factor :math:`\beta_\text{in}` by which
+   penalties are increased.
+
+-  ``PenaltyDecreaseFactor``: This option sets the factor :math:`\beta_\text{de}` by which
+   penalties are decreased.
+
+-  ``PenaltyIncreaseThreshold``: This option sets the factor :math:`\gamma_\text{in}` that rates the
+   progress in the constraints between the last two iterates.
+
+-  ``AugLagUpdateGradientRelTol``: Threshold :math:`\varepsilon_\text{rel,u}` for the maximum relative
+   gradient of the inner minimization problem.
+
+-  ``ConvergenceCheck``: This option activates the convergence criterion. Otherwise, the
+   inner and outer loops always perform the maximum number of
+   iterations, see the options ``MaxGradIter`` and ``MaxMultIter``.
+
+-  ``ConvergenceGradientRelTol``: This option sets the threshold :math:`\varepsilon_\text{rel,c}` for
+   the maximum relative gradient of the inner minimization problem that
+   is used in the convergence criterion. Note that this threshold is
+   different from the one that is used in the update of multipliers and
+   penalties.
+
+.. _appendix:DataTypes:
+
+GRAMPC data types
+-------------------
+
+The following lines list the data types of GRAMPC. Note that these
+data types define the structure variable ``grampc`` including the
+substructures ``sol``, ``param``, ``opt``, ``rws``, and ``userparam``, also see
+:ref:`chap:grampcStructure:initialization`.
+
+.. code-block:: c
+    :caption: GRAMPC main structure.
+
+    typedef struct
+    {
+        typeGRAMPCparam *param;
+        typeGRAMPCopt *opt;
+        typeGRAMPCsol *sol;
+        typeGRAMPCrws *rws;
+        typeUSERPARAM *userparam;
+    } typeGRAMPC;
+
+.. code-block:: c
+    :caption: GRAMPC parameter structure.
+
+    typedef struct
+    {
+        typeInt Nx;
+        typeInt Nu;
+        typeInt Np;
+        typeInt Ng;
+        typeInt Nh;
+        typeInt NgT;
+        typeInt NhT;
+        typeInt Nc;
+
+        typeRNum *x0;
+        typeRNum *xdes;
+
+        typeRNum *u0;
+        typeRNum *udes;
+        typeRNum *umax;
+        typeRNum *umin;
+
+        typeRNum *p0;
+        typeRNum *pmax;
+        typeRNum *pmin;
+
+        typeRNum Thor;
+        typeRNum Tmax;
+        typeRNum Tmin;
+
+        typeRNum dt;
+        typeRNum t0;
+    } typeGRAMPCparam;
+
+.. code-block:: c
+    :caption: GRAMPC option structure.
+
+    typedef struct
+    {
+        typeInt Nhor;
+        typeInt MaxGradIter;
+        typeInt MaxMultIter;
+        typeInt ShiftControl;
+
+        typeInt TimeDiscretization;
+
+        typeInt IntegralCost;
+        typeInt TerminalCost;
+        typeInt IntegratorCost;
+
+        typeInt  Integrator;
+        typeRNum IntegratorRelTol;
+        typeRNum IntegratorAbsTol;
+        typeRNum IntegratorMinStepSize;
+        typeInt  IntegratorMaxSteps;
+        typeInt  *FlagsRodas;
+
+        typeInt  LineSearchType;
+        typeInt  LineSearchExpAutoFallback;
+        typeRNum LineSearchMax;
+        typeRNum LineSearchMin;
+        typeRNum LineSearchInit;
+        typeRNum LineSearchIntervalFactor;
+        typeRNum LineSearchAdaptFactor;
+        typeRNum LineSearchIntervalTol;
+
+        typeInt  OptimControl;
+        typeInt  OptimParam;
+        typeRNum OptimParamLineSearchFactor;
+        typeInt  OptimTime;
+        typeRNum OptimTimeLineSearchFactor;
+
+        typeInt  ScaleProblem;
+        typeRNum *xScale;
+        typeRNum *xOffset;
+        typeRNum *uScale;
+        typeRNum *uOffset;
+        typeRNum *pScale;
+        typeRNum *pOffset;
+        typeRNum TScale;
+        typeRNum TOffset;
+        typeRNum JScale;
+        typeRNum *cScale;
+
+        typeInt  EqualityConstraints;
+        typeInt  InequalityConstraints;
+        typeInt  TerminalEqualityConstraints;
+        typeInt  TerminalInequalityConstraints;
+        typeInt  ConstraintsHandling;
+        typeRNum *ConstraintsAbsTol;
+
+        typeRNum MultiplierMax;
+        typeRNum MultiplierDampingFactor;
+        typeRNum PenaltyMax;
+        typeRNum PenaltyMin;
+        typeRNum PenaltyIncreaseFactor;
+        typeRNum PenaltyDecreaseFactor;
+        typeRNum PenaltyIncreaseThreshold;
+        typeRNum AugLagUpdateGradientRelTol;
+
+        typeInt  ConvergenceCheck;
+        typeRNum ConvergenceGradientRelTol;
+
+    } typeGRAMPCopt;
+
+.. code-block:: c
+    :caption: GRAMPC solution structure.
+
+    typedef struct
+    {
+        typeRNum *xnext;
+        typeRNum *unext;
+        typeRNum *pnext;
+        typeRNum Tnext;
+        typeRNum *J;
+        typeRNum cfct;
+        typeRNum pen;
+        typeInt *iter;
+        typeInt status;
+    } typeGRAMPCsol;
+
+.. code-block:: c
+    :caption: GRAMPC real workspace structure.
+
+    typedef struct
+    {
+        typeRNum *t;
+        typeRNum *tls;
+
+        typeRNum *x;
+        typeRNum *adj;
+        typeRNum *dcdx;
+
+        typeRNum *u;
+        typeRNum *uls;
+        typeRNum *uprev;
+        typeRNum *gradu;
+        typeRNum *graduprev;
+        typeRNum *dcdu;
+
+        typeRNum *p;
+        typeRNum *pls;
+        typeRNum *pprev;
+        typeRNum *gradp;
+        typeRNum *gradpprev;
+        typeRNum *dcdp;
+
+        typeRNum T;
+        typeRNum Tprev;
+        typeRNum gradT;
+        typeRNum gradTprev;
+        typeRNum dcdt;
+
+        typeRNum *mult;
+        typeRNum *pen;
+        typeRNum *cfct;
+        typeRNum *cfctprev;
+        typeRNum *cfctAbsTol;
+
+        typeRNum *lsAdapt;
+        typeRNum *lsExplicit;
+        typeRNum *rwsScale;
+        typeInt  lrwsGeneral;
+        typeRNum *rwsGeneral;
+
+        typeInt  lworkRodas;
+        typeInt  liworkRodas;
+        typeRNum *rparRodas;
+        typeInt  *iparRodas;
+        typeRNum *workRodas;
+        typeInt  *iworkRodas;
+    } typeGRAMPCrws;
+
+.. _appendix:FunctionInterface:
+
+GRAMPC function interface
+---------------------------
+
+The main C functions for the usage of GRAMPC are listed below.
+
+.. code-block:: c
+    :caption: **File** ``grampc_init``:
+
+    void grampc_init(typeGRAMPC **grampc, typeUSERPARAM *userparam);
+    void grampc_free(typeGRAMPC **grampc);
+
+.. code-block:: c
+    :caption: **File** ``grampc_run``:
+
+    void grampc_run(const typeGRAMPC *grampc);
+
+.. code-block:: c
+    :caption: **File** ``grampc_setparam``:
+
+    void grampc_setparam_real(const typeGRAMPC *grampc, const typeChar *paramName, ctypeRNum paramValue);
+                            
+    void grampc_setparam_real_vector(const typeGRAMPC *grampc, const typeChar *paramName, ctypeRNum *paramValue);
+                                    
+    void grampc_printparam(const typeGRAMPC *grampc);
+
+
+.. code-block:: c
+    :caption: **File** ``grampc_setopt``:
+
+    void grampc_setopt_real(const typeGRAMPC *grampc, const typeChar *optName, ctypeRNum optValue);
+    
+    void grampc_setopt_int(const typeGRAMPC *grampc, const typeChar *optName, ctypeInt optValue);
+                        
+    void grampc_setopt_string(const typeGRAMPC *grampc, const typeChar *optName, const typeChar *optValue);
+                            
+    void grampc_setopt_real_vector(const typeGRAMPC *grampc, const typeChar *optName, ctypeRNum *optValue);
+                                
+    void grampc_setopt_int_vector(const typeGRAMPC *grampc, const typeChar *optName, ctypeInt *optValue);
+                                
+    void grampc_printopt(const typeGRAMPC *grampc);
+
+.. code-block:: c
+    :caption: **File** ``grampc_mess``:
+
+    /** estimates PenaltyMin on basis of the first MPC iteration **/
+    typeInt grampc_printstatus(ctypeInt status, ctypeInt level);
+
+.. code-block:: c
+    :caption: **File** ``grampc_util``:
+
+    /* estimates PenaltyMin on basis of the first MPC iteration */
+    typeInt grampc_estim_penmin(typeGRAMPC *grampc, ctypeInt rungrampc);
+
+.. code-block:: c
+    :caption: **File** ``probfct``:
+
+    /** Dimensions of the states (Nx), controls (Nu), parameters (Np), equalities (Ng), 
+    inequalities (Nh), terminal equalities (NgT), and terminal inequalities (NhT) **/
+    void ocp_dim(typeInt *Nx, typeInt *Nu, typeInt *Np, typeInt *Ng, 
+                typeInt *Nh, typeInt *NgT, typeInt *NhT, typeUSERPARAM *userparam);
+
+
+    /** System function f(t,x,u,p,userparam) **/
+    void ffct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dfdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dfdu_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dfdp_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+
+
+    /** Integral cost l(t,x(t),u(t),p,userparam) **/
+    void lfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dldx(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dldu(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dldp(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+
+
+    /** Terminal cost V(T,x(T),p,xdes,userparam) **/
+    void Vfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dVdx(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dVdp(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dVdT(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+
+
+    /** Equality constraints g(t,x(t),u(t),p,uperparam) = 0 **/
+    void gfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dgdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dgdu_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dgdp_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+
+
+    /** Inequality constraints h(t,x(t),u(t),p,uperparam) <= 0 **/
+    void hfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dhdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dhdu_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dhdp_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t,
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+
+
+    /** Terminal equality constraints gT(T,x(T),p,uperparam) = 0 **/
+    void gTfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dgTdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dgTdp_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dgTdT_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+
+
+    /** Terminal inequality constraints hT(T,x(T),p,uperparam) <= 0 **/
+    void hTfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+            ctypeRNum *x, ctypeRNum *p, typeUSERPARAM *userparam);
+    void dhTdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dhTdp_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+    void dhTdT_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, 
+                ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+
+
+    /*rodas specific functions*/
+    void dfdx(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
+            typeUSERPARAM *userparam);
+    void dfdxtrans(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
+                typeUSERPARAM *userparam);
+                
+    void dfdt(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+            ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, 
+            typeUSERPARAM *userparam);
+    void dHdxdt(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, 
+                ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, 
+                typeUSERPARAM *userparam);
+                
+    void Mfct(const typeGRAMPCparam *param, typeRNum *out, typeUSERPARAM *userparam);
+    void Mtrans(const typeGRAMPCparam *param, typeRNum *out, typeUSERPARAM *userparam);

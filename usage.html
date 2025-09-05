@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Usage of GRAMPC &#8212; grampc 2.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    <link rel="stylesheet" type="text/css" href="_static/proof.css" />
+    
+    <script src="_static/documentation_options.js?v=57236720"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="tutorials.html" />
+    <link rel="prev" title="Optimization algorithm and options" href="algorithm.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="prf-prf.html" title="Proof Index"
+             >Proof</a> |</li>
+        <li class="right" >
+          <a href="tutorials.html" title="Tutorials"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="algorithm.html" title="Optimization algorithm and options"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">grampc 2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Usage of GRAMPC</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="usage-of-grampc">
+<span id="chap-grampcstructure"></span><h1>Usage of GRAMPC<a class="headerlink" href="#usage-of-grampc" title="Link to this heading">¶</a></h1>
+<p>This chapter describes how to use GRAMPC in C and via the interface to
+Matlab/Simulink. Note that the implementation of the problem
+formulation is described in <a class="reference internal" href="problem_formulation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>
+and therefore not repeated here.</p>
+<section id="using-grampc-in-c">
+<h2>Using GRAMPC in C<a class="headerlink" href="#using-grampc-in-c" title="Link to this heading">¶</a></h2>
+<p>A high level of portability is provided by GRAMPC in view of different
+operating systems and hardware devices. The main components are written
+in plain C without the use of external libraries, also see the
+discussion in <a class="reference internal" href="install.html#sec-structure"><span class="std std-ref">Structure of GRAMPC</span></a>. This section describes
+the usage of GRAMPC in C including initialization, compilation and
+running the MPC framework.</p>
+<section id="main-components-of-grampc">
+<span id="sec-maincomponents"></span><h3>Main components of GRAMPC<a class="headerlink" href="#main-components-of-grampc" title="Link to this heading">¶</a></h3>
+<p>As illustrated in Figure <a class="reference internal" href="#fig-grampcmaincomponents"><span class="std std-numref">Fig. 4</span></a>, GRAMPC
+contains initializing as well as running files, different integrators
+for the system and adjoint dynamics (<a class="reference internal" href="problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and <a class="reference internal" href="algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>) and
+functions to alter the options and parameters (also see <a class="reference internal" href="problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and <a class="reference internal" href="algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>).</p>
+<p>In more detail, GRAMPC comprises the following main files (see also
+Appendix <a class="reference internal" href="appendix.html#appendix-functioninterface"><span class="std std-ref">GRAMPC function interface</span></a> for the function
+interface):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_init.c</span></code>: Functions for initializing GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_alloc.c</span></code>: Functions for memory allocation and deallocation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_run.c</span></code>: Functions for running GRAMPC including the implemented augmented Lagrangian algorithm and the underlying gradient algorithm. Further functions of this file are concerned with the line search strategies and the update steps of the primal and dual variables as described in <a class="reference internal" href="algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_setparam.c</span></code>: Provides several functions for setting problem-related parameters, see the description in <a class="reference internal" href="problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a> and the list of parameters in Table <a class="reference internal" href="appendix.html#tab-listofparameters"><span class="std std-numref">Table 3</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_setopt.c</span></code>: Provides several functions for setting algorithmic options, see the description in <a class="reference internal" href="algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a> and the list of options in Table <a class="reference internal" href="appendix.html#tab-listofoptions"><span class="std std-numref">Table 4</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_mess.c</span></code>: Function for printing information regarding the initialization as well as execution of GRAMPC (e.g. errors, convergence behavior of the augmented Lagrangian algorithm or status of integrators).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grampc_util.c</span></code>: Auxiliary functions for the GRAMPC toolbox such as memory management and trajectory interpolation. It also contains the function <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> to compute an estimate of the minimal penalty parameter, cf. <a class="reference internal" href="algorithm.html#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simpson.c</span></code>: Function for integrating the integral cost by means of the Simpson rule.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trapezoidal.c</span></code>: Function for integrating the integral cost by means of the trapezoidal rule.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">euler1.c</span></code>: Euler forward integration scheme with fixed step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eulermod2.c</span></code>: Modified Euler integration scheme with fixed step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">heun2.c</span></code>: Heun integration scheme with fixed step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rodas.c</span></code>: Semi-implicit Rosenbrock integration scheme with variable step size. The code follows from an f2c conversion of the original Fortran files of RODAS <a class="footnote-reference brackets" href="#footcite-rodas-webpage-2018" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and are directly included in the GRAMPC source files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ruku45.c</span></code>: Runge-Kutta integration scheme of order 4 with variable step size.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discrete.c</span></code>: Discrete integrator.</p></li>
+</ul>
+<figure class="align-default" id="fig-grampcmaincomponents">
+<img alt="_images/MainComponents.svg" src="_images/MainComponents.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Main components of GRAMPC</span><a class="headerlink" href="#fig-grampcmaincomponents" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="initialization-of-grampc">
+<span id="chap-grampcstructure-initialization"></span><h3>Initialization of GRAMPC<a class="headerlink" href="#initialization-of-grampc" title="Link to this heading">¶</a></h3>
+<p>The global initialization of GRAMPC is done via the routine</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">void</span> <span class="n">grampc_init</span><span class="p">(</span><span class="n">typeGRAMPC</span> <span class="o">**</span><span class="n">grampc</span><span class="p">,</span> <span class="n">typeUSERPARAM</span> <span class="o">*</span><span class="n">userparam</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where the overall structure variable contains the following
+substructures (see <a class="reference internal" href="appendix.html#appendix-datatypes"><span class="std std-ref">GRAMPC data types</span></a> for the
+definition of the data type):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sol</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCsol</span></code>): Contains the optimization variables
+<span class="math notranslate nohighlight">\((\mb{u}^{i+1},\mb{p}^{i+1},T^{i+1})\)</span> and the
+interpolated state <span class="math notranslate nohighlight">\(\mb{x}^{i+1}\)</span> in the next MPC step
+as well as the corresponding cost values
+<span class="math notranslate nohighlight">\(\bar J(\mb{u}^{i+1}, \mb{p}^{i+1}, T^{i+1}, \mb{\mu}^{i+1},
+\mb{c}^{i+1};\mb{x}_0)\)</span> and
+<span class="math notranslate nohighlight">\(J(\mb{u}^{i+1}, \mb{p}^{i+1}, T^{i+1};\mb{x}_0)\)</span>,
+respectively. The control <span class="math notranslate nohighlight">\(\mb{u}^{i+1}\)</span> and the state
+<span class="math notranslate nohighlight">\(\mb{x}^{i+1}\)</span> refer to the corresponding trajectories
+evaluated at the sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span>. In addition, the
+substructure <code class="docutils literal notranslate"><span class="pre">sol</span></code> contains the evaluated functions of the defined
+state constraints, some status information, and an array in which the
+number of gradient iterations are stored in each augmented Lagrangian
+step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">param</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCparam</span></code>): Contains the parameter structure of GRAMPC.
+A detailed description of all parameters is given in <a class="reference internal" href="problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opt</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCopt</span></code>): Contains the option structure of GRAMPC.
+A detailed description of all options is given in <a class="reference internal" href="algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rws</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeGRAMPCrws</span></code>): Contains the real-time workspace of GRAMPC including calculations of the augmented Lagrangian algorithm and the gradient algorithm along the prediction horizon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code> (data type <code class="docutils literal notranslate"><span class="pre">typeUSERPARAM</span></code>): Can be used to define parameters, e.g. to parametrize the cost functional, the system dynamics or the state constraints.</p></li>
+</ul>
+<p>The definition of these data types is given in Appendix <a class="reference internal" href="appendix.html#appendix-datatypes"><span class="std std-ref">GRAMPC data types</span></a>.
+The deallocation of is done by means of the function</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_free</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">**</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="setting-options-and-parameters">
+<span id="sec-setting-opt-par"></span><h3>Setting options and parameters<a class="headerlink" href="#setting-options-and-parameters" title="Link to this heading">¶</a></h3>
+<p>The single options in Table <a class="reference internal" href="appendix.html#tab-listofoptions"><span class="std std-ref">Algorithmic Options.</span></a> are set via the functions</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">optValue</span><span class="p">)</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_int</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">optValue</span><span class="p">)</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_int_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeInt</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="n">grampc_setopt_string</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optName</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">optValue</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>for option values with floating point, integer and string type, respectively.
+An overview of the current options can be displayed by using</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_printopt</span><span class="p">(</span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Setting options in C)</strong></div>
+</div>
+<p>The number of gradient iterations, the integration scheme, and the relative tolerance of the integrator can be set in the following way:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="cm">/********* declaration *********/</span>
+<span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="cm">/********* option definition *********/</span>
+<span class="cm">/* Basic algorithmic options */</span>
+<span class="n">ctypeInt</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+
+<span class="cm">/* System integration */</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">Integrator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ruku45&quot;</span><span class="p">;</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">IntegratorRelTol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="cm">/********* grampc init *********/</span>
+<span class="n">grampc_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">userparam</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/********* setting options *********/</span>
+<span class="n">grampc_setopt_int</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MaxGradIter&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="p">);</span>
+
+<span class="n">grampc_setopt_string</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Integrator&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Integrator</span><span class="p">);</span>
+<span class="n">grampc_setopt_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;IntegratorRelTol&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">IntegratorRelTol</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>Similar to setting the GRAMPC options, the parameters in Table <a class="reference internal" href="appendix.html#tab-listofparameters"><span class="std std-ref">Problem-specific parameters.</span></a> are set according to their data type with the following functions:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">paramValue</span><span class="p">);</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">grampc_setparam_real_vector</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">typeChar</span><span class="w"> </span><span class="o">*</span><span class="n">paramName</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">paramValue</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>An overview of the parameters can be displayed by using</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">grampc_printparam</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Setting parameters in C)</strong></div>
+</div>
+<p>The sampling time, the prediction horizon, and the initial conditions for a system with two states and one control input can be set in the following way:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="cm">/********* parameter definition *********/</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)</span><span class="mf">0.001</span><span class="p">;</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">Thor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.0</span><span class="p">;</span>
+
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">x0</span><span class="p">[</span><span class="n">NX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">-1</span><span class="p">,</span><span class="mi">-1</span><span class="p">};</span>
+<span class="n">ctypeRNum</span><span class="w"> </span><span class="n">u0</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+
+
+<span class="cm">/********* setting parameters *********/</span>
+<span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span>
+<span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Thor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Thor</span><span class="p">);</span>
+<span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">);</span>
+<span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;u0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+</section>
+<section id="compiling-and-calling-grampc">
+<span id="sec-compilerun"></span><h3>Compiling and calling GRAMPC<a class="headerlink" href="#compiling-and-calling-grampc" title="Link to this heading">¶</a></h3>
+<p>GRAMPC can be integrated into an executable program after the problem formulation (cf. <a class="reference internal" href="problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>) as well as options and parameters are provided.
+A makefile for compilation purposes is provided in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code>. The main calling routine for GRAMPC is</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="n">grampc_run</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following code demonstrates how to integrate GRAMPC within an MPC loop by completing the ball-on-plate example, cf. <a class="reference internal" href="problem_formulation.html#sec-ball-on-plate"><span class="std std-ref">Example: Ball-on-plate system</span></a>.
+The code is part of the file <code class="docutils literal notranslate"><span class="pre">main_BALL_ON_PLATE.c</span></code> contained in the GRAMPC folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/BallOnPLate</span></code>.</p>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(C code for running GRAMPC within an MPC loop)</strong></div>
+</div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;grampc.h&quot;</span><span class="c1">   /* contains all necessary header files */</span>
+
+<span class="cp">#define NX   2</span>
+<span class="cp">#define NU   1</span>
+<span class="cp">#define NC  4</span>
+<span class="cp">#define NP  0</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="cm">/********* Declaration and parameter definition *********/</span>
+<span class="w">  </span><span class="n">typeGRAMPC</span><span class="w"> </span><span class="o">*</span><span class="n">grampc</span><span class="p">;</span>
+<span class="w">  </span><span class="n">typeInt</span><span class="w"> </span><span class="n">iMPC</span><span class="p">,</span><span class="w"> </span><span class="n">MaxSimIter</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">Tsim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">clock_t</span><span class="w"> </span><span class="n">tic</span><span class="p">,</span><span class="w"> </span><span class="n">toc</span><span class="p">;</span>
+<span class="w">  </span><span class="n">typeRNum</span><span class="w"> </span><span class="o">*</span><span class="n">CPUtimeVec</span><span class="p">;</span>
+<span class="w">  </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">CPUtime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">x0</span><span class="p">[</span><span class="n">NX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.01</span><span class="p">};</span><span class="w">   </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">xdes</span><span class="p">[</span><span class="n">NX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-0.2</span><span class="p">,</span><span class="mf">0.0</span><span class="p">};</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">u0</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">};</span><span class="w">        </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">udes</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0</span><span class="p">};</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">umax</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">0.0524</span><span class="p">};</span><span class="w">   </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">umin</span><span class="p">[</span><span class="n">NU</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">-0.0524</span><span class="p">};</span>
+
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">Thor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.3</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">dt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)</span><span class="mf">0.01</span><span class="p">;</span>
+<span class="w">  </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)</span><span class="mf">0.0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="cm">/********* userparam *********/</span>
+<span class="w">  </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">param</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mf">-0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="n">typeUSERPARAM</span><span class="w"> </span><span class="o">*</span><span class="n">userparam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param</span><span class="p">;</span>
+
+<span class="w">  </span><span class="cm">/********* grampc init *********/</span>
+<span class="w">  </span><span class="n">grampc_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">userparam</span><span class="p">);</span>
+
+<span class="w">  </span><span class="cm">/********* Option definition *********/</span>
+<span class="w">  </span><span class="cm">/* Basic algorithmic options */</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">Nhor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ctypeInt</span><span class="w"> </span><span class="n">MaxMultIter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">AugLagUpdateGradientRelTol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)</span><span class="mf">1e0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">ConstraintsAbsTol</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mf">1e-3</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-3</span><span class="p">};</span>
+
+<span class="w">  </span><span class="cm">/********* set parameters and option *********/</span>
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;xdes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xdes</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;u0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;udes&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">udes</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;umax&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;umin&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">umin</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Thor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Thor</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dt&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setparam_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;t0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">);</span>
+
+<span class="w">  </span><span class="cm">/********* Option definition *********/</span>
+<span class="w">  </span><span class="n">grampc_setopt_int</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Nhor&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Nhor</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setopt_int</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MaxGradIter&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">MaxGradIter</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setopt_int</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MaxMultIter&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">MaxMultIter</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">grampc_setopt_real</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="s">&quot;AugLagUpdateGradientRelTol&quot;</span><span class="p">,</span><span class="n">AugLagUpdateGradientRelTol</span><span class="p">);</span>
+<span class="w">  </span><span class="n">grampc_setopt_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="s">&quot;ConstraintsAbsTol&quot;</span><span class="p">,</span><span class="n">ConstraintsAbsTol</span><span class="p">);</span>
+
+<span class="w">  </span><span class="cm">/********* estimate and set PenaltyMin *********/</span>
+<span class="w">  </span><span class="n">grampc_estim_penmin</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">  </span><span class="cm">/* MPC loop */</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">iMPC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">iMPC</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">MaxSimIter</span><span class="p">;</span><span class="w"> </span><span class="n">iMPC</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="n">tic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clock</span><span class="p">();</span>
+<span class="w">       </span><span class="n">grampc_run</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+<span class="w">       </span><span class="n">toc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clock</span><span class="p">();</span>
+<span class="w">       </span><span class="n">CPUtimeVec</span><span class="p">[</span><span class="n">iMPC</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">typeRNum</span><span class="p">)((</span><span class="n">toc</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tic</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">CLOCKS_PER_SEC</span><span class="p">);</span>
+
+<span class="w">       </span><span class="cm">/* check solver status */</span>
+<span class="w">       </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">grampc</span><span class="o">-&gt;</span><span class="n">sol</span><span class="o">-&gt;</span><span class="n">status</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">               </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">grampc_printstatus</span><span class="p">(</span><span class="n">grampc</span><span class="o">-&gt;</span><span class="n">sol</span><span class="o">-&gt;</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="n">STATUS_LEVEL_ERROR</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                       </span><span class="n">myPrint</span><span class="p">(</span><span class="s">&quot;at iteration %i:</span><span class="se">\n</span><span class="s"> -----</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">iMPC</span><span class="p">);</span>
+<span class="w">               </span><span class="p">}</span>
+<span class="w">       </span><span class="p">}</span>
+
+<span class="w">       </span><span class="cm">/* update state and time */</span>
+<span class="w">       </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dt</span><span class="p">;</span>
+<span class="w">       </span><span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">grampc</span><span class="o">-&gt;</span><span class="n">sol</span><span class="o">-&gt;</span><span class="n">xnext</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="cm">/* Memory deallocation */</span>
+<span class="w">  </span><span class="n">grampc_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">);</span>
+<span class="w">  </span><span class="n">free</span><span class="p">(</span><span class="n">CPUtimeVec</span><span class="p">);</span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The structure <code class="docutils literal notranslate"><span class="pre">grampc</span></code> is initialized at the beginning and some options are set.
+Afterwards, the mandatory as well as some optional parameters are defined in the code.
+GRAMPC is then repetitively executed until a defined simulation time is reached.
+Note that the estimate of the minimal penalty value <span class="math notranslate nohighlight">\(c_\text{min}\)</span> is determined via the function <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> before the augmented Lagrangian algorithm is executed, also see the discussion in <a class="reference internal" href="algorithm.html#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a>.</p>
+<p>For a more convenience MPC design, there are several status flags that can be printed after each MPC step.
+As shown in the above example, the variable <code class="docutils literal notranslate"><span class="pre">grampc-&gt;sol-&gt;status</span></code> is used to check whether new status informations are available.
+Subsequently, the function <code class="docutils literal notranslate"><span class="pre">grampc_printstatus</span></code> is used to visualize the corresponding informations on the console.
+In the current GRAMPC version, there are status informations concerning the integration scheme, the update of Lagrange multipliers, convergence properties of the augmented Lagrangian and gradient algorithm, and the line search method, see <a class="reference internal" href="algorithm.html#sec-algopt-statusflags"><span class="std std-ref">Status flags</span></a> for more details.
+In addition, the GRAMPC examples provide functions to print key variables such as the system state or the controls into text files.
+These files are stored in the subfolder <code class="docutils literal notranslate"><span class="pre">res</span></code> of the example directory.</p>
+<p>The ball-on-plate example described above can be compiled by running the following commands in a (Cygwin) terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/examples/BallOnPlate
+$ make
+</pre></div>
+</div>
+<p>The make command compiles the file <code class="docutils literal notranslate"><span class="pre">main_BALL_ON_PLATE.c</span></code> and links it against the GRAMPC toolbox, i.e., against the library <code class="docutils literal notranslate"><span class="pre">libgrampc.a</span></code> within <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/libs</span></code>.
+Note that compiling an application example in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/examples/</span></code> requires the previous compilation of the GRAMPC toolbox as described in <a class="reference internal" href="install.html#chap-install"><span class="std std-ref">Installation and structure of GRAMPC</span></a>.
+As a result, the executable <code class="docutils literal notranslate"><span class="pre">startMPC</span></code> is generated, which can now be used to solve and/or design the MPC problem.</p>
+</section>
+<section id="using-grampc-without-dynamic-memory-allocation">
+<h3>Using GRAMPC without dynamic memory allocation<a class="headerlink" href="#using-grampc-without-dynamic-memory-allocation" title="Link to this heading">¶</a></h3>
+<p>GRAMPC restricts the usage of dynamic memory allocation, i.e. <code class="docutils literal notranslate"><span class="pre">calloc</span></code> and <code class="docutils literal notranslate"><span class="pre">realloc</span></code>, to initialization and option setting, such that no allocations are performed while the MPC is running.
+However, some microcontrollers and embedded devices do not support dynamic memory allocation at all.
+Using GRAMPC on these devices requires to replace all dynamically-sized arrays by fixed-size arrays and to remove all functions that involve dynamic memory allocation.</p>
+<p>To this end, a header file <code class="docutils literal notranslate"><span class="pre">fixedsize_settings.h</span></code> must be placed in the search path of the compiler.
+This header file defines several constant parameters such as the number of states <code class="docutils literal notranslate"><span class="pre">NX</span></code>, the number of controls <code class="docutils literal notranslate"><span class="pre">NU</span></code>, as well as several constant options, e.g. the number of discretization steps <code class="docutils literal notranslate"><span class="pre">NHOR</span></code>, the number of gradient iterations <code class="docutils literal notranslate"><span class="pre">MAXGRADITER</span></code>, and the number of multiplier iterations <code class="docutils literal notranslate"><span class="pre">MAXMULTITER</span></code>.
+Note that these options cannot be changed during run-time, but are fixed at compile-time.
+A template file is provided in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code>.</p>
+<p>In addition, the GRAMPC structures must be created on the stack instead of the heap.
+To this end, the macro <code class="docutils literal notranslate"><span class="pre">TYPE_GRAMPC_POINTER</span></code> is provided that allows to use the same code both with and without dynamic memory allocation:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">TYPE_GRAMPC_POINTER</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="n">grampc_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="n">userparam</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="w">  </span><span class="n">grampc_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">grampc</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The makefile can be called with the parameter <code class="docutils literal notranslate"><span class="pre">FIXEDSIZE=1</span></code>, which automatically defines the required preprocessor macro <code class="docutils literal notranslate"><span class="pre">FIXEDSIZE</span></code>.
+Thus compiling and running the ball-on-plate example without dynamic memory allocation is done by executing the following commands in the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/examples/BallOnPlate
+$ make FIXEDSIZE=1
+$ ./startMPC_fixedsize
+</pre></div>
+</div>
+<p>Note that in this case a separate GRAMPC library named <code class="docutils literal notranslate"><span class="pre">libgrampc_fixedsize.a</span></code> is created in the problem folder that depends on the constants defined in <code class="docutils literal notranslate"><span class="pre">fixedsize_settings.h</span></code>.
+Changing these settings requires to recompile both the library and the application.</p>
+</section>
+</section>
+<section id="using-grampc-in-matlab-simulink">
+<h2>Using GRAMPC in Matlab/Simulink<a class="headerlink" href="#using-grampc-in-matlab-simulink" title="Link to this heading">¶</a></h2>
+<p>As already mentioned, the main components of GRAMPC are implemented in plain C to ensure a high level of portability.
+However, GRAMPC also provides a user-friendly interface with Matlab/Simulink to allow for a convenient MPC design.</p>
+<section id="interface-to-matlab">
+<span id="sec-grampcinterfacematlab"></span><h3>Interface to Matlab<a class="headerlink" href="#interface-to-matlab" title="Link to this heading">¶</a></h3>
+<p>Each main component of GRAMPC (cf. <a class="reference internal" href="#sec-maincomponents"><span class="std std-ref">Main components of GRAMPC</span></a>) has a related Mex routine that is included in the directory <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/src</span></code>, also see <a class="reference internal" href="#fig-grampcinterfacematlab"><span class="std std-numref">Fig. 5</span></a>.
+This allows one to run GRAMPC in Matlab/Simulink as well as altering options and parameters without recompilation.</p>
+<p>A makefile to compile GRAMPC for use in Matlab/Simulink is provided in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab</span></code>.
+The makefile compiles the source files to generate object files within <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/bin</span></code>.
+In order to obtain an actual Mex compilation for a given problem, the object files must be linked against the object file obtained by compiling the problem function, since at least some of these functions depend on the actual problem formulation, e.g. the state dimension <span class="math notranslate nohighlight">\(N_{\mb{x}}\)</span>.</p>
+<p>The m-file <code class="docutils literal notranslate"><span class="pre">startMPC.m</span></code> in each of the examples under <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples</span></code> contains a flag <code class="docutils literal notranslate"><span class="pre">compile</span></code>.
+Setting this flag to 1 leads to a compilation of the problem file and to the generation of the Mex files.
+Setting <code class="docutils literal notranslate"><span class="pre">compile</span></code> to 2 leads to an additional recompilation of the toolbox by calling the makefile in the directory <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/src</span></code>.
+The Mex files are stored in the local subfolder <code class="docutils literal notranslate"><span class="pre">+CmexFiles</span></code>.
+The folder name begins with a plus sign allowing the user to call the functions stored in this
+folder using the command <code class="docutils literal notranslate"><span class="pre">CmexFiles.&lt;function</span> <span class="pre">name&gt;</span></code>.
+The S-function files are stored in the local application directory, since Simulink requires the S-functions to be in the Matlab path.</p>
+<figure class="align-default" id="fig-grampcinterfacematlab">
+<img alt="_images/InterfaceMatlab.svg" src="_images/InterfaceMatlab.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Interface of GRAMPC to Matlab/Simulink (gray - C code, white - Matlab code)</span><a class="headerlink" href="#fig-grampcinterfacematlab" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>The structure of the main components of GRAMPC in C and Matlab for setting options and parameters are slightly different, as it is not allowed (or at least not very elegant) to manipulate the input argument of Mex routines.
+Consequently, each Mex routine returns the manipulated structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code> as an output argument.
+If, for example, the initial condition <span class="math notranslate nohighlight">\(\mb{x}_0\)</span> should be set to a specific value in C, the function <code class="docutils literal notranslate"><span class="pre">grampc_setparam_real_vector</span></code> must be used, as already discussed in <a class="reference internal" href="#chap-grampcstructure-initialization"><span class="std std-ref">Initialization of GRAMPC</span></a>.
+In Matlab, however, this is done using the Mex routine <code class="docutils literal notranslate"><span class="pre">grampc_setparam_Cmex</span></code> with the structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code> as an input argument.
+The manipulated structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code> is returned as an output argument including the initial condition <span class="math notranslate nohighlight">\(x_0\)</span>.
+For instance, the parameter setting in C</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">x0</span><span class="p">[</span><span class="n">NX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">-1</span><span class="p">,</span><span class="mi">-1</span><span class="p">};</span>
+<span class="n">grampc_setparam_real_vector</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>would read as follows in Matlab:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grampc</span> <span class="o">=</span> <span class="n">grampc_setparam_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="s1">&#39;x0&#39;</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="o">-</span><span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>Note that the Mex routine <code class="docutils literal notranslate"><span class="pre">grampc_setparam_Cmex</span></code> does not distinguish between vectors and scalars, but handles the different dimensions of parameters internally.
+The same applies to the Mex routine <code class="docutils literal notranslate"><span class="pre">grampc_setopt_Cmex</span></code> for changing algorithmic options in GRAMPC.
+The data type of the parameter or option to be set can either be double or the corresponding data type in the parameter structure <code class="docutils literal notranslate"><span class="pre">param</span></code> or option structure <code class="docutils literal notranslate"><span class="pre">opt</span></code>, see also Table <a class="reference internal" href="appendix.html#tab-listofparameters"><span class="std std-numref">Table 3</span></a> or
+Table <a class="reference internal" href="appendix.html#tab-listofoptions"><span class="std std-numref">Table 4</span></a>.</p>
+<p>In order to simplify changing parameters and options in Matlab, GRAMPC also provides the routine <code class="docutils literal notranslate"><span class="pre">grampc_update_struct_grampc(grampc,user)</span></code> included in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/mfiles</span></code>.
+The purpose of this function is to allow the user to define the options and parameters to be set as structure variable instead of requiring to call the functions <code class="docutils literal notranslate"><span class="pre">grampc_setparam_Cmex</span></code> and <code class="docutils literal notranslate"><span class="pre">grampc_setopt_Cmex</span></code> manually for each chosen parameter/option.
+In detail, the structure variable <code class="docutils literal notranslate"><span class="pre">user</span></code> must contain the substructures <code class="docutils literal notranslate"><span class="pre">param</span></code> and <code class="docutils literal notranslate"><span class="pre">opt</span></code> that define the parameters and options to be set.
+The corresponding function call under Matlab is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="o">%%</span> <span class="n">Parameter</span> <span class="n">definition</span>
+<span class="o">%</span> <span class="n">Initial</span> <span class="n">values</span> <span class="n">of</span> <span class="n">the</span> <span class="n">states</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+<span class="o">...</span>
+
+<span class="o">%%</span> <span class="n">Option</span> <span class="n">definition</span>
+<span class="o">%</span> <span class="n">Basic</span> <span class="n">algorithmic</span> <span class="n">options</span>
+<span class="n">user</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">Nhor</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="o">...</span>
+
+<span class="o">%%</span> <span class="n">User</span> <span class="n">parameter</span> <span class="n">definition</span>
+<span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">system</span> <span class="n">parameters</span> <span class="ow">or</span> <span class="n">weights</span> <span class="k">for</span> <span class="n">the</span> <span class="n">cost</span> <span class="n">function</span>
+<span class="n">userparam</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">];</span>
+
+<span class="o">%%</span> <span class="n">Grampc</span> <span class="n">initialization</span>
+<span class="n">grampc</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_init_Cmex</span><span class="p">(</span><span class="n">userparam</span><span class="p">);</span>
+
+<span class="o">%%</span> <span class="n">Update</span> <span class="n">grampc</span> <span class="n">struct</span> <span class="k">while</span> <span class="n">ensuring</span> <span class="n">correct</span> <span class="n">data</span> <span class="n">types</span>
+<span class="n">grampc</span> <span class="o">=</span> <span class="n">grampc_update_struct_grampc</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="n">user</span><span class="p">);</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Similar to <a class="reference internal" href="#chap-grampcstructure-initialization"><span class="std std-ref">Initialization of GRAMPC</span></a> and <a class="reference internal" href="#sec-compilerun"><span class="std std-ref">Compiling and calling GRAMPC</span></a>, the following lines show the mainsteps to run the ball-on-plate example in Matlab.
+An executable version of this example within Matlab can be found in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/BallOnPlate</span></code>.
+In analogy to the C implementation, the simulation loop and the evaluation are implemented in the main file <code class="docutils literal notranslate"><span class="pre">startMPC.m</span></code>.
+The parameters and options are defined in the separate file <code class="docutils literal notranslate"><span class="pre">initData.m</span></code> that is called within <code class="docutils literal notranslate"><span class="pre">startMPC.m</span></code> for the sake of readability and to use the settings directly in the Simulink model,
+see <a class="reference internal" href="#sec-grampcinterfacesimulink"><span class="std std-ref">Interface to Matlab/Simulink</span></a>. Please note a template file can be found in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code>.</p>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Matlab code for setting options and parameters, see initData.m)</strong></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span> <span class="n">Parameter</span> <span class="n">definition</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">x0</span>    <span class="o">=</span> <span class="p">[</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">];</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">xdes</span>  <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">];</span>
+
+<span class="o">%</span> <span class="n">Initial</span> <span class="n">values</span><span class="p">,</span> <span class="n">setpoints</span> <span class="ow">and</span> <span class="n">limits</span> <span class="n">of</span> <span class="n">the</span> <span class="n">inputs</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">u0</span>    <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">udes</span>  <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">umax</span>  <span class="o">=</span>  <span class="mf">0.0524</span><span class="p">;</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">umin</span>  <span class="o">=</span> <span class="o">-</span><span class="mf">0.0524</span><span class="p">;</span>
+
+<span class="o">%</span> <span class="n">Time</span> <span class="n">variables</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">Thor</span>  <span class="o">=</span> <span class="mf">0.3</span><span class="p">;</span>         <span class="o">%</span> <span class="n">Prediction</span> <span class="n">horizon</span>
+
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">dt</span>    <span class="o">=</span> <span class="mf">0.01</span><span class="p">;</span>        <span class="o">%</span> <span class="n">Sampling</span> <span class="n">time</span>
+<span class="n">user</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">t0</span>    <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>         <span class="o">%</span> <span class="n">time</span> <span class="n">at</span> <span class="n">the</span> <span class="n">current</span> <span class="n">sampling</span> <span class="n">step</span>
+
+<span class="o">%%</span> <span class="n">Option</span> <span class="n">definition</span>
+<span class="n">user</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">Nhor</span>        <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>      <span class="o">%</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">steps</span> <span class="k">for</span> <span class="n">the</span> <span class="n">system</span> <span class="n">integration</span>
+<span class="n">user</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">MaxMultIter</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>       <span class="o">%</span> <span class="n">Maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">augmented</span> <span class="n">Lagrangian</span> <span class="n">iterations</span>
+
+<span class="o">%</span> <span class="n">Constraints</span> <span class="n">thresholds</span>
+<span class="n">user</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">ConstraintsAbsTol</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="o">*</span><span class="p">[</span><span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">];</span>
+
+<span class="o">%%</span> <span class="n">User</span> <span class="n">parameter</span> <span class="n">definition</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">system</span> <span class="n">parameters</span> <span class="ow">or</span> <span class="n">weights</span> <span class="k">for</span> <span class="n">the</span> <span class="n">cost</span> <span class="n">function</span>
+<span class="n">userparam</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">];</span>
+
+<span class="o">%%</span> <span class="n">Grampc</span> <span class="n">initialization</span>
+<span class="n">grampc</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_init_Cmex</span><span class="p">(</span><span class="n">userparam</span><span class="p">);</span>
+
+<span class="o">%%</span> <span class="n">Update</span> <span class="n">grampc</span> <span class="n">struct</span> <span class="k">while</span> <span class="n">ensuring</span> <span class="n">correct</span> <span class="n">data</span> <span class="n">types</span>
+<span class="n">grampc</span> <span class="o">=</span> <span class="n">grampc_update_struct_grampc</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="n">user</span><span class="p">);</span>
+
+<span class="o">%%</span> <span class="n">Estimate</span> <span class="ow">and</span> <span class="nb">set</span> <span class="n">PenaltyMin</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span>
+<span class="n">grampc</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_estim_penmin_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="n">ot_stat</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="n">grampc</span><span class="p">,</span><span class="n">phpS</span><span class="p">);</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><strong>Example</strong> <strong>(Matlab code for running GRAMPC within an MPC loop, see startMPC.m)</strong></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="o">%%</span> <span class="n">Initialization</span>
+<span class="p">[</span><span class="n">grampc</span><span class="p">,</span><span class="n">Tsim</span><span class="p">]</span> <span class="o">=</span> <span class="n">initData</span><span class="p">;</span>
+<span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_printopt_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+<span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_printparam_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+
+<span class="o">%</span> <span class="n">init</span> <span class="n">solution</span> <span class="n">structure</span>
+<span class="n">vec</span> <span class="o">=</span> <span class="n">grampc_init_struct_sol</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span> <span class="n">Tsim</span><span class="p">);</span>
+
+<span class="o">%</span> <span class="n">init</span> <span class="n">plots</span> <span class="ow">and</span> <span class="n">store</span> <span class="n">figure</span> <span class="n">handles</span>
+<span class="n">phpP</span> <span class="o">=</span> <span class="n">grampc_init_plot_pred</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="n">figNr</span><span class="p">);</span>     <span class="n">figNr</span> <span class="o">=</span> <span class="n">figNr</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">phpT</span> <span class="o">=</span> <span class="n">grampc_init_plot_sim</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="n">figNr</span><span class="p">);</span>         <span class="n">figNr</span> <span class="o">=</span> <span class="n">figNr</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">phpS</span> <span class="o">=</span> <span class="n">grampc_init_plot_stat</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="n">grampc</span><span class="p">,</span><span class="n">figNr</span><span class="p">);</span> <span class="n">figNr</span> <span class="o">=</span> <span class="n">figNr</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+
+<span class="o">%%</span> <span class="n">MPC</span> <span class="n">loop</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span> <span class="mi">1</span>
+  <span class="o">%</span> <span class="nb">set</span> <span class="n">current</span> <span class="n">time</span> <span class="ow">and</span> <span class="n">current</span> <span class="n">state</span>
+  <span class="n">grampc</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_setparam_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="s1">&#39;t0&#39;</span><span class="p">,</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">));</span>
+  <span class="n">grampc</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_setparam_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="s1">&#39;x0&#39;</span><span class="p">,</span><span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">(:,</span><span class="n">i</span><span class="p">));</span>
+
+  <span class="o">%</span> <span class="n">run</span> <span class="n">MPC</span> <span class="ow">and</span> <span class="n">save</span> <span class="n">results</span>
+  <span class="p">[</span><span class="n">grampc</span><span class="p">,</span><span class="n">vec</span><span class="o">.</span><span class="n">CPUtime</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_run_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="p">);</span>
+  <span class="n">vec</span> <span class="o">=</span> <span class="n">grampc_update_struct_sol</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span> <span class="n">vec</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+
+  <span class="o">%</span> <span class="nb">print</span> <span class="n">solver</span> <span class="n">status</span>
+  <span class="n">printed</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_printstatus_Cmex</span><span class="p">(</span><span class="n">grampc</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">status</span><span class="p">,</span><span class="s1">&#39;Error&#39;</span><span class="p">);</span>
+
+  <span class="o">%</span> <span class="n">check</span> <span class="k">for</span> <span class="n">end</span> <span class="n">of</span> <span class="n">simulation</span>
+  <span class="k">if</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">&gt;</span> <span class="n">length</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="n">end</span>
+
+  <span class="o">%</span> <span class="n">simulate</span> <span class="n">system</span>
+  <span class="p">[</span><span class="o">~</span><span class="p">,</span><span class="n">xtemp</span><span class="p">]</span> <span class="o">=</span> <span class="n">ode45</span><span class="p">(</span><span class="nd">@CmexFiles</span><span class="o">.</span><span class="n">grampc_ffct_Cmex</span><span class="p">,</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="p">[</span><span class="mi">0</span> <span class="n">double</span><span class="p">(</span><span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">dt</span><span class="p">)],</span>
+              <span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">odeopt</span><span class="p">,</span><span class="n">vec</span><span class="o">.</span><span class="n">u</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">vec</span><span class="o">.</span><span class="n">p</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="p">,</span><span class="n">grampc</span><span class="o">.</span><span class="n">userparam</span><span class="p">);</span>
+  <span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">(:,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">xtemp</span><span class="p">(</span><span class="n">end</span><span class="p">,:);</span>
+
+  <span class="o">%</span> <span class="n">evaluate</span> <span class="n">time</span><span class="o">-</span><span class="n">dependent</span> <span class="n">constraints</span>
+  <span class="n">vec</span><span class="o">.</span><span class="n">constr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">CmexFiles</span><span class="o">.</span><span class="n">grampc_ghfct_Cmex</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span> <span class="n">vec</span><span class="o">.</span><span class="n">u</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span>
+                                         <span class="n">vec</span><span class="o">.</span><span class="n">p</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="n">grampc</span><span class="o">.</span><span class="n">userparam</span><span class="p">);</span>
+
+  <span class="o">%</span> <span class="n">update</span> <span class="n">iteration</span> <span class="n">counter</span>
+  <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+
+  <span class="o">%</span> <span class="n">plot</span> <span class="n">data</span>
+  <span class="n">grampc_update_plot_pred</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span><span class="n">phpP</span><span class="p">);</span>
+  <span class="n">grampc_update_plot_sim</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="n">phpT</span><span class="p">);</span>
+  <span class="n">grampc_update_plot_stat</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span><span class="n">grampc</span><span class="p">,</span><span class="n">phpS</span><span class="p">);</span>
+<span class="n">end</span>
+</pre></div>
+</div>
+<p>Similar to the C example in <a class="reference internal" href="#sec-compilerun"><span class="std std-ref">Compiling and calling GRAMPC</span></a>, the structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code> is initialized before the options as well as optional parameters are set.
+In addition, the plot functions (see <a class="reference internal" href="#sec-plotfunctions"><span class="std std-ref">Plot functions</span></a>) are initialized before GRAMPC is started within an MPC loop, where the current state of the system (new initial condition) is provided to GRAMPC.
+After computing the new controls, the status of GRAMPC is printed, see <a class="reference internal" href="algorithm.html#sec-algopt-statusflags"><span class="std std-ref">Status flags</span></a> for more details.
+Subsequently, a reference integration of the system is performed and the constraints are evaluated before the plots are updated.</p>
+</section>
+<section id="interface-to-matlab-simulink">
+<span id="sec-grampcinterfacesimulink"></span><h3>Interface to Matlab/Simulink<a class="headerlink" href="#interface-to-matlab-simulink" title="Link to this heading">¶</a></h3>
+<p>GRAMPC also allows a Matlab/Simulink integration via the S-function <code class="docutils literal notranslate"><span class="pre">grampc_run_Sfct.c</span></code> (also included in the directory <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/src</span></code>).
+A corresponding Simulink template can be found in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATES</span></code> for a number of Matlab versions.
+The directory also contains the m-file <code class="docutils literal notranslate"><span class="pre">initData_TEMPLATE.m</span></code> which can be used for initializing GRAMPC’s options and parameters, as mentioned in the previous subsection.
+The build procedure of the Mex routines additionally compiles the S-function for the Simulink block.</p>
+<p>The Matlab/Simulink model of GRAMPC is shown in <a class="reference internal" href="#fig-grampcsimulink"><span class="std std-numref">Fig. 6</span></a>.
+The block <code class="docutils literal notranslate"><span class="pre">MPC-Subsystem</span></code> contains algorithmic components of GRAMPC (implemented within the S-function <code class="docutils literal notranslate"><span class="pre">grampc_run_Sfct.c</span></code>).
+The block <code class="docutils literal notranslate"><span class="pre">Click</span> <span class="pre">to</span> <span class="pre">init</span> <span class="pre">grampc</span></code> must be executed by a double-click in order to initialize the structure variable that is required by the Matlab/Simulink model.
+This generates also the Simulink-specific structure variable <code class="docutils literal notranslate"><span class="pre">grampc_sdata</span></code>.
+For the sake of convenience, the blocks <code class="docutils literal notranslate"><span class="pre">Click</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">toolbox</span></code> and <code class="docutils literal notranslate"><span class="pre">Click</span> <span class="pre">to</span> <span class="pre">compile</span> <span class="pre">probfct</span></code> are included in the model to be able to compile the GRAMPC toolbox and the specific problem directly from Matlab/Simulink.</p>
+<p>The block <code class="docutils literal notranslate"><span class="pre">System</span> <span class="pre">function</span></code> is a Matlab Function block which implements the system dynamics in order to numerically integrate the system dynamics after each MPC step <span class="math notranslate nohighlight">\(k\)</span> for the sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span> and to return the new state value <span class="math notranslate nohighlight">\(\mb{x}_{k+1}\)</span> corresponding to the next sampling instant <span class="math notranslate nohighlight">\(t_{k+1}\)</span> that is fed back to the MPC block.</p>
+<p>Furthermore, the S-function <code class="docutils literal notranslate"><span class="pre">grampc_run_Sfct.c</span></code> satisfies the additional restrictions of the Matlab code generator.
+Therefore, the block can be used in models implemented for running on various hardware platforms, such as dSpace real-time systems.
+Please note that especially in case of dSpace applications, the include folders <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/include</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/include</span></code> as well as all C source files in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/src</span></code>,
+the source file of the S-function <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/src/grampc_runSfct.c</span></code> and the problem function must be listed as additional build information in the <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">Configuration</span> <span class="pre">Parameters</span></code> of the Simulink model under <code class="docutils literal notranslate"><span class="pre">Code</span> <span class="pre">Generation</span> <span class="pre">/</span> <span class="pre">Custom</span> <span class="pre">Code</span></code>.
+It is recommended to use absolute paths at least for the S-function file.</p>
+<figure class="align-default" id="fig-grampcsimulink">
+<img alt="_images/grampc_Simulink.svg" src="_images/grampc_Simulink.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">Matlab/Simulink model of GRAMPC.</span><a class="headerlink" href="#fig-grampcsimulink" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="plot-functions">
+<span id="sec-plotfunctions"></span><h3>Plot functions<a class="headerlink" href="#plot-functions" title="Link to this heading">¶</a></h3>
+<p>GRAMPC offers various plot functions in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/matlab/mfiles</span></code>. Each plot must be initialized at first using the m-files <code class="docutils literal notranslate"><span class="pre">grampc_init_plot_*.m</span></code>.
+During the simulation the plots can be updated by the m-files <code class="docutils literal notranslate"><span class="pre">grampc_update_plot_*.m</span></code>.
+Beside the trajectories of the simulated system dynamics (file ending *=sim) and trajectories along the prediction horizon (file ending *=pred), also some statistics (file ending *=stat) can be plotted.
+When solving OCPs instead of MPC problems, the plot along the prediction horizon shows the actual results.
+The plotted quantities depend on the parameter and option settings of GRAMPC, i.e. whether constraints are considered or not.
+The available plots are listed in more detail in the following lines.
+(Also see the example problems under <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples</span></code> for code samples on how to use the plot routines.)</p>
+<section id="system-dynamics-plot-plot-sim">
+<h4>System dynamics plot (plot_sim)<a class="headerlink" href="#system-dynamics-plot-plot-sim" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>States</strong>: This plot illustrates the trajectories of the state <span class="math notranslate nohighlight">\(\mb{x}\)</span> along the simulation time.</p></li>
+<li><p><strong>Adjoint states</strong>: This plot illustrates the trajectories of the adjoint state <span class="math notranslate nohighlight">\(\mb{\lambda}\)</span> along the simulation time.</p></li>
+<li><p><strong>Controls</strong>: This plot illustrates the trajectories of the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span> along the simulation time.</p></li>
+<li><p><strong>Constraints</strong>: This plot appears only if equality and/or inequality constraints are defined (<span class="math notranslate nohighlight">\({N_{\mb{g}}}\)</span> and/or <span class="math notranslate nohighlight">\({N_{\mb{h}}}\)</span> is larger than zero as specified in <code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code>).
+The plot shows the trajectories of the constraints <span class="math notranslate nohighlight">\(\mb{g}\)</span> and <span class="math notranslate nohighlight">\(\mb{h}\)</span> along the simulation time.</p></li>
+<li><p><strong>Lagrange multipliers</strong>: This plot appears only if equality and/or inequality constraints are defined.
+The plot shows the trajectories of the multipliers <span class="math notranslate nohighlight">\(\mb{\mu}_{\mb{g}}\)</span> and <span class="math notranslate nohighlight">\(\mb{\mu}_{\mb{h}}\)</span> along the simulation time.
+If any Lagrange multiplier reaches the limit <span class="math notranslate nohighlight">\(\mu_\text{max}\)</span> (specified by <code class="docutils literal notranslate"><span class="pre">MultiplierMax</span></code>), it indicates that the penalty parameters are too high or that the problem is not well-conditioned or that the costs are badly scaled.</p></li>
+<li><p><strong>Penalty parameters</strong>: This plot appears only if equality and/or inequality constraints are defined.
+The plot shows the trajectories of the penalties <span class="math notranslate nohighlight">\(\mb{c}_{\mb{g}}\)</span> and <span class="math notranslate nohighlight">\(\mb{c}_{\mb{h}}\)</span> along the simulation time.
+If any penalty reaches the maximum value <span class="math notranslate nohighlight">\(c_\text{max}\)</span>, set by <code class="docutils literal notranslate"><span class="pre">PenaltyMax</span></code>, it indicates that either the limit is not high enough or the update is too aggressive.</p></li>
+</ul>
+</section>
+<section id="prediction-plot-plot-pred">
+<h4>Prediction plot (plot_pred)<a class="headerlink" href="#prediction-plot-plot-pred" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>Predicted states</strong>: This plot illustrates the trajectories of the state <span class="math notranslate nohighlight">\(\mb{x}\)</span> along the prediction horizon.</p></li>
+<li><p><strong>Predicted adjoint states</strong>: This plot illustrates the trajectories of the adjoint state <span class="math notranslate nohighlight">\(\mb{\lambda}\)</span> along the prediction horizon.</p></li>
+<li><p><strong>Predicted controls</strong>: This plot illustrates the trajectories of the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span> along the prediction horizon.</p></li>
+<li><p><strong>Predicted constraints</strong>: This plot appears only if (terminal) equality and/or inequality constraints are defined.
+The plot shows the predicted violation of the equality constraints <span class="math notranslate nohighlight">\(\mb{g}\)</span> and inequality constraints <span class="math notranslate nohighlight">\(\mb{\max}(\mb{h},\mb{0})\)</span>
+along the prediction horizon and the predicted violation of the terminal equality constraints <span class="math notranslate nohighlight">\({\mb{g}_{T}}\)</span> and inequality
+constraints <span class="math notranslate nohighlight">\(\mb{\max}(\mb{h}_T,\mb{0})\)</span> at the end of the prediction horizon.
+Please note that except for OCPs, these are not the actual but predicted internal constraint violations of the current GRAMPC iteration.</p></li>
+<li><p><strong>Lagrange multipliers</strong>: This plot appears only if (terminal)
+equality and/or inequality constraints are defined.
+The plot shows the trajectories of the multipliers <span class="math notranslate nohighlight">\(\mb{\mu}_{\mb{g}}\)</span> and
+<span class="math notranslate nohighlight">\(\mb{\mu}_{\mb{h}}\)</span> along the prediction horizon and the multipliers
+<span class="math notranslate nohighlight">\({\mb{\mu}_{\mb{g}_T}}\)</span> and <span class="math notranslate nohighlight">\({\mb{\mu}_{\mb{h}_T}}\)</span>.
+If any Lagrange multiplier reaches the limit <span class="math notranslate nohighlight">\(\mu_\text{max}\)</span>, set by <code class="docutils literal notranslate"><span class="pre">MultiplierMax</span></code>, it
+indicates that the penalty parameters are too high or that the problem is not well-conditioned or that the costs are badly scaled.</p></li>
+<li><p><strong>Penalty parameters</strong>: This plot appears only if (terminal) equality and/or inequality constraints are defined.
+The plot shows the trajectories of the penalties <span class="math notranslate nohighlight">\(\mb{c}_{\mb{g}}\)</span> and <span class="math notranslate nohighlight">\(\mb{c}_{\mb{h}}\)</span>
+along the prediction horizon and the penalties <span class="math notranslate nohighlight">\({\mb{c}_{\mb{g}_T}}\)</span> and <span class="math notranslate nohighlight">\({\mb{c}_{\mb{h}_T}}\)</span>.
+If any penalty reaches the maximum value <span class="math notranslate nohighlight">\(c_\text{max}\)</span> set by <code class="docutils literal notranslate"><span class="pre">PenaltyMax</span></code>, it indicates that either the limit is not high enough or
+the update is too aggressive, see also <a class="reference internal" href="algorithm.html#sec-algopt-updatemultpen"><span class="std std-ref">Update of multipliers and penalties</span></a>.</p></li>
+</ul>
+</section>
+<section id="statistics-plot-plot-stat">
+<h4>Statistics plot (plot_stat)<a class="headerlink" href="#statistics-plot-plot-stat" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>Costs</strong>: This plot illustrates the costs <span class="math notranslate nohighlight">\(J\)</span> along the simulation time or along the augmented Lagrangian iterations.
+If constraints are defined, the augmented costs <span class="math notranslate nohighlight">\(\bar{J}\)</span> are shown as well.</p></li>
+<li><p><strong>Computation time</strong>: This plot illustrates the computation time of one MPC or optimization step of GRAMPC along the simulation time or along the augmented Lagrangian iterations.
+The time measurement is done in the function <code class="docutils literal notranslate"><span class="pre">grampc_run_Cmex.c</span></code> using operation system specific timer functions.
+Consequently, the time excludes the overhead resulting from the Mex interface as well as the time consumed by the plot functions.</p></li>
+<li><p><strong>Line search step size</strong>: This plot illustrates the step size <span class="math notranslate nohighlight">\(\alpha\)</span> of the last gradient iteration along the simulation time or along the augmented Lagrangian iterations.
+If the adaptive line search is used (see <a class="reference internal" href="algorithm.html#sec-algopt-linesearchadaptive"><span class="std std-ref">Adaptive line search</span></a>), the plot also illustrates the three corresponding sample points <span class="math notranslate nohighlight">\(\alpha_1\)</span>, <span class="math notranslate nohighlight">\(\alpha_2\)</span>, and <span class="math notranslate nohighlight">\(\alpha_3\)</span>.
+A step size equal to the maximum or minimum value <span class="math notranslate nohighlight">\(\alpha_\text{max}\)</span> or <span class="math notranslate nohighlight">\(\alpha_\text{min}\)</span> indicates that these values may have to be adapted or the problem may have to be scaled.
+Additionally, if the explicit line search is chosen and the fallback strategy is not activated (see <a class="reference internal" href="algorithm.html#sec-algopt-linesearchexplicit"><span class="std std-ref">Explicit line search</span></a> and <a class="reference internal" href="algorithm.html#sec-algopt-linesearchfallback"><span class="std std-ref">Fallback strategy for explicit line search</span></a>), a frequent use of the initial value <span class="math notranslate nohighlight">\(\alpha_\text{init}\)</span> indicates an ill-conditioned problem.</p></li>
+<li><p><strong>Gradient iterations</strong>: This plot appears only if the option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is set to <code class="docutils literal notranslate"><span class="pre">on</span></code>.
+It illustrates the number of executed gradient iterations along the simulation time or along the augmented Lagrangian iterations.
+In particular, the plot depicts whether the maximum number of gradient iterations <span class="math notranslate nohighlight">\(j_\text{max}\)</span> is reached or the convergence check caused a premature termination of the minimization.</p></li>
+<li><p><strong>Prediction horizon</strong>: This plot appears only if the option <code class="docutils literal notranslate"><span class="pre">OptimTime</span></code> is set to <code class="docutils literal notranslate"><span class="pre">on</span></code>.
+It illustrates the prediction horizon <span class="math notranslate nohighlight">\(T\)</span> along the simulation time or along the augmented Lagrangian iterations.
+In shrinking horizon applications the value should decrease linearly after a short settling phase.</p></li>
+<li><p><strong>Norm of constraints over horizon</strong>: This plot appears only if constraints are defined.
+It illustrates the norm <span class="math notranslate nohighlight">\(\frac{1}{T}\sqrt{\|\mb{g}\|_{L_2}^2+\|\mb{\max}( {\mb{h}},\mb{0})\|_{L_2}^2 +\| {\mb{g}_T}\|_{2}^2+\|\mb{\max}( {\mb{h}_T},\mb{0})\|_{2}^2 }\)</span>
+over all predicted constraints plotted over the simulation time or the augmented Lagrangian iterations.
+Especially when solving OCPs, the value should decrease continuously.</p></li>
+<li><p><strong>Norm of penalty parameters over horizon</strong>: This plot appears only if the number of equality <span class="math notranslate nohighlight">\({N_{\mb{g}}}\)</span>, inequality <span class="math notranslate nohighlight">\({N_{\mb{h}}}\)</span>, terminal equality <span class="math notranslate nohighlight">\({N_{\mb{g}_T}}\)</span> or terminal inequality <span class="math notranslate nohighlight">\({N_{\mb{h}_T}}\)</span> constraints is not zero.
+It illustrates the norm <span class="math notranslate nohighlight">\(\frac{1}{T}\sqrt{\|\mb{\bar c}\|_{L_2}}\)</span> over all predicted penalty parameters along the simulation time or along the augmented Lagrangian iterations.</p></li>
+<li><p><strong>Terminal constraints</strong>: This plot appears only if terminal constraints are defined.
+It illustrates the violation of the terminal equality constraints <span class="math notranslate nohighlight">\({\mb{g}_{T}}\)</span> and inequality constraints <span class="math notranslate nohighlight">\(\mb{\max}(\mb{h}_T,\mb{0})\)</span> along the simulation time or along the augmented Lagrangian iterations in case of OCPs.</p></li>
+<li><p><strong>Terminal Lagrangian multipliers</strong>: This plot appears only if terminal constraints are defined.
+It illustrates the multipliers <span class="math notranslate nohighlight">\({\mb{\mu}_{\mb{g}_T}}\)</span> and <span class="math notranslate nohighlight">\({\mb{\mu}_{\mb{h}_T}}\)</span> along the simulation time or along the augmented Lagrangian iterations in case of OCPs.</p></li>
+<li><p><strong>Terminal penalty parameters</strong>: This plot appears only if terminal constraints are defined.
+It illustrates the penalties <span class="math notranslate nohighlight">\({\mb{c}_{\mb{g}_T}}\)</span> and <span class="math notranslate nohighlight">\({\mb{c}_{\mb{h}_T}}\)</span> along the simulation time or along the augmented Lagrangian iterations in case of OCPs.</p></li>
+</ul>
+<div class="docutils container" id="id2">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-rodas-webpage-2018" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>RODAS. Webpage. http://www.unige.ch/\texttt ~hairer/software.html, Accessed 01-December-2018.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Usage of GRAMPC</a><ul>
+<li><a class="reference internal" href="#using-grampc-in-c">Using GRAMPC in C</a><ul>
+<li><a class="reference internal" href="#main-components-of-grampc">Main components of GRAMPC</a></li>
+<li><a class="reference internal" href="#initialization-of-grampc">Initialization of GRAMPC</a></li>
+<li><a class="reference internal" href="#setting-options-and-parameters">Setting options and parameters</a></li>
+<li><a class="reference internal" href="#compiling-and-calling-grampc">Compiling and calling GRAMPC</a></li>
+<li><a class="reference internal" href="#using-grampc-without-dynamic-memory-allocation">Using GRAMPC without dynamic memory allocation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-grampc-in-matlab-simulink">Using GRAMPC in Matlab/Simulink</a><ul>
+<li><a class="reference internal" href="#interface-to-matlab">Interface to Matlab</a></li>
+<li><a class="reference internal" href="#interface-to-matlab-simulink">Interface to Matlab/Simulink</a></li>
+<li><a class="reference internal" href="#plot-functions">Plot functions</a><ul>
+<li><a class="reference internal" href="#system-dynamics-plot-plot-sim">System dynamics plot (plot_sim)</a></li>
+<li><a class="reference internal" href="#prediction-plot-plot-pred">Prediction plot (plot_pred)</a></li>
+<li><a class="reference internal" href="#statistics-plot-plot-stat">Statistics plot (plot_stat)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="algorithm.html"
+                          title="previous chapter">Optimization algorithm and options</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="tutorials.html"
+                          title="next chapter">Tutorials</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/usage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="prf-prf.html" title="Proof Index"
+             >Proof</a> |</li>
+        <li class="right" >
+          <a href="tutorials.html" title="Tutorials"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="algorithm.html" title="Optimization algorithm and options"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">grampc 2.3 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Usage of GRAMPC</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Andreas Völz, Thore Wietzke.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.4.0.
+    </div>
+  </body>
+</html>

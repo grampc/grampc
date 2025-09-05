@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Installation and structure of GRAMPC &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=6fea359b"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Problem formulation and implementation" href="problem_formulation/problem_formulation.html" />
+    <link rel="prev" title="Changelog" href="changelog.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/install.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Installation and structure of GRAMPC</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-c-with-cygwin">Installation of GRAMPC for use in C with Cygwin</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-c-c-with-cmake">Installation of GRAMPC for use in C/C++ with CMake</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-matlab">Installation of GRAMPC for use in Matlab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-python">Installation of GRAMPC for use in Python</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-of-grampc">Structure of GRAMPC</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="installation-and-structure-of-grampc">
+<span id="chap-install"></span><h1>Installation and structure of GRAMPC<a class="headerlink" href="#installation-and-structure-of-grampc" title="Link to this heading">#</a></h1>
+<p>The following subsections describe the installation procedure of
+GRAMPC for use in C and Matlab.
+<a class="reference internal" href="#sec-structure"><span class="std std-ref">Structure of GRAMPC</span></a> presents the principal structure of the toolbox.</p>
+<section id="installation-of-grampc-for-use-in-c-with-cygwin">
+<span id="sec-installc"></span><h2>Installation of GRAMPC for use in C with Cygwin<a class="headerlink" href="#installation-of-grampc-for-use-in-c-with-cygwin" title="Link to this heading">#</a></h2>
+<p>A convenient way to use GRAMPC in C/C++ under MS Windows is the Linux
+environment Cygwin. To install Cygwin, download the setup file from the
+web page <a class="reference external" href="http://www.cygwin.com/">http://www.cygwin.com/</a> and follow the installation
+instructions. In the installation process when packages can be selected,
+you have to choose the <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler and <code class="docutils literal notranslate"><span class="pre">make</span></code>. If Cygwin is properly installed,
+open a Cygwin terminal and perform the following steps:</p>
+<ol class="arabic">
+<li><p>Download the current version of GRAMPC from <a class="github reference external" href="https://github.com/grampc/grampc">grampc/grampc</a>.</p></li>
+<li><p>Unpack the archive to an arbitrary location on your computer.
+After the unpacking procedure, a new directory with the following subfolders is created:</p>
+<ul class="simple">
+<li><p><strong>cpp</strong>: Interface of GRAMPC to C++.</p></li>
+<li><p><strong>doc</strong>: Contains this GRAMPC documentation.</p></li>
+<li><p><strong>examples</strong>: This folder contains several executable MPC, MHE and OCP problems as well as templates for implementing your own problems.</p></li>
+<li><p><strong>include</strong>: The header files of the GRAMPC project are located in this folder.</p></li>
+<li><p><strong>libs</strong>: This folder is only available after compiling the GRAMPC toolbox and contains the GRAMPC library.</p></li>
+<li><p><strong>matlab</strong>: Interface of GRAMPC to Matlab/Simulink, also see <a class="reference internal" href="#sec-installmatlab"><span class="std std-ref">Installation of GRAMPC for use in Matlab</span></a>.</p></li>
+<li><p><strong>src</strong>: The source files of the GRAMPC project are located in this folder.</p></li>
+</ul>
+<p>The GRAMPC directory additionally contains a makefile for building the GRAMPC toolbox.
+For the remainder of this manual, the location of the created GRAMPC folder will be denoted by <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;</span></code>.</p>
+</li>
+<li><p>Compile GRAMPC by running the following commands in a terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;
+$ make clean all
+</pre></div>
+</div>
+<p>The dollar symbol indicates the line prompt of the terminal.
+The make command compiles the source files and generates the GRAMPC library within <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/libs</span></code>, which can now be used to solve a suitable problem in C.
+The additional argument <code class="docutils literal notranslate"><span class="pre">clean</span> <span class="pre">all</span></code> removes previously installed parts of GRAMPC.</p>
+</li>
+</ol>
+</section>
+<section id="installation-of-grampc-for-use-in-c-c-with-cmake">
+<span id="sec-installcmake"></span><h2>Installation of GRAMPC for use in C/C++ with CMake<a class="headerlink" href="#installation-of-grampc-for-use-in-c-c-with-cmake" title="Link to this heading">#</a></h2>
+<p>GRAMPC also supplies <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> files for building the GRAMPC library and the examples.
+From the command line, if cmake is installed, type</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">build</span>
+<span class="n">cd</span> <span class="n">build</span>
+<span class="n">cmake</span> <span class="o">../</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>and the toolbox and the examples are built.
+If only the toolbox shall be build, one can issue</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">.</span> <span class="o">--</span><span class="n">target</span> <span class="n">grampc</span>
+</pre></div>
+</div>
+<p>which only compiles the GRAMPC library.</p>
+</section>
+<section id="installation-of-grampc-for-use-in-matlab">
+<span id="sec-installmatlab"></span><h2>Installation of GRAMPC for use in Matlab<a class="headerlink" href="#installation-of-grampc-for-use-in-matlab" title="Link to this heading">#</a></h2>
+<p>GRAMPC requires a C compiler that is supported by Matlab for a direct use.
+Details on supported compilers for the current Matlab version as well as previous releases can be found via the Mathworks homepage.
+The correct linkage of the compiler to Matlab can be checked by typing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">mex</span> <span class="o">-</span><span class="n">setup</span>
+</pre></div>
+</div>
+<p>in the Matlab terminal window and subsequently selecting the
+corresponding C compiler. The symbol <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> denotes the Matlab prompt.
+The GRAMPC installation under Matlab proceeds in two steps:</p>
+<ol class="arabic">
+<li><p>After downloading and unpacking GRAMPC as described in <a class="reference internal" href="#sec-installc"><span class="std std-ref">Installation of GRAMPC for use in C with Cygwin</span></a>, go to the Matlab directory</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">cd</span> <span class="o">&lt;</span><span class="n">grampc_root</span><span class="o">&gt;/</span><span class="n">matlab</span>
+</pre></div>
+</div>
+<p>which contains the following subfolders:</p>
+<ul class="simple">
+<li><p><strong>bin</strong>: This folder is only available after compiling the GRAMPC toolbox and contains the object files of GRAMPC.</p></li>
+<li><p><strong>include</strong>: The header files of the GRAMPC project for the Matlab interface.</p></li>
+<li><p><strong>mfiles</strong>: Various auxiliary functions for the Matlab interface.</p></li>
+<li><p><strong>src</strong>: C sources files of the Mex files which provide the interface between GRAMPC and Matlab.</p></li>
+</ul>
+<p>In addition, the subfolder contains the m-file <code class="docutils literal notranslate"><span class="pre">make.m</span></code> to start the building process.</p>
+</li>
+<li><p>Build the necessary object files for GRAMPC by executing the make function.
+The compilation of the source files can be performed with the following options:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">make</span> <span class="pre">clean</span></code> removes all previously built GRAMPC files,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">make</span></code> creates the necessary object files to use GRAMPC,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">make</span> <span class="pre">verbose</span></code> the object files are created in verbose mode, i.e. additional information regarding the building process are provided during the compilation,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">make</span> <span class="pre">debug</span></code> the debug option creates the object files with additional information for use in debugging,</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&gt;&gt;</span> <span class="pre">make</span> <span class="pre">debug</span> <span class="pre">verbose</span></code> activates the debug option as well as the verbose mode.</p></li>
+</ul>
+<p>Similar to the compiling procedure in C as described in <a class="reference internal" href="#sec-installc"><span class="std std-ref">Installation of GRAMPC for use in C with Cygwin</span></a>, the <code class="docutils literal notranslate"><span class="pre">make</span></code> command compiles the source files to generate object files within <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/matlab/bin</span></code>, which can now be used to solve a suitable problem in Matlab.</p>
+</li>
+</ol>
+</section>
+<section id="installation-of-grampc-for-use-in-python">
+<span id="sec-installpython"></span><h2>Installation of GRAMPC for use in Python<a class="headerlink" href="#installation-of-grampc-for-use-in-python" title="Link to this heading">#</a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version v2.3.</span></p>
+</div>
+<p>The Python interface of GRAMPC uses pybind11 <a class="github reference external" href="https://github.com/pybind/pybind11">pybind/pybind11</a> and Eigen 3.4 <a class="reference external" href="https://eigen.tuxfamily.org/index.php?title=Main_Page">https://eigen.tuxfamily.org/index.php?title=Main_Page</a>.
+First, download Eigen 3.4 and follow the steps in <code class="docutils literal notranslate"><span class="pre">INSTALL</span></code>, so its header files are available through the <code class="docutils literal notranslate"><span class="pre">find_package()</span></code> command in CMake.
+Make sure the run the installation for Eigen with administration rights.
+Then, the interface is installed through</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>assuming you are within <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;</span></code>, or directly from github with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">grampc</span><span class="o">/</span><span class="n">grampc</span> <span class="o">.</span>
+</pre></div>
+</div>
+<p>The Python interface can then be imported with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pygrampc</span>
+</pre></div>
+</div>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>If working on Windows, make sure to use Microsoft Visual Studio Compiler (MSVC), since Python for Windows is compiled with MSVC.</p>
+</div>
+</section>
+<section id="structure-of-grampc">
+<span id="sec-structure"></span><h2>Structure of GRAMPC<a class="headerlink" href="#structure-of-grampc" title="Link to this heading">#</a></h2>
+<p>The aim of GRAMPC is to be portable and executable on different
+operating systems and hardware devices without the use of external
+libraries. After the installation procedure as described in <a class="reference internal" href="#sec-installc"><span class="std std-ref">Installation of GRAMPC for use in C with Cygwin</span></a> and <a class="reference internal" href="#sec-installmatlab"><span class="std std-ref">Installation of GRAMPC for use in Matlab</span></a>, the
+GRAMPC structure shown in <a class="reference internal" href="#fig-grampcgeneralstructure"><span class="std std-numref">Fig. 1</span></a>
+is available to cope with problems from optimal control, model
+predictive control, moving horizon estimation, and parameter
+optimization. As illustrated in <a class="reference internal" href="#fig-grampcgeneralstructure"><span class="std std-numref">Fig. 1</span></a>, the GRAMPC project is
+implemented in plain C with a user-friendly interface to C++, Matlab/Simulink, and dSpace.</p>
+<p>A specific problem can be implemented in GRAMPC using the C template
+<code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> included in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/examples/TEMPLATES</span></code>.
+A more detailed discussion about this step can be found in <a class="reference internal" href="problem_formulation/problem_formulation.html#chap-problemformulation"><span class="std std-ref">Problem formulation and implementation</span></a>. The workspace of a GRAMPC project
+as well as algorithmic options and parameters are stored by the
+structure variable <code class="docutils literal notranslate"><span class="pre">grampc</span></code>. While several parameter settings are
+problem specific and need to be provided, most values are set to their
+respective default value, see <a class="reference internal" href="algorithm/algorithm.html#chap-algopt"><span class="std std-ref">Optimization algorithm and options</span></a>. The GRAMPC
+structure can be manipulated through a generic interface, e.g. in order
+to set algorithmic options or parameters for a specific problem without
+the need to recompile the <code class="docutils literal notranslate"><span class="pre">grampc</span></code> project every time.</p>
+<figure class="align-default" id="fig-grampcgeneralstructure">
+<img alt="GRAMPC Structure" src="_images/GeneralStructure.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">General structure of GRAMPC (gray - C code, white - Matlab code).</span><a class="headerlink" href="#fig-grampcgeneralstructure" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>A specific example contained in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/examples</span></code> can be
+compiled in C as well as in Matlab and linked against the GRAMPC toolbox.
+A more detailed discussion on this step can be found in <a class="reference internal" href="usage/usage.html#chap-grampcstructure"><span class="std std-ref">Usage of GRAMPC</span></a>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="changelog.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Changelog</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="problem_formulation/problem_formulation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Problem formulation and implementation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-c-with-cygwin">Installation of GRAMPC for use in C with Cygwin</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-c-c-with-cmake">Installation of GRAMPC for use in C/C++ with CMake</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-matlab">Installation of GRAMPC for use in Matlab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation-of-grampc-for-use-in-python">Installation of GRAMPC for use in Python</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-of-grampc">Structure of GRAMPC</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

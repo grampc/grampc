@@ -1,0 +1,993 @@
+.. _chap:Tutorials:
+
+Tutorials
+=========
+
+This chapter presents some application examples of GRAMPC and how to
+tune GRAMPC to improve the performance compared to the default
+settings. In addition to a model predictive control and an optimal
+control problem, a moving horizon estimation example is presented.
+Please note that the plot functions, described in :ref:`sec:Plotfunctions`, and the status of GRAMPC, see :ref:`sec:AlgOpt:StatusFlags`, also provide important
+information for tuning GRAMPC.
+
+.. _sec:TUT:PMSM:
+
+Model predictive control of a PMSM
+----------------------------------
+
+The torque or current control of a permanent magnet synchronous machine
+(PMSM) is a challenging example for nonlinear constrained model
+predictive control. The following subsections illustrate the problem
+formulation as well as useful options of GRAMPC to improve the control
+performance. Corresponding m and C files can be found in the folder ``<grampc_root>/examples/PMSM``.
+
+Problem formulation
+~~~~~~~~~~~~~~~~~~~
+
+
+.. figure:: img/tikz/ext/ext_PMSM_constr_unscaled.*
+    :name: fig:PMSM_constr_unscaled
+
+    Simulated MPC trajectories for the PMSM example with default settings.
+
+The system dynamics of a PMSM :footcite:`Englert:CEP:2018`
+
+.. math::
+    :label: eq:tut:PMSM:model
+
+    L_\text{d}\tfrac{{\rm d}}{{\rm d}t}i_\text{d} &= -R i_\text{d}+L_\text{q}\omega i_\text{q}+u_\text{d}\\ 
+    L_\text{q}\tfrac{{\rm d}}{{\rm d}t}i_\text{q} &= -R i_\text{q}-L_\text{d}\omega i_\text{d}-\omega\psi_\text{p}+u_\text{q} \\
+    J\tfrac{{\rm d}}{{\rm d}t}\omega &= \left(\tfrac{3}{2}z_\text{p}\left(\psi_\text{p}i_\text{q} + 
+    i_\text{d}i_\text{q}(L_\text{d} - L_\text{q})\right)-\tfrac{\mu_\text{f}}{z_\text{p}}\omega-T_\text{L}\right)z_\text{p}\\
+    \tfrac{{\rm d}}{{\rm d}t}\phi &= \omega
+
+is given in the dq-coordinates. The system state
+:math:`\mb{x} = [i_\text{d},i_\text{q},\omega,\phi]^\mathsf{T}`
+comprises the dq-currents, the electrical rotor speed as well as the
+electrical angle. The dq-voltages serve as controls
+:math:`\mb{u} = [u_\text{d},u_\text{q}]^\mathsf{T}`. Further
+system parameters are the stator resistance :math:`R = 3.5\,\Omega`,
+the number of pole-pairs :math:`z_\text{p} = 3`, the permanent magnet
+flux :math:`\psi_p = 0.17\,\mathrm{V\,s}`, the dq-inductivities
+:math:`L_\text{d}=L_\text{q}=17.5\,\mathrm{mH}`, the moment of
+inertia :math:`J= 0.9\,\mathrm{g\,m^2}` as well as the friction
+coefficient :math:`\mu_\text{f}=0.4\,\mathrm{mN\,m\,s}`.
+
+The magnitude of the dq-currents is limited by the maximum current
+:math:`I_\text{max}=10\,A`, i.e.
+
+.. math::
+    :label: eq:tut:PMSM:stateconstr
+
+    i_\text{abs} =i_\text{d}^2+i_\text{q}^2 \leq I_\text{max}^2\,,
+
+in order prevent damage of the electrical components. Another constraint
+concerns the dq-voltages. Through the modulation stage between the
+controller and the voltage source inverter, the dq-voltages are limited
+inside the circle
+
+.. math::
+    :label: eq:tut:PMSM:inputconstr
+
+    u_\text{abs} = u_\text{d}^2+u_\text{q}^2 \leq U_\text{max}^2
+
+with the maximum voltage :math:`U_\text{max}=323\,\mathrm{V}`.
+
+The optimal control problem
+
+.. math::
+
+   	\min_{\mb{u}} \quad & J(\mb{u};\mb{x}_k) = \int_0^T l(\mb{x}(\tau), \mb{u}(\tau)) \, {\rm d}\tau
+
+   	\textrm{s.t.} \quad & \mb{\dot x}(\tau) = \mb{f}(\mb{x}(\tau), \mb{u}(\tau)) \,, \quad \mb{x}(0) = \mb{x}_k
+
+   	& h_1(\mb{x} (\tau)) = x_1(\tau)^2 +  x_2(\tau)^2 - I_\text{max}^2 \leq 0
+
+   	& h_2(\mb{u} (\tau)) = u_1(\tau)^2 +  u_2(\tau)^2 - U_\text{max}^2 \leq 0
+
+   	& \mb{u}(\tau) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]
+
+is subject to the system dynamics given by :math:numref:`eq:tut:PMSM:model` and the
+constraints given by :math:numref:`eq:tut:PMSM:stateconstr` and
+:math:numref:`eq:tut:PMSM:inputconstr`. 
+The control constraints :math:numref:`eq:tut:PMSM:inputconstr` are
+nonlinear and are therefore handled by the augmented Lagrangian
+framework and not by the projection gradient method itself. It is
+therefore reasonable to add the box constraints for :math:`\mb{u}` with :math:`\mb{u}_\text{min} = [-U_\text{max},-U_\text{max}]^\mathsf{T}` and
+:math:`\mb{u} _\text{max} = [U_\text{max},U_\text{max}]^\mathsf{T}` to the OCP formulation to enhance the overall robustness of the
+algorithm. The cost functional consists of the integral part
+
+.. math::
+
+   l(\mb{x}, \mb{u}) = q_1 (\mb{i}_\text{d} -  i_\text{d,des} )^2 + q_2 (\mb{i}_\text{q} -  i_\text{q,des} )^2 + (\mb{u} - \mb{u}_\text{des} ) ^\mathsf{T}\mb{R}  (\mb{u} - \mb{u}_\text{des} )\,,
+
+with the setpoints for the states :math:`i_\text{d,des}`,
+:math:`i_\text{q,des}` and controls
+:math:`\mb{u}_\mathrm{des} \in \mathbb{R}^2` respectively. The
+weights are set to :math:`q_1 = 8\,\mathrm{A^{-2}}`,
+:math:`q_2=200\,\mathrm{A^{-2}}` and :math:`\mb{R} ={\rm diag}(0.001\,\mathrm{V^{-2}},0.001\,\mathrm{V^{-2}})`. The example considers a
+startup of the motor from standstill by defining the setpoints
+:math:`i_\text{d,des}=0\,\mathrm{A}` and
+:math:`i_\text{q,des}=10\,\mathrm{A}`, corresponding to a constant
+torque demand of :math:`7.65\,\mathrm{N\,m}`. The desired controls are set to
+:math:`\mb{u}_\text{d,des}=[0\,\mathrm{V}, 0\,\mathrm{V}]^\mathsf{T}`.
+
+The resulting OCP is solved by GRAMPC with the sampling time
+:math:`\Delta t = 125\,\mathrm{\mu s}` (parameter ``dt``) and the horizon
+:math:`T = 5\,\mathrm{ms}` (parameter ``Thor``) using standard options
+almost exclusively. Only the number of discretization points ``Nhor=11`` , the
+number of gradient iterations ``MaxGradIter=3``  and the number of augmented
+Lagrangian iterations ``MaxMultIter=3``  are adapted to the problem. In addition, the
+constraints tolerances ``ConstraintsAbsTol`` are set to 0.1% of the respective limit, i.e.
+:math:`0.1\,\mathrm{A^2}` and :math:`104.5\,\mathrm{V^2}`. ``PenaltyMin`` is set to 2.5 x 10\ :sup:`-7` by
+the estimation method of GRAMPC, see :ref:`sec:AlgOpt:EstimPenMin`.
+
+:numref:`fig:PMSM_constr_unscaled` illustrates the simulation
+results. The setpoints are reached very fast and are stabilized almost
+exactly. However, an overshoot can be observed, which also leads to a
+small violation of the dq-current constraint by :math:`0.45\,\mathrm{A}`. With increasing
+rotor speed, the voltage also increases until the voltage constraint
+becomes active. While the voltage constraint is almost exactly hold, the
+dq-current constraint is clearly violated. The figure shows that at the
+end of the simulation the dq-current constraint violation is more than
+:math:`1\,\mathrm{A}` or 10%. Though a larger number of iterations might be used to reduce
+the constraint violation, the main reason for this deviation is that the
+nonlinear voltage and current constraints differ in several orders of
+magnitude. The next section therefore shows how to scale the problem in
+GRAMPC.
+
+Also note that the increase of the cost functional does not indicate
+instability, but can be explained by the increasing speed, which affects
+the control term in the cost with the control setpoints
+:math:`(\mb{u}_\text{d,des}=[0\,\mathrm{V}, 0\,\mathrm{V}]^\mathsf{T})`.
+Moreover, the current setpoints
+:math:`(i_\text{d,des}=0\,\mathrm{A},\,i_\text{q,des}=10\,\mathrm{A})`
+cannot be hold due to the
+constraints :math:numref:`eq:tut:PMSM:stateconstr` and
+:math:numref:`eq:tut:PMSM:inputconstr`, which leads to
+an additional cost increase.
+
+Constraints scaling
+~~~~~~~~~~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_PMSM_constr_scaled.*
+    :name: fig:PMSM_constr_scaled
+
+    Simulated MPC trajectories for the PMSM example with scaled constraints.
+
+The two spherical constraints :math:numref:`eq:tut:PMSM:stateconstr` and
+:math:numref:`eq:tut:PMSM:inputconstr` lie in very
+different orders of magnitude, i.e. :math:`I_\text{max}^2 =100\,\mathrm{A^2}` 
+and :math:`U_\text{max}^2 =104329\,\mathrm{V^2}`. 
+Consequently, the two constraints should be scaled by the maximum value
+
+.. math::
+
+   \frac{i_\text{d}^2+i_\text{q}^2}{I_\text{max}^2}-1 \leq 0\,,\qquad  \frac{u_\text{d}^2+u_\text{q}^2}{U_\text{max}^2}-1 \leq 0\,.
+
+This scaling can either be done by hand directly in the problem function
+or by activating the option ``ScaleProblem`` and setting ``cScale`` :math:`=[I_\text{max}^2, U_\text{max}^2]`. 
+The scaling option of GRAMPC, however, causes
+additional computing effort (approx. 45% for the PMSM problem). Hence,
+this option is suitable for testing the scaling, but eventually should
+be done manually in the problem formulation to achieve the highest
+computational efficiency. In accordance with the scaling of the
+constraints, the tolerances are also adapted to 1 x 10\ :sup:`-3`
+corresponding to 0.1% of the scaled constraints limits.
+
+Besides the scaling and ``PenaltyMin`` that is set to 2 x 10\ :sup:`3` by the
+estimation routine of GRAMPC, all parameters and options are the same
+as in the last subsection. Please note that the estimation method for ``PenaltyMin``
+strongly depends on reasonable constraint tolerances. In general, the
+method returns rather conservative values, which may lead to constraint
+violations if the order of magnitude of the constraints is very
+different.
+
+:numref:`fig:PMSM_constr_scaled` shows a clear improvement in
+terms of the dq-current constraint that is now fully exploited. The only
+violation results from the overshoot at the beginning, which is in the
+same range as in the unscaled case (approx. 0.35 A). Further
+improvements, e.g. reduction of the overshoot, can be achieved by
+optimizing the penalty update as described in the next subsection.
+
+Optimization of the penalty update
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_PMSM_penalty_opt.*
+    :name: fig:PMSM_penalty_opt
+
+    Simulated MPC trajectories for the PMSM example with scaled constraints and optimized penalty update.
+
+In order to improve compliance with the dq-current constraint at the
+beginning of the simulation, the number of augmented Lagrangian updates
+is increased. To this end ``AugLagUpdateGradientRelTol`` is raised to 1, which means that in every
+outer iteration an update of the multipliers and penalties is performed,
+even if the inner minimization is not converged. Furthermore ``PenaltyMin`` , is raised
+to 1 x 10\ :sup:`4` compared to the estimated value of 2 x 10\ :sup:`3`.
+In addition, the plot of the step size, see the plot functions described
+in :ref:`sec:Plotfunctions`, shows that the maximum value
+:math:`\alpha_\text{max}` is often used. Consequently, setting the
+maximum step size ``LineSearchMax`` to 10 allows larger optimization steps, especially at
+the beginning and at the end of the simulation. All other parameters and
+options, in particular the scaling options, are the same as in the
+previous subsection.
+
+:numref:`fig:PMSM_penalty_opt` illustrates the simulation result
+with the optimized penalty update. The initial dq-current overshoot is
+further reduced and the constraint is only violated by less than 0.07 A.
+Furthermore, no oscillations occur in the costs and the augmented and
+original cost are almost the same, which indicates that GRAMPC is well
+tuned.
+
+The computation time on a Windows 10 machine with Intel(R) Core(TM)
+i5-5300U CPU running at 2.3 GHz using the Microsoft Visual C++ 2013
+Professional (C) compiler amounts to 0.032 ms. On the dSpace real-time
+hardware DS1202, the computation time is 0.13 ms.
+
+Optimal control of a double integrator
+--------------------------------------
+
+.. figure:: img/tikz/ext/ext_DoubleInt.*
+    :name: fig:DoubleInt
+
+    Numerical OCP solution of the double integrator problem with fixed end time.
+
+This section describes how GRAMPC can be used to solve OCPs by
+considering the example of a double integrator problem. The problem
+formulation includes equality and inequality constraints. Both the
+control variable :math:`u` and the end time :math:`T` serve as
+optimization variables. In addition to the problem formulation of the
+OCP, one focus of the following discussion will be the appropriate
+convergence check of the augmented Lagrangian and gradient method, and
+the optimization of the end time.
+
+.. _problem-formulation-1:
+
+Problem formulation
+~~~~~~~~~~~~~~~~~~~
+
+The double integrator problems reads as
+
+.. math::
+    :label: eq:OCP_doubleInt
+
+    \min_{u, T} \quad & J(u, T;\mb{x}_0) = T + \int_0^T q_1u^2(t) \, {\rm d}t \\
+    \textrm{s.t.} \quad & {\dot x_1}(t) = x_2(t) \,, \quad x_1(0) = x_{1,0} \\
+    & {\dot x_2}(t) = u(t) \,, \quad x_2(0) = x_{2,0} \\
+    & \mb{g}_{T}(\mb{x}(T))  = [x_1(T)\,, x_2(T)]^\mathsf{T}= \mb{0} \\
+    & h(\mb{x} (t)) = x_2(t) - 0.5 \leq 0 \\
+    & u(t) \in \left[u_{\min}, u_{\max}\right] \,,\quad T \in \left[T_{\min}, T_{\max}\right]
+
+including two terminal equality constraints :math:`\mb{g}_{T}(\mb{x}(T))`
+and one general inequality constraint :math:`h(\mb{x} (t))`.
+The control task consists in a setpoint transition from the initial
+state :math:`x_{1,0}=x_{2,0}=-1` to the origin :math:`x_1(T)=x_2(T)=0`.
+The cost functional :math:`J(u, T;\mb{x}_0)` represents a
+trade-off between time and energy optimality depending on the weight :math:`q_1=0.1`.
+
+The problem is formulated in GRAMPC using the C file
+``probfct_DOUBLE_INTEGRATOR``, which can be found in ``<grampc_root>/examples/Double_Integrator``. In particular,
+the terminal equality constraints are formulated in GRAMPC via the functions ``gTfct`` , ``dgTdx_vec`` and ``dgTdT_vec``. 
+The number of terminal equality constraints is set to ``NgT`` =2 in the function ``ocp_dim``. Similarly,
+the inequality constraint is formulated by means of the functions ``hfct`` , ``dhdx_vec`` and ``dhdu_vec`` and setting to ``Nh`` =1 in ``ocp_dim``.
+More details on implementing the OCP can be found in
+:ref:`sec:ProblemImplementation` and in the example provided in the folder ``<grampc root>/examples/Double Integrator``.
+
+The options ``OptimControl`` and ``OptimTime`` are activated to optimize not only the control
+variable :math:`u` but also the end time :math:`T`. The lower and upper
+bounds of the optimzation variables are set to :math:`u\in[-1,1]` and
+:math:`T\in[1,10]` using the parameters ``umin`` , ``umax`` , ``Tmin`` and ``Tmax`` ,
+cf. :ref:`chap:ProblemFormulation`. Note that the option ``ShiftControl`` is
+deactivated, as the shifting of the control trajectory typically only
+applies to MPC problems.
+
+The option ``ConvergenceCheck`` is activated to terminate the augmented Lagrangian algorithm
+as soon as the state constraints are fulfilled with sufficient accuracy
+and the optimization variable has converged to an optimal value. To this
+end, the convergence
+criteria :math:numref:`eq:AlgOpt:ConvGradient` and
+:math:numref:`eq:AlgOpt:ConvConstraints` are
+evaluated after each gradient and augmented Lagrangian step using the
+thresholds
+:math:`\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}`
+and :math:`\varepsilon_{\mb{h}}=1e-6`, cf. the option ``ConstraintsAbsTol`` .
+The threshold for checking convergence of the optimization variable
+:math:`\varepsilon_\text{rel,c}` is set to :math:`1e-9` via the
+option ``ConvergenceGradientRelTol`` . Note that the activation of the convergence check using the
+option ``ConvergenceCheck`` causes the gradient method to be aborted when the convergence
+condition :math:`\eta^{i|j+1} \leq \varepsilon_\text{rel,c}` defined by
+:math:numref:`eq:AlgOpt:ConvConstraints` is reached.
+
+Optimization with fixed end time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_DoubleInt_constr.*
+    :name: fig:DoubleInt_constr
+
+    Numerical OCP solution of the double integrator problem with fixed end time and state constraint.
+
+In a first scenario, the OCP :math:numref:`eq:OCP_doubleInt` is numerically solved with the fixed end time :math:`T=4\,\mathrm{s}`,
+i.e., the option ``OptimTime`` is set ``off`` , and without the inequality
+constraint, i.e., the option ``InequalityConstraints`` is also set ``off`` . The time interval :math:`[0,T]` is
+discretized using ``Nhor=50`` discretization points. During the
+augmented Lagrangian iterations, a decrease of the penalty parameters is
+prevented by setting the adaptation factor :math:`\beta_\text{de}=1`
+(see option ``PenaltyDecreaseFactor``). The increase factor :math:`\beta_\text{in}` of the
+penalty parameter update :math:numref:`eq:AlgOpt:UpdatePenh` is set to the value
+:math:`1.25`. These settings ensure a fast convergence, since the
+very low tolerances :math:`\mb{\varepsilon_{\mb{g}_T}}`
+require high penalty parameters. However, starting with high penalties
+can lead to instabilities, as high penalties distort the optimization
+problem.
+
+As shown in :numref:`fig:DoubleInt`, the state variables
+:math:`\mb{x}(t)` are transferred to the origin as specified by
+the terminal state constraints.
+Note that only 5 augmented Lagrangian steps are required in total for
+numerically solving the state constrained optimization problem in
+accordance with the formulated convergence criterion for the terminal
+equality constraints and the optimization variable :math:`u`. The number
+of gradient iterations varies in each augmented Lagrangian step as shown
+in :numref:`fig:DoubleInt`. The violation of the formulated
+terminal equality constraints continuously decreases below the specified thresholds
+:math:`\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}`.
+As a result, the augmented cost functional and the original cost
+functional converge to the same value, i.e. the so-called duality gap
+is zero.
+
+In a second scenario, :numref:`fig:DoubleInt_constr` shows the
+optimal solution of OCP :math:numref:`eq:OCP_doubleInt` with
+activated inequality constraint using the fixed end time :math:`T=5.25\,\mathrm{s}`. Further problem
+settings are identical to the first simulation scenario. Again, the
+terminal equality constraints are satisfied by the optimal solution and the state variables
+:math:`\mb{x}(t)` are transferred to the origin. The control
+variable :math:`u` is slightly adapted compared to the first simulation
+scenario in :numref:`fig:DoubleInt` in order to comply with the inequality constraint.
+In view of the additional inequality constraint, 17 augmented Lagrangian
+steps are required to be able to solve the optimization problem with
+sufficient accuracy.
+
+The number of gradient iterations varies in each augmented Lagrangian
+step as shown in :numref:`fig:DoubleInt_constr`. The
+violation of the state constraints is almost continuously decreased
+below the specified thresholds
+:math:`\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}`
+and :math:`\varepsilon_{\mb{h}}=1e-6`, respectively. As
+before, the augmented cost functional and the original cost functional
+converge to the same value. The computation time for solving the problem
+on a Windows 10 machine with an Intel(R) Core(TM) i5-5300U CPU running
+at 2.3GHz using the Microsoft Visual C++ 2013 Professional (C) compiler
+amounts to 1.1ms and 14.6ms, respectively.
+
+Optimization with free end time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_DoubleInt_Timeopt_constr.*
+    :name: fig:DoubleInt_Timeopt_constr
+
+    Numerical OCP solution of the double integrator problem with free end time and state constraint.
+
+In a third simulation scenario, the
+OCP :math:numref:`eq:OCP_doubleInt` is numerically solved in
+the free end time setting. The initial end time is set to
+:math:`T=5.25\,\mathrm{s}` as given before. To weight the update of
+the end time :math:`T` against the control update when updating the
+optimization variables according to :math:numref:`eq:AlgOpt:LineSearchProblem`,
+the adaptation factor :math:`\gamma_{T}` is set using the option ``OptimTimeLineSearchFactor``. 
+The value :math:`\gamma_{T}=1.75` is used in the scenario. Note, however,
+that values :math:`\gamma_{T}<1` typically increase the algorithmic
+stability at the expense of the calculation time and vice versa.
+
+The numerical results for the free end time case are shown in
+:math:numref:`fig:DoubleInt_Timeopt_constr`. In contrast to the first
+two simulation scenarios, the reduction of the end time below
+:math:`4.6\,\mathrm{s}` allows one to carry out the setpoint
+transition with a significantly more aggressive control
+trajectory :math:`u`. The free end time optimization is a more
+challenging problem than before and is accompanied by a higher
+computational effort. This can be observed both in the larger number of
+augmented Lagrangian steps and gradient steps as well as in terms of the
+slower improvement of the violation of the state constraints.
+
+Nevertheless, the state constraints are fulfilled at the last augmented
+Lagrangian step in accordance with the thresholds
+:math:`\mb{\varepsilon_{\mb{g}_T}}=[1e-6,1e-6]^\mathsf{T}`
+and :math:`\varepsilon_{\mb{h}}=1e-6`. The improvement of
+the control performance when optimizing the end time compared to a fixed
+end time can be specified by the lower value of the cost functional,
+cf. :numref:`fig:DoubleInt_constr` and :numref:`fig:DoubleInt_Timeopt_constr`. 
+However, this results in a slightly increased computation time of 21.96ms compared to 14.66ms
+with a fixed end time on the same Windows 10 machine.
+
+Moving horizon estimation of a CSTR
+-----------------------------------
+
+Continuous stirred tank reactors (CSTR) are a popular class of systems
+when it comes to the implementation of advanced nonlinear control
+methods. In this subsection, a CSTR model is used for an example
+implementation of a moving horizon estimation (MHE) used in closed loop
+with MPC. Corresponding m and C files can be found in the folder ``<grampc_root>/examples/Reactor_CSTR``.
+
+.. _problem-formulation-2:
+
+Problem formulation
+~~~~~~~~~~~~~~~~~~~
+
+The system dynamic are given by :footcite:`Rothfuss1996`
+
+.. math::
+
+    \dot c_\mathrm{A} &= -k_1(T) c_\mathrm{A} - k_2(T) c_\mathrm{A}^2 + (c_{\mathrm{in}} - c_\mathrm{A}) u_1 \\
+    \dot c_\mathrm{B} &= k_1(T) c_\mathrm{A} - k_1(T) c_\mathrm{B} - c_\mathrm{B} u_1 \\
+    \dot{T}~ &= -\delta ( k_1(T) c_\mathrm{A} \Delta H_\mathrm{AB} + k_1(T) \Delta H_\mathrm{BC} + k_2(T) c_\mathrm{A}^2 \Delta H_\mathrm{AD}) \nonumber\\
+    &\hspace{1cm}+ \alpha (T_\mathrm{C} - T) + (T_\mathrm{in} - T) u_1 \\
+    \dot{T}_\mathrm{C} &= \beta (T - T_\mathrm{C}) + \gamma u_2\,,
+
+where the monomer and product concentrations :math:`c_\mathrm{A}` and
+:math:`c_\mathrm{B}`, respectively, as well as the reactor and cooling
+temperature :math:`T` and :math:`T_\mathrm{C}` form the state vector
+:math:`\mb{x} =[c_\mathrm{A}, c_\mathrm{B}, T, T_\mathrm{C}]`. The two functions
+:math:`k_1(T)` and :math:`k_2(T)` are of Arrhenius type
+
+.. math::
+
+    k_i(T) = k_{i0}  \exp \left(\frac{-E_i}{T/\mathrm{^\circ C} + 273.15} \right) ,\quad i =  1,2\,.
+
+The measured quantities are the two temperatures
+:math:`\mb{y}=[T,T_C]^\mathsf{T}`. The controls
+:math:`\mb{u} = [u_1, u_2]`, i.e. the normalized flow rate and
+the cooling power, are assumed to be known as well.
+:numref:`tab:CSTRParams` gives the parameters of the system that
+are passed to the GRAMPC problem functions via ``userparam``. A more detailed
+description can be found in :footcite:`Rothfuss1996`.
+  
+.. list-table:: Parameters of the CSTR mode :footcite:`Rothfuss1996`.
+    :name: tab:CSTRParams
+    :widths: auto
+    :header-rows: 1
+
+    * - Parameter
+      - Value
+      - Unit
+      - Parameter
+      - Value
+      - Unit
+    * - :math:`\alpha`
+      - 30.828
+      - h :sup:`-1`
+      - :math:`k_{20}`
+      - 9.043 x 10 :sup:`6`
+      - m :sup:`3` mol :sup:`-1` h :sup:`-1`
+    * - :math:`\beta`
+      - 86.688
+      - h :sup:`-1`
+      - :math:`E_{1}`
+      - 9785.3
+      - 
+    * - :math:`\delta`
+      - 3.522 x 10 :sup:`-4`
+      - K kJ :sup:`-1`
+      - :math:`E_{2}`
+      - 8560.0
+      - 
+    * - :math:`\gamma`
+      - 0.1
+      - kh :sup:`-1`
+      - :math:`\Delta H_{AB}`
+      - 4.2
+      - kJ mol :sup:`-1`
+    * - :math:`T_{in}`
+      - 104.9
+      - °C
+      - :math:`\Delta H_{BC}`
+      - -11.0
+      - kJ mol :sup:`-1`
+    * - :math:`c_{in}`
+      - 5.1 x 10 :sup:`3`
+      - mol m :sup:`-3`
+      - :math:`\Delta H_{AD}`
+      - -41.85
+      - kJ mol :sup:`-1`
+    * - :math:`k_{10}`
+      - 1.287 x 10 :sup:`12`
+      - h :sup:`-1`
+      - 
+      - 
+      - 
+
+The control task at hand is the setpoint change between the two
+stationary points
+
+.. math::
+
+   \mb{x}_\mathrm{des,1} = [1370\,\mathrm{\frac{kmol}{m^3}}, 950\,\mathrm{\frac{kmol}{m^3}}, 110.0\,\mathrm{^\circ C}, 108.6\,\mathrm{^\circ C}]^\mathsf{T},  \mb{u}_\mathrm{des,1} = [5.0\,\mathrm{h^{-1}}, -1190\,\mathrm{kJ\,h^{-1}}]^\mathsf{T}
+
+and
+
+.. math::
+   \mb{x}_\mathrm{des,2} = [2020\,\mathrm{\frac{kmol}{m^3}}, 1070\,\mathrm{\frac{kmol}{m^3}}, 100.0\,\mathrm{^\circ C}, 97.1\,\mathrm{^\circ C}]^\mathsf{T},  \mb{u}_\mathrm{des,2} = [5.0\,\mathrm{h^{-1}}, -2540\,\mathrm{kJ\,h^{-1}}]^\mathsf{T}.
+
+The cost functional is designed quadratically
+
+.. math:: J(\mb{u}, \mb{x}_k) := \Delta \mb{x}(T)^\mathsf{T}\mb{P} \Delta \mb{x}(T) + \int_{0}^{T} \Delta \mb{x}(t)^\mathsf{T}\mb{Q} \Delta \mb{x}(t) \Delta \mb{u}(t)^\mathsf{T}\mb{R} \Delta \mb{u}(t)
+
+in order to penalize the deviation of the state and control from the
+desired setpoint
+:math:`(\mb{x}_\mathrm{des,1},\mb{u}_\mathrm{des,1})`
+with
+:math:`\Delta \mb{x} = \mb{x} - \mb{x}_\mathrm{des}`
+and
+:math:`\Delta \mb{u} = \mb{u} - \mb{u}_\mathrm{des}`.
+The weight matrices are chosen as
+
+.. math::
+
+    \mb{P} = \text{diag}(0.2, 1.0, 0.5,0.2),\,\, \mb{R} = \text{diag}(0.5, 5.0\mathrm{e-3}),\,\, \mb{Q} = \text{diag}(0.2, 1.0, 0.5, 0.2).
+
+The control task will be tackled by MPC using GRAMPC. In addition, an
+MHE using GRAMPC is designed to estimate the current state
+:math:`\mb{\hat x}_k` w.r.t. the measured temperatures
+:math:`\mb{y}=[T,T_C]^\mathsf{T}`.
+
+In analogy to the MPC formulation :math:numref:`OCP`,
+moving horizon estimation is typically based on the online solution of a
+dynamic optimization problem
+
+.. math::
+    :label: eq:MHE_1_orig
+
+   	\min_{\mb{\hat x}_k} \quad & J(\mb{\hat x}_k; \mb{u}, \mb{y}) = \int_{t_k-T}^{t_k} \| \mb{\hat y}(t) - \mb{y}(t) \|^2 \, {\rm d}t
+
+   	\,\textrm{s.t.} \quad & \mb{M}\mb{\dot{\hat x}}(t) = \mb{f}(\mb{\hat x}(t), \mb{u}(t),t) \,,\quad \mb{\hat x}(t_k) = \mb{\hat x}_k
+
+    & \mb{\hat y}(t) = \mb{\sigma}(\mb{\hat x}(t))
+
+that depends on the history of the measured outputs
+:math:`\mb{y}(t)` and controls :math:`\mb{u}(t)` in the
+past time window :math:`[t_k - T, t_k]`. The solution of :math:numref:`eq:MHE_1_orig` yields the estimate of the state
+:math:`\mb{\hat{x}}_k` such that the difference between the
+measured output :math:`\mb{y}(t)` and the estimated output
+function :math:`\mb{\hat y}(t) = \mb{\sigma}(\mb{\hat x}(t))` is minimal in the sense of
+:math:numref:`eq:MHE_1_orig`. GRAMPC solves this MHE problem by
+means of parameter optimization. To this end, the state at the beginning
+of the optimization horizon is defined as optimization variable,
+i.e. :math:`\mb{p} = \mb{\hat{x}}(t_k - T)`.
+
+Both MHE and MPC use a sampling rate of
+:math:`\Delta t = 1\,\mathrm{s}`. A prediction horizon of
+:math:`T = 20\,\mathrm{min}` with 40 discretization points is used for the
+MPC, while a prediction horizon of :math:`T = 10\,\mathrm{s}` with 10
+discretization points is used for the MHE. The MPC implementation uses
+three gradient iterations per sampling step,
+i.e. :math:`(i_\text{max},j_\text{max})=(1,3)`, while the implementation
+of the MHE uses only a single gradient iteration,
+i.e. :math:`(i_\text{max},j_\text{max}) =(1,1)`. Note that because the
+MHE and MPC problems are defined without state constraints, the outer
+augmented Lagrangian loop causes no computational overhead, as GRAMPC
+skips the multiplier and penalty update. As the implementation of the
+MHE is not quite as straightforward as the MPC case, the next subsection
+describes the implementation process in more detail.
+
+Implementation aspects
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following lines describe the implementation of the MHE problem with
+GRAMPC, the corresponding simulation results are shown in the next
+subsection. In a first step, the MHE
+problem :math:numref:`eq:MHE_1_orig` has to be transformed in a
+more suitable representation that can be tackled with the parameter
+optimization functionality of GRAMPC. To this end, a coordinate
+transformation
+
+.. math::
+    :label: eq:coordTrafo
+
+    \mb{\tilde x}(\tau) = \mb{\hat x}(t_k\!-\!T\!+\!\tau) - \mb{p} \,,\quad
+    \mb{\tilde u}(\tau) = \mb{u}(t_k\!-\!T\!+\!\tau) \,,\quad
+    \mb{\tilde y}(\tau) = \mb{y}(t_k\!-\!T\!+\!\tau)
+
+is used together with the corresponding time transformation from
+:math:`t\in [t_k-T,t_k]^\mathsf{T}` to the new time coordinate
+:math:`\tau \in [0, T]`. In combination with the optimization variable
+:math:`\mb{p} = \mb{\hat{x}}(t_k - T)` and the
+homogeneous initial state
+:math:`\mb{\tilde{x}}(0) = \mb{0}`, the optimization
+problem can be cast into the form
+
+.. math::
+    :label: eq:MHE_orig
+
+   	\min_{\mb{p}} \quad & J(\mb{p}; \mb{\tilde u}, \mb{\tilde y}) = \int_0^T \| \mb{\hat y}(\tau) - \mb{\tilde y}(\tau) \|^2 \, {\rm d}\tau
+
+   	\textrm{s.t.} \quad & \mb{\dot{\tilde x}}(\tau) = \mb{f}(\mb{\tilde x}(\tau) + \mb{p}, \mb{\tilde u}(\tau), t_k\!-\!T\!+\!\tau) \,,\quad \mb{\tilde x}(0) = \mb{0}
+
+    & \mb{\hat y}(\tau) = \mb{\sigma}(\mb{\tilde x}(\tau)+\mb{p})\,.
+
+The implementation of this optimization problem still requires to access
+the measurements :math:`\mb{\tilde y}` in the integral cost
+term. This is achieved by appending the measurements to ``userparam`` (see ``startMHE.m`` in ``<grampc_root>/examples/Reactor_CSTR``) 
+
+::
+
+   	% init array of last MHE-Nhor measurements of the two temperatures
+   	xMeas_array = repmat(grampcMPC.param.x0(3:4), 1, grampcMHE.opt.Nhor);
+   	grampcMHE.userparam(end-2*grampcMHE.opt.Nhor+1:end) = xMeas_array;
+
+The measurements are updated in each iteration of the MPC/MHE loop, e.g.
+
+::
+
+   	% set values of last MHE-Nhor measurements of the two temperatures
+   	xMeas_temp = xtemp(end,3:4) + randn(1,2)*4; % measurement noise
+   	xMeas_array = [xMeas_array(3:end), xMeas_temp];
+   	grampcMHE.userparam(end-2*grampcMHE.opt.Nhor+1:end) = xMeas_array;
+
+When the number of discretization points and the horizon length is
+known, the measurements can easily be accessed in the problem
+description file in the following way:
+
+::
+
+   	typeRNum* pSys = (typeRNum*)userparam;
+   	typeRNum* pCost = &pSys[14];
+   	typeRNum* pMeas = &pSys[20];
+   	typeInt index = (int)floor(t / 2.777777777777778e-04 + 0.00001);
+   	typeRNum meas1 = pMeas[2 * index];
+   	typeRNum meas2 = pMeas[1 + 2 * index];
+
+The pointer ``pMeas`` is set to the 20th element of the ``userparam`` vector, since the first 14
+are the system parameters given in :numref:`tab:CSTRParams` and
+the next six elements are the weights of the cost function. Also note
+that :math:`2.778e-4\,\mathrm{h^{-1}} \approx \Delta t`. Since the order of
+magnitude of the individual states and controls differs a lot, the
+scaling option ``ScaleProblem`` with
+
+.. math::
+
+   \mb{x}_{\mathrm{scale}}  &= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}& \mb{x}_{\mathrm{offset}} &= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}
+
+   \mb{p}_{\mathrm{scale}}  &= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}& \mb{p}_{\mathrm{offset}} &= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}
+
+   \mb{u}_{\mathrm{scale}}  &= [16\,\mathrm{h^{-1}}, 4500\,\mathrm{kJ h^{-1}}]^\mathsf{T}&	\mb{u}_{\mathrm{offset}} &= [19\,\mathrm{h^{-1}}, -4500\,\mathrm{kJ h^{-1}}]^\mathsf{T}
+
+is activated.
+
+Evaluation
+~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_CSTR_closedLoop.*
+    :name: fig:CSTR_closedLoop
+
+    Simulated MHE/MPC trajectories for the CSTR reactor example.
+
+The moving horizon estimator is evaluated in conjunction with the MPC.
+The state estimates are initialized with an initial disturbance
+:math:`\delta \mb{p} = [100\,\mathrm{\frac{kmol}{m^3}}`,
+:math:`100\,\mathrm{\frac{kmol}{m^3}}`,
+:math:`5\,\mathrm{^\circ C}`,
+:math:`7\,\mathrm{^\circ C}]^\mathsf{T}`. For a more realistic
+setting, white Gaussian noise with zero mean and a standard deviation of
+:math:`4\,\mathrm{^\circ C}` is added to the measurements
+:math:`\mb{y}=[T,T_C]^\mathsf{T}`.
+
+:numref:`fig:CSTR_closedLoop` shows the simulation results from
+the closed loop simulation of the MHE in conjunction with the MPC. The
+estimates :math:`\mb{\hat x}_k` quickly converge to the actual
+states (ground truth), as e.g.can be seen in the upper right plot.
+Furthermore, the cost of the MPC quickly converges to zero after each
+setpoint change at :math:`t=0\,\mathrm{h}` and
+:math:`t=1.5\,\mathrm{h}`, respectively, which shows the good
+performance of the combined MPC/MHE problem.
+
+The corresponding computation times of GRAMPC amount to
+:math:`58\,\mathrm{\mu s}` and :math:`11\,\mathrm{\mu s}` per
+MPC and MHE step, respectively, on a Windows 10 machine with Intel(R)
+Core(TM) i5-5300U CPU running at 2.3GHz using the Microsoft Visual C++
+2013 Professional (C) compiler.
+
+Differential algebraic equations
+--------------------------------
+
+This section first introduces the DAE-system, before implementation
+aspects regarding the dedicated DAE-solver RODAS are considered.
+Finally, the example is evaluated.
+
+.. _problem-formulation-3:
+
+Problem formulation
+~~~~~~~~~~~~~~~~~~~
+
+The problem at hand is a toy example to illustrate the functionality of
+GRAMPC with regard to the solution of DAEs. It consists of two
+differential integrator states and one algebraic state. In addition,
+this algebraic state is subject to an equality constraint. The
+corresponding MPC problem is given by
+
+.. math::
+    :label: eq:DAEExample
+
+   	\min_{u} \quad & J(\mb{x}, \mb{u}) = \int_0^T \frac{1}{2}\left( {\Delta} \mb{x} \mb{Q} {\Delta} \mb{x}^\mathsf{T}+ \mb{u} \mb{R} \mb{u}^\mathsf{T}\right)  \, {\rm d}t
+
+   	\textrm{s.t.} \quad & {\dot x_1}(t) = u_1(t) \,, \quad \quad x_1(0) = x_{1,0}
+
+    & {\dot x_2}(t) = u_2(t) \,, \quad \quad x_2(0) = x_{2,0}
+
+    & \hspace{6.5mm} 0 = x_1(t) + x_2(t) - x_3(t)
+
+    & g(\mb{x}(t)) = x_3(t) - 1 = 0
+
+    & \mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right],
+
+where
+:math:`\Delta \mb{x} = \mb{x} - \mb{x}_{\mathrm{des}}`
+and the weight matrices are chosen as
+:math:`\mb{Q}  = \text{diag}(500,0,0)` and
+:math:`\mb{R} = \text{diag}(1,1)`, respectively. The target of
+the MPC formulation is to steer the first differential state to the
+desired value, while remaining on the manifold defined by
+:math:`x_1(t) + x_2(t) = 1`. Note that this equation results from
+substituting the algebraic equation into the constraint :math:`g(\mb{x}(t))` . 
+Even though it would be possible to do this substitution and solve the resulting problem, the
+purpose of this example is to illustrate the solution of a DAE.
+
+The DAE given in :math:numref:`eq:DAEExample` can be rewritten
+with a mass matrix :math:`\mb{M}`, i.e.
+
+.. math::
+
+    \underbrace{\begin{pmatrix}
+   	1 & 0 & 0\\
+   	0 & 1 & 0\\
+   	0 & 0 & 0\\
+   	\end{pmatrix}}_{\mb{M}} \dot{\mb{x}} = \underbrace{\begin{pmatrix}
+   										  u_1\\
+   										  u_2\\
+   										  x_1 + x_2 - x_3\\
+   										  \end{pmatrix}}_{\mb{f}(\mb{x}, \mb{u})}.
+
+Clearly, the mass matrix is different from the identity matrix and
+singular, i.e. the inverse does not exist and therefore the solver RODAS
+is used to integrate the system dynamics as well as the corresponding
+adjoint dynamics.
+
+.. _implementation-aspects-1:
+
+Implementation aspects
+~~~~~~~~~~~~~~~~~~~~~~
+
+To solve the MPC problem for a DAE, the integrator RODAS has to be used
+and some additional options have to be set. Furthermore, some additional
+functions have to be implemented in the ``probfct``-file.
+
+The options are described in :ref:`sec:AlgOpt:IntegrationRodas`. In the example at
+hand, the right hand side of the system dynamics is not explicitly
+dependent on the time :math:`t` and therefore
+``IFCN`` is set to zero. The next option concerns
+the calculation of :math:`\frac{\partial f}{\partial t}` and
+:math:`\frac{\partial^2 H}{\partial x \partial t}`. It can either be set
+to zero (i.e. :math:`\text{IDFX}=0`) and finite differences
+are utilized or set to one (i.e. :math:`\text{IDFX}=1`) and
+the analytical solutions implemented in the functions ``dfdt`` and ``dHdxdt`` are called.
+The third option determines if the numerical (i.e. finite differences)
+or the analytical solution (i.e. ``dfdx`` and ``dfdxtrans``) is used to compute the Jacobians
+:math:`\frac{\partial f}{\partial x}` and
+:math:`(\frac{\partial f}{\partial x})^\mathrm{T} = \frac{\partial^2 H}{\partial x \partial \lambda}`.
+The next option (``IMAS``) determines if the the mass matrix is equal to the
+identity matrix (i.e. :math:`\text{IMAS}=0`) or if it is
+specified by the functions ``Mfct`` and ``Mtrans`` (i.e. :math:`\text{IMAS}=1`).
+In the current example, the mass matrix is singular (not the identity
+matrix) and therefore the option is set to one. The remaining options
+regard the size of the Jacobian and the mass matrix. The number of
+non-zero lower and upper diagonals of the Jacobian are given by ``MLJAC`` and ``MUJAC`` ,
+respectively. In our case, we have a full matrix and therefore set both
+options to the system dimension, i.e. :math:`N_{\mb{x}}`. The
+only non-zero entries of the mass matrix lie on the main diagonal. Thus,
+the corresponding options (i.e. ``MLMAS`` and ``MUMAS``) are set to zero. Note that one has
+to be careful, if the Jacobian or mass matrix are sparse, since the
+lower and upper diagonals are padded with zeros. This is shown for the
+example matrix in :numref:`fig:exampleMassMatrix` with the
+corresponding code in the following Example.
+
+.. code-block:: c
+    :caption: Example (C-Code for the mass function illustrated in :numref:`fig:exampleMassMatrix`)
+
+   	void Mfct(typeRNum *out, typeUSERPARAM *userparam)
+   	{
+   		/* row 1 */
+   		out[0]  = 0;
+   		out[1]  = k;
+   		out[2]  = k;
+   		out[3]  = k;
+   		/* row 2 */
+   		out[4]  = k;
+   		out[5]  = k;
+   		out[6]  = k;
+   		out[7]  = k;
+   		/* row 3 */
+   		out[8]  = k;
+   		out[9]  = k;
+   		out[10] = k;
+   		out[11] = k;
+   		/* row 4 */
+   		out[12] = k;
+   		out[13] = k;
+   		out[14] = k;
+   		out[15] = 0;
+   		/* row 5 */
+   		out[16] = k;
+   		out[17] = k;
+   		out[18] = 0;
+   		out[19] = 0;		
+   	};
+   	
+
+.. figure:: img/tikz/ext/ext_MassMatrixExample.*
+    :name: fig:exampleMassMatrix
+
+    Example mass matrix with the index i showing at which position in the output array (i.e. out[i]) the corresponding value has to be written, cf. the example above.
+
+.. _evaluation-1:
+
+Evaluation
+~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_ExampleDAE.*
+   :name: fig:ExampleDAE
+
+   Simulated MPC trajectories for the DAE-example
+
+:numref:`fig:ExampleDAE` shows the simulated trajectories for
+three set point changes. The setpoint of the first state :math:`x_1`
+changes from 1 to 0 at :math:`0\,\mathrm{s}`, from 0 to 0.5 after
+:math:`1\,\mathrm{s}`, and finally from 0.5 to 1 after
+:math:`2\,\mathrm{s}`. Due to the algebraic state and the equality
+constraint, the trajectory of the second state :math:`x_2` has to be the
+mirror image of :math:`x_1` around 0.5, which can be observed in the
+upper left plot. The corresponding controls in the upper right plot are
+also mirrored. The constraint violation during the simulation is shown
+in the lower left plot of :numref:`fig:ExampleDAE`. The allowed
+constraint violation was set to 1 x 10\ :sup:`-4`, which is
+approximately met. Lastly, the lower right plot shows the original
+costs and the augmented costs. Both of which quickly converge to zero after each set
+point change (after 0, 1 and :math:`2\,\mathrm{s}`, respectively).
+
+Constraint Tuning
+-----------------
+
+This section shows how the options of GRAMPC can be adjusted in such a
+way that the performance in terms of computation time and optimality is
+improved. To this end, a specific OCP problem is considered. However,
+the approach can serve as template for different problems.
+
+.. _problem-formulation-4:
+
+Problem formulation
+~~~~~~~~~~~~~~~~~~~
+
+The system at hand is a double integrator with one inequality constraint
+and a terminal equality constraint for each state
+:footcite:`BrysonHo:book:1969`. The OCP problem is then defined as
+
+.. math::
+    :label: eq:BrysonExample
+
+   	\min_{u} \quad & J(\mb{x}, u) = \int_0^T r u^2 \, {\rm d}t
+
+   	\textrm{s.t.} \quad & {\dot x_1}(t) = x_2(t) \,, \qquad x_1(0) = x_{1,0}
+
+    & {\dot x_2}(t) = u(t) \,, \phantom{_2} \qquad x_2(0) = x_{2,0}
+
+    & h(\mb{x}(t)) = x_1(t) - 0.1 \leq 0
+
+    & g_{\mathrm{T},1}(\mb{x}(T)) = x_1(T) = 0
+
+    & g_{\mathrm{T},2}(\mb{x}(T)) = x_2(T) + 1 = 0,
+
+with the weight :math:`r= 0.5` and the initial state
+:math:`\mb{x}(0) = [0, 1]^\mathsf{T}`. The target of the problem
+is to steer the double integrator states to the terminal state
+:math:`\mb{x}(T) = [0, -1]^\mathsf{T}` without violating the
+inequality constraint :math:`h(\mb{x}(t))` . 
+The time in which the set point change should be executed is set to
+:math:`T=1\,\mathrm{s}`.
+
+Tuning approach
+~~~~~~~~~~~~~~~
+
+.. figure:: img/tikz/ext/ext_BrysonIntegrator1.*
+    :name: fig:BrysonIntegrator1
+
+    The prediction plot of GRAMPC for the double integrator example in :math:numref:`eq:BrysonExample`.
+
+In the listing below, the step by step approach of tuning the parameters
+of the augmented Lagrangian algorithm are detailed. The computation time
+as well as the number of outer and inner iterations are shown in
+:numref:`tab:TuningCompTime` along with the corresponding option
+that was added or changed in each step.
+
+.. list-table::  Computation time and outer / inner iteration count for the different settings. The last column shows which additional parameter was set different from the initial values in each step.
+    :name: tab:TuningCompTime
+    :widths: auto
+    :header-rows: 1
+
+    * - Step
+      - Time
+      - MultIter
+      - GradIter (mean)
+      - Additional option
+    * - 0.
+      - 343 ms
+      - 3883
+      - 10.3
+      - Default settings
+    * - 1.
+      - 129 ms
+      - 637
+      - 22.4
+      - ``grampc_estim_penmin``
+    * - 2.
+      - 59 ms
+      - 171
+      - 42.0
+      - :math:`\text{PenaltyIncreaseFactor}=1.5`
+    * - 3.
+      - 36 ms
+      - 98
+      - 46.6
+      - :math:`\text{PenaltyIncreaseThreshold}=0.75`
+    * - 4.
+      - 22 ms
+      - 42
+      - 61.2
+      - :math:`\text{LineSearchInit}=5\text{e-7}`
+    * - 4.
+      - 22 ms
+      - 42
+      - 61.2
+      - :math:`\text{PenaltyMin}=2\text{e4}`
+
+#. The choice of the initial penalty parameter is crucial for numerical
+   conditioning and therefore convergence. A value that is too high will
+   initially put an unnecessary amount of weight on constraint
+   satisfaction and mostly ignore the optimality. If the value is too
+   low, the opposite will happen, i.e. at first the cost function is
+   decreased at the cost of constraint violation. This will be
+   especially detrimental in MPC applications. If no prior knowledge is
+   available, it is recommended to use the function
+   ``grampc_estim_penmin`` (or the corresponding Cmex interface ``grampc_estim_penmin_Cmex``). 
+   For the example at hand, this reduces
+   the computation time by approximately a third.
+   :numref:`fig:BrysonIntegrator1` shows the simulation results
+   using the estimated value for ``PenaltyMin``.
+
+#. While the convergence speed is significantly increased, the penalty
+   parameters at :math:`0.3\,\mathrm{s}` and :math:`0.7\,\mathrm{s}`
+   are several magnitudes greater than the initial value. Since this
+   huge penalty parameter occurs only at two points during the
+   simulation, it is advisable to set the ``PenaltyIncreaseFactor`` to a bigger value. This again
+   reduces the computation time by more than half, since fewer increases
+   of the penalty parameter during the outer iterations are necessary.
+   The value should not be chosen too big, as this will have an adverse
+   effect on the numerical conditioning and convergence.
+
+#. In accordance with the previous step, the threshold to increase the
+   penalty parameter, i.e. ``PenaltyIncreaseThreshold`` is lowered in order to increase the penalty
+   parameter more aggressively. This step almost doubles the convergence
+   speed. Note that this step and the previous step are interchangeable.
+
+#. Another common tuning possibility is the initial step size of the
+   line search, especially if one of the explicit methods is used,
+   cf. :ref:`sec:AlgOpt:LineSearchExplicit`. Note that the
+   initial value ``LineSearchInit`` is used in the case that the explicit formula results
+   in a negative step size. One approach is to use the ``LineSearchExpAutoFallback`` option. However,
+   problem specific tuning (mostly trial and error) can result in a
+   significant performance boost. In the example at hand, this results
+   in approximately 40% faster convergence speed.
+
+#. To further optimize the parameters, the estimation function for the
+   minimal penalty parameter can be deactivated again and a better value
+   for ``PenaltyMin`` be used (note that the parameter is increased until there is no
+   further improvement or an decrease in performance). This results in
+   an additional 15%` decrease of computation time.
+
+.. footbibliography::

@@ -1,0 +1,701 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Moving horizon estimation of a CSTR &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/CSTR';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Differential algebraic equations" href="DAE.html" />
+    <link rel="prev" title="Optimal control of a double integrator" href="DoubleIntegrator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials/CSTR.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Moving horizon estimation of a CSTR</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-aspects">Implementation aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="moving-horizon-estimation-of-a-cstr">
+<span id="sec-tut-cstr"></span><h1>Moving horizon estimation of a CSTR<a class="headerlink" href="#moving-horizon-estimation-of-a-cstr" title="Link to this heading">#</a></h1>
+<p>Continuous stirred tank reactors (CSTR) are a popular class of systems
+when it comes to the implementation of advanced nonlinear control
+methods. In this subsection, a CSTR model is used for an example
+implementation of a moving horizon estimation (MHE) used in closed loop
+with MPC. Corresponding m and C files can be found in the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Reactor_CSTR</span></code>.</p>
+<section id="problem-formulation">
+<span id="problem-formulation-2"></span><h2>Problem formulation<a class="headerlink" href="#problem-formulation" title="Link to this heading">#</a></h2>
+<p>The system dynamic are given by <a class="footnote-reference brackets" href="#footcite-rothfuss1996" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\dot c_\mathrm{A} &amp;= -k_1(T) c_\mathrm{A} - k_2(T) c_\mathrm{A}^2 + (c_{\mathrm{in}} - c_\mathrm{A}) u_1 \\
+\dot c_\mathrm{B} &amp;= k_1(T) c_\mathrm{A} - k_1(T) c_\mathrm{B} - c_\mathrm{B} u_1 \\
+\dot{T}~ &amp;= -\delta ( k_1(T) c_\mathrm{A} \Delta H_\mathrm{AB} + k_1(T) \Delta H_\mathrm{BC} + k_2(T) c_\mathrm{A}^2 \Delta H_\mathrm{AD}) \nonumber\\
+&amp;\hspace{1cm}+ \alpha (T_\mathrm{C} - T) + (T_\mathrm{in} - T) u_1 \\
+\dot{T}_\mathrm{C} &amp;= \beta (T - T_\mathrm{C}) + \gamma u_2\,,\end{split}\]</div>
+<p>where the monomer and product concentrations <span class="math notranslate nohighlight">\(c_\mathrm{A}\)</span> and
+<span class="math notranslate nohighlight">\(c_\mathrm{B}\)</span>, respectively, as well as the reactor and cooling
+temperature <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(T_\mathrm{C}\)</span> form the state vector
+<span class="math notranslate nohighlight">\(\mb{x} =[c_\mathrm{A}, c_\mathrm{B}, T, T_\mathrm{C}]\)</span>. The two functions
+<span class="math notranslate nohighlight">\(k_1(T)\)</span> and <span class="math notranslate nohighlight">\(k_2(T)\)</span> are of Arrhenius type</p>
+<div class="math notranslate nohighlight">
+\[k_i(T) = k_{i0}  \exp \left(\frac{-E_i}{T/\mathrm{^\circ C} + 273.15} \right) ,\quad i =  1,2\,.\]</div>
+<p>The measured quantities are the two temperatures
+<span class="math notranslate nohighlight">\(\mb{y}=[T,T_C]^\mathsf{T}\)</span>. The controls
+<span class="math notranslate nohighlight">\(\mb{u} = [u_1, u_2]\)</span>, i.e. the normalized flow rate and
+the cooling power, are assumed to be known as well.
+<a class="reference internal" href="#tab-cstrparams"><span class="std std-numref">Table 1</span></a> gives the parameters of the system that
+are passed to the GRAMPC problem functions via <code class="docutils literal notranslate"><span class="pre">userparam</span></code>. A more detailed
+description can be found in <a class="footnote-reference brackets" href="#footcite-rothfuss1996" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="tab-cstrparams">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Parameters of the CSTR model <a class="footnote-reference brackets" href="#footcite-rothfuss1996" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</span><a class="headerlink" href="#tab-cstrparams" title="Link to this table">#</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Unit</p></th>
+<th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Unit</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\alpha\)</span></p></td>
+<td><p>30.828</p></td>
+<td><p>h <sup>-1</sup></p></td>
+<td><p><span class="math notranslate nohighlight">\(k_{20}\)</span></p></td>
+<td><p>9.043 x 10 <sup>6</sup></p></td>
+<td><p>m <sup>3</sup> mol <sup>-1</sup> h <sup>-1</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\beta\)</span></p></td>
+<td><p>86.688</p></td>
+<td><p>h <sup>-1</sup></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_{1}\)</span></p></td>
+<td><p>9785.3</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\delta\)</span></p></td>
+<td><p>3.522 x 10 <sup>-4</sup></p></td>
+<td><p>K kJ <sup>-1</sup></p></td>
+<td><p><span class="math notranslate nohighlight">\(E_{2}\)</span></p></td>
+<td><p>8560.0</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\gamma\)</span></p></td>
+<td><p>0.1</p></td>
+<td><p>kh <sup>-1</sup></p></td>
+<td><p><span class="math notranslate nohighlight">\(\Delta H_{AB}\)</span></p></td>
+<td><p>4.2</p></td>
+<td><p>kJ mol <sup>-1</sup></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(T_{in}\)</span></p></td>
+<td><p>104.9</p></td>
+<td><p>°C</p></td>
+<td><p><span class="math notranslate nohighlight">\(\Delta H_{BC}\)</span></p></td>
+<td><p>-11.0</p></td>
+<td><p>kJ mol <sup>-1</sup></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(c_{in}\)</span></p></td>
+<td><p>5.1 x 10 <sup>3</sup></p></td>
+<td><p>mol m <sup>-3</sup></p></td>
+<td><p><span class="math notranslate nohighlight">\(\Delta H_{AD}\)</span></p></td>
+<td><p>-41.85</p></td>
+<td><p>kJ mol <sup>-1</sup></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_{10}\)</span></p></td>
+<td><p>1.287 x 10 <sup>12</sup></p></td>
+<td><p>h <sup>-1</sup></p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The control task at hand is the setpoint change between the two
+stationary points</p>
+<div class="math notranslate nohighlight">
+\[\mb{x}_\mathrm{des,1} = [1370\,\mathrm{\frac{kmol}{m^3}}, 950\,\mathrm{\frac{kmol}{m^3}}, 110.0\,\mathrm{^\circ C}, 108.6\,\mathrm{^\circ C}]^\mathsf{T},  \mb{u}_\mathrm{des,1} = [5.0\,\mathrm{h^{-1}}, -1190\,\mathrm{kJ\,h^{-1}}]^\mathsf{T}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\mb{x}_\mathrm{des,2} = [2020\,\mathrm{\frac{kmol}{m^3}}, 1070\,\mathrm{\frac{kmol}{m^3}}, 100.0\,\mathrm{^\circ C}, 97.1\,\mathrm{^\circ C}]^\mathsf{T},  \mb{u}_\mathrm{des,2} = [5.0\,\mathrm{h^{-1}}, -2540\,\mathrm{kJ\,h^{-1}}]^\mathsf{T}.\]</div>
+<p>The cost functional is designed quadratically</p>
+<div class="math notranslate nohighlight">
+\[J(\mb{u}, \mb{x}_k) := \Delta \mb{x}(T)^\mathsf{T}\mb{P} \Delta \mb{x}(T) + \int_{0}^{T} \Delta \mb{x}(t)^\mathsf{T}\mb{Q} \Delta \mb{x}(t) \Delta \mb{u}(t)^\mathsf{T}\mb{R} \Delta \mb{u}(t)\]</div>
+<p>in order to penalize the deviation of the state and control from the
+desired setpoint
+<span class="math notranslate nohighlight">\((\mb{x}_\mathrm{des,1},\mb{u}_\mathrm{des,1})\)</span>
+with
+<span class="math notranslate nohighlight">\(\Delta \mb{x} = \mb{x} - \mb{x}_\mathrm{des}\)</span>
+and
+<span class="math notranslate nohighlight">\(\Delta \mb{u} = \mb{u} - \mb{u}_\mathrm{des}\)</span>.
+The weight matrices are chosen as</p>
+<div class="math notranslate nohighlight">
+\[\mb{P} = \text{diag}(0.2, 1.0, 0.5,0.2),\,\, \mb{R} = \text{diag}(0.5, 5.0\mathrm{e-3}),\,\, \mb{Q} = \text{diag}(0.2, 1.0, 0.5, 0.2).\]</div>
+<p>The control task will be tackled by MPC using GRAMPC. In addition, an
+MHE using GRAMPC is designed to estimate the current state
+<span class="math notranslate nohighlight">\(\mb{\hat x}_k\)</span> w.r.t. the measured temperatures
+<span class="math notranslate nohighlight">\(\mb{y}=[T,T_C]^\mathsf{T}\)</span>.</p>
+<p>In analogy to the MPC formulation <a class="reference internal" href="../problem_formulation/problem_formulation.html#equation-eq-ocp">(1)</a>,
+moving horizon estimation is typically based on the online solution of a
+dynamic optimization problem</p>
+<div class="math notranslate nohighlight" id="equation-eq-mhe-1-orig">
+<span class="eqno">(25)<a class="headerlink" href="#equation-eq-mhe-1-orig" title="Link to this equation">#</a></span>\[ \begin{align}\begin{aligned}    \min_{\mb{\hat x}_k} \quad &amp; J(\mb{\hat x}_k; \mb{u}, \mb{y}) = \int_{t_k-T}^{t_k} \| \mb{\hat y}(t) - \mb{y}(t) \|^2 \, {\rm d}t\\    \,\textrm{s.t.} \quad &amp; \mb{M}\mb{\dot{\hat x}}(t) = \mb{f}(\mb{\hat x}(t), \mb{u}(t),t) \,,\quad \mb{\hat x}(t_k) = \mb{\hat x}_k\\&amp; \mb{\hat y}(t) = \mb{\sigma}(\mb{\hat x}(t))\end{aligned}\end{align} \]</div>
+<p>that depends on the history of the measured outputs
+<span class="math notranslate nohighlight">\(\mb{y}(t)\)</span> and controls <span class="math notranslate nohighlight">\(\mb{u}(t)\)</span> in the
+past time window <span class="math notranslate nohighlight">\([t_k - T, t_k]\)</span>. The solution of <a class="reference internal" href="#equation-eq-mhe-1-orig">(25)</a> yields the estimate of the state
+<span class="math notranslate nohighlight">\(\mb{\hat{x}}_k\)</span> such that the difference between the
+measured output <span class="math notranslate nohighlight">\(\mb{y}(t)\)</span> and the estimated output
+function <span class="math notranslate nohighlight">\(\mb{\hat y}(t) = \mb{\sigma}(\mb{\hat x}(t))\)</span> is minimal in the sense of
+<a class="reference internal" href="#equation-eq-mhe-1-orig">(25)</a>. GRAMPC solves this MHE problem by
+means of parameter optimization. To this end, the state at the beginning
+of the optimization horizon is defined as optimization variable,
+i.e. <span class="math notranslate nohighlight">\(\mb{p} = \mb{\hat{x}}(t_k - T)\)</span>.</p>
+<p>Both MHE and MPC use a sampling rate of
+<span class="math notranslate nohighlight">\(\Delta t = 1\,\mathrm{s}\)</span>. A prediction horizon of
+<span class="math notranslate nohighlight">\(T = 20\,\mathrm{min}\)</span> with 40 discretization points is used for the
+MPC, while a prediction horizon of <span class="math notranslate nohighlight">\(T = 10\,\mathrm{s}\)</span> with 10
+discretization points is used for the MHE. The MPC implementation uses
+three gradient iterations per sampling step,
+i.e. <span class="math notranslate nohighlight">\((i_\text{max},j_\text{max})=(1,3)\)</span>, while the implementation
+of the MHE uses only a single gradient iteration,
+i.e. <span class="math notranslate nohighlight">\((i_\text{max},j_\text{max}) =(1,1)\)</span>. Note that because the
+MHE and MPC problems are defined without state constraints, the outer
+augmented Lagrangian loop causes no computational overhead, as GRAMPC
+skips the multiplier and penalty update. As the implementation of the
+MHE is not quite as straightforward as the MPC case, the next subsection
+describes the implementation process in more detail.</p>
+</section>
+<section id="implementation-aspects">
+<h2>Implementation aspects<a class="headerlink" href="#implementation-aspects" title="Link to this heading">#</a></h2>
+<p>The following lines describe the implementation of the MHE problem with
+GRAMPC, the corresponding simulation results are shown in the next
+subsection. In a first step, the MHE
+problem <a class="reference internal" href="#equation-eq-mhe-1-orig">(25)</a> has to be transformed in a
+more suitable representation that can be tackled with the parameter
+optimization functionality of GRAMPC. To this end, a coordinate
+transformation</p>
+<div class="math notranslate nohighlight" id="equation-eq-coordtrafo">
+<span class="eqno">(26)<a class="headerlink" href="#equation-eq-coordtrafo" title="Link to this equation">#</a></span>\[\mb{\tilde x}(\tau) = \mb{\hat x}(t_k\!-\!T\!+\!\tau) - \mb{p} \,,\quad
+\mb{\tilde u}(\tau) = \mb{u}(t_k\!-\!T\!+\!\tau) \,,\quad
+\mb{\tilde y}(\tau) = \mb{y}(t_k\!-\!T\!+\!\tau)\]</div>
+<p>is used together with the corresponding time transformation from
+<span class="math notranslate nohighlight">\(t\in [t_k-T,t_k]^\mathsf{T}\)</span> to the new time coordinate
+<span class="math notranslate nohighlight">\(\tau \in [0, T]\)</span>. In combination with the optimization variable
+<span class="math notranslate nohighlight">\(\mb{p} = \mb{\hat{x}}(t_k - T)\)</span> and the
+homogeneous initial state
+<span class="math notranslate nohighlight">\(\mb{\tilde{x}}(0) = \mb{0}\)</span>, the optimization
+problem can be cast into the form</p>
+<div class="math notranslate nohighlight" id="equation-eq-mhe-orig">
+<span class="eqno">(27)<a class="headerlink" href="#equation-eq-mhe-orig" title="Link to this equation">#</a></span>\[ \begin{align}\begin{aligned}    \min_{\mb{p}} \quad &amp; J(\mb{p}; \mb{\tilde u}, \mb{\tilde y}) = \int_0^T \| \mb{\hat y}(\tau) - \mb{\tilde y}(\tau) \|^2 \, {\rm d}\tau\\    \textrm{s.t.} \quad &amp; \mb{\dot{\tilde x}}(\tau) = \mb{f}(\mb{\tilde x}(\tau) + \mb{p}, \mb{\tilde u}(\tau), t_k\!-\!T\!+\!\tau) \,,\quad \mb{\tilde x}(0) = \mb{0}\\&amp; \mb{\hat y}(\tau) = \mb{\sigma}(\mb{\tilde x}(\tau)+\mb{p})\,.\end{aligned}\end{align} \]</div>
+<p>The implementation of this optimization problem still requires to access
+the measurements <span class="math notranslate nohighlight">\(\mb{\tilde y}\)</span> in the integral cost
+term. This is achieved by appending the measurements to <code class="docutils literal notranslate"><span class="pre">userparam</span></code> (see <code class="docutils literal notranslate"><span class="pre">startMHE.m</span></code> in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/Reactor_CSTR</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">init</span> <span class="n">array</span> <span class="n">of</span> <span class="n">last</span> <span class="n">MHE</span><span class="o">-</span><span class="n">Nhor</span> <span class="n">measurements</span> <span class="n">of</span> <span class="n">the</span> <span class="n">two</span> <span class="n">temperatures</span>
+<span class="n">xMeas_array</span> <span class="o">=</span> <span class="n">repmat</span><span class="p">(</span><span class="n">grampcMPC</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">x0</span><span class="p">(</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">grampcMHE</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">Nhor</span><span class="p">);</span>
+<span class="n">grampcMHE</span><span class="o">.</span><span class="n">userparam</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">grampcMHE</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">Nhor</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">end</span><span class="p">)</span> <span class="o">=</span> <span class="n">xMeas_array</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The measurements are updated in each iteration of the MPC/MHE loop, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="nb">set</span> <span class="n">values</span> <span class="n">of</span> <span class="n">last</span> <span class="n">MHE</span><span class="o">-</span><span class="n">Nhor</span> <span class="n">measurements</span> <span class="n">of</span> <span class="n">the</span> <span class="n">two</span> <span class="n">temperatures</span>
+<span class="n">xMeas_temp</span> <span class="o">=</span> <span class="n">xtemp</span><span class="p">(</span><span class="n">end</span><span class="p">,</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="p">;</span> <span class="o">%</span> <span class="n">measurement</span> <span class="n">noise</span>
+<span class="n">xMeas_array</span> <span class="o">=</span> <span class="p">[</span><span class="n">xMeas_array</span><span class="p">(</span><span class="mi">3</span><span class="p">:</span><span class="n">end</span><span class="p">),</span> <span class="n">xMeas_temp</span><span class="p">];</span>
+<span class="n">grampcMHE</span><span class="o">.</span><span class="n">userparam</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">grampcMHE</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">Nhor</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">end</span><span class="p">)</span> <span class="o">=</span> <span class="n">xMeas_array</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When the number of discretization points and the horizon length is
+known, the measurements can easily be accessed in the problem
+description file in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typeRNum</span><span class="o">*</span> <span class="n">pSys</span> <span class="o">=</span> <span class="p">(</span><span class="n">typeRNum</span><span class="o">*</span><span class="p">)</span><span class="n">userparam</span><span class="p">;</span>
+<span class="n">typeRNum</span><span class="o">*</span> <span class="n">pCost</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">pSys</span><span class="p">[</span><span class="mi">14</span><span class="p">];</span>
+<span class="n">typeRNum</span><span class="o">*</span> <span class="n">pMeas</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">pSys</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
+<span class="n">typeInt</span> <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="n">floor</span><span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="mf">2.777777777777778e-04</span> <span class="o">+</span> <span class="mf">0.00001</span><span class="p">);</span>
+<span class="n">typeRNum</span> <span class="n">meas1</span> <span class="o">=</span> <span class="n">pMeas</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">index</span><span class="p">];</span>
+<span class="n">typeRNum</span> <span class="n">meas2</span> <span class="o">=</span> <span class="n">pMeas</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">index</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>The pointer <code class="docutils literal notranslate"><span class="pre">pMeas</span></code> is set to the 20th element of the <code class="docutils literal notranslate"><span class="pre">userparam</span></code> vector, since the first 14
+are the system parameters given in <a class="reference internal" href="#tab-cstrparams"><span class="std std-numref">Table 1</span></a> and
+the next six elements are the weights of the cost function. Also note
+that <span class="math notranslate nohighlight">\(2.778e-4\,\mathrm{h^{-1}} \approx \Delta t\)</span>. Since the order of
+magnitude of the individual states and controls differs a lot, the
+scaling option <code class="docutils literal notranslate"><span class="pre">ScaleProblem</span></code> with</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\mb{x}_{\mathrm{scale}}  &amp;= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}&amp; \mb{x}_{\mathrm{offset}} &amp;= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}\\\mb{p}_{\mathrm{scale}}  &amp;= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}&amp; \mb{p}_{\mathrm{offset}} &amp;= [500\,\mathrm{\frac{kmol}{m^3}}, 500\,\mathrm{\frac{kmol}{m^3}}, 50\,\mathrm{^\circ C}, 50\,\mathrm{^\circ C}]^\mathsf{T}\\\mb{u}_{\mathrm{scale}}  &amp;= [16\,\mathrm{h^{-1}}, 4500\,\mathrm{kJ h^{-1}}]^\mathsf{T}&amp;      \mb{u}_{\mathrm{offset}} &amp;= [19\,\mathrm{h^{-1}}, -4500\,\mathrm{kJ h^{-1}}]^\mathsf{T}\end{aligned}\end{align} \]</div>
+<p>is activated.</p>
+</section>
+<section id="evaluation">
+<h2>Evaluation<a class="headerlink" href="#evaluation" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-cstr-closedloop">
+<img alt="../_images/CSTR_closedLoop.svg" src="../_images/CSTR_closedLoop.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Simulated MHE/MPC trajectories for the CSTR reactor example.</span><a class="headerlink" href="#fig-cstr-closedloop" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The moving horizon estimator is evaluated in conjunction with the MPC.
+The state estimates are initialized with an initial disturbance
+<span class="math notranslate nohighlight">\(\delta \mb{p} = [100\,\mathrm{\frac{kmol}{m^3}}\)</span>,
+<span class="math notranslate nohighlight">\(100\,\mathrm{\frac{kmol}{m^3}}\)</span>,
+<span class="math notranslate nohighlight">\(5\,\mathrm{^\circ C}\)</span>,
+<span class="math notranslate nohighlight">\(7\,\mathrm{^\circ C}]^\mathsf{T}\)</span>. For a more realistic
+setting, white Gaussian noise with zero mean and a standard deviation of
+<span class="math notranslate nohighlight">\(4\,\mathrm{^\circ C}\)</span> is added to the measurements
+<span class="math notranslate nohighlight">\(\mb{y}=[T,T_C]^\mathsf{T}\)</span>.</p>
+<p><a class="reference internal" href="#fig-cstr-closedloop"><span class="std std-numref">Fig. 13</span></a> shows the simulation results from
+the closed loop simulation of the MHE in conjunction with the MPC. The
+estimates <span class="math notranslate nohighlight">\(\mb{\hat x}_k\)</span> quickly converge to the actual
+states (ground truth), as e.g. can be seen in the upper right plot.
+Furthermore, the cost of the MPC quickly converges to zero after each
+setpoint change at <span class="math notranslate nohighlight">\(t=0\,\mathrm{h}\)</span> and
+<span class="math notranslate nohighlight">\(t=1.5\,\mathrm{h}\)</span>, respectively, which shows the good
+performance of the combined MPC/MHE problem.</p>
+<p>The corresponding computation times of GRAMPC amount to
+<span class="math notranslate nohighlight">\(58\,\mathrm{\mu s}\)</span> and <span class="math notranslate nohighlight">\(11\,\mathrm{\mu s}\)</span> per
+MPC and MHE step, respectively, on a Windows 10 machine with Intel(R)
+Core(TM) i5-5300U CPU running at 2.3GHz using the Microsoft Visual C++
+2013 Professional (C) compiler.</p>
+<div class="docutils container" id="id4">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-rothfuss1996" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
+<p>R. Rothfuss, J. Rudolph, and M. Zeitz. Flatness based control of a nonlinear chemical reactor model. <em>Automatica</em>, 32(10):1433–1439, 1996.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="DoubleIntegrator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Optimal control of a double integrator</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="DAE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Differential algebraic equations</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation">Problem formulation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-aspects">Implementation aspects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

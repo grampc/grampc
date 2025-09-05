@@ -1,0 +1,25 @@
+================================
+GRAMPC documentation
+(pronounced gramp-c [græmp’si:])
+Version 2.3
+================================
+
+:Author: 
+         Tobias Englert, Andreas Völz, Felix Mesmer,
+         Sönke Rhein, Knut Graichen
+         Former contributors (GRAMPC version < 2.0):
+         Bartosz Käpernik, Tilman Utz
+         Chair of Automatic Control
+         Friedrich-Alexander-Universität Erlangen-Nürnberg
+:Date: 2024-05-27
+
+.. toctree::
+    :maxdepth: 1
+    
+    introduction
+    install
+    problem_formulation
+    algorithm
+    usage
+    tutorials
+    appendix

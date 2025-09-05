@@ -1,0 +1,763 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Using GRAMPC in Python &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'usage/usage_python';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorials" href="../tutorials/tutorials.html" />
+    <link rel="prev" title="Using GRAMPC in Matlab/Simulink" href="usage_matlab.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="usage.html">Usage of GRAMPC</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/usage/usage_python.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Using GRAMPC in Python</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation-in-c">Problem Formulation in C++</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation-in-python">Problem Formulation in Python</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-in-python">Usage in Python</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="using-grampc-in-python">
+<h1>Using GRAMPC in Python<a class="headerlink" href="#using-grampc-in-python" title="Link to this heading">#</a></h1>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version v2.3.</span></p>
+</div>
+<p>The Python interface for GRAMPC is similar to the Matlab interface.
+It furthermore offers the possibility to write the problem formulation in Python code without a compilation step for rapid prototyping.</p>
+<section id="problem-formulation-in-c">
+<h2>Problem Formulation in C++<a class="headerlink" href="#problem-formulation-in-c" title="Link to this heading">#</a></h2>
+<p>The first step to implement an MPC in Python is writing the problem definition.
+Doing so in C++ is the preferred way, since the computation speed of GRAMPC can be leveraged.
+Writing the problem definition itself does not differ greatly from the C++ interface.
+Instead of array pointers, e.g. <code class="code docutils literal notranslate"><span class="pre">typeRNum</span> <span class="pre">*out</span></code>, matrices from Eigen are used.
+They are defined by</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Dynamic</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Vector</span><span class="p">;</span>
+<span class="k">typedef</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Matrix</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Dynamic</span><span class="p">,</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Matrix</span><span class="p">;</span>
+<span class="k">typedef</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Ref</span><span class="o">&lt;</span><span class="n">Vector</span><span class="o">&gt;</span><span class="w"> </span><span class="n">VectorRef</span><span class="p">;</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Eigen</span><span class="o">::</span><span class="n">Ref</span><span class="o">&lt;</span><span class="k">const</span><span class="w"> </span><span class="n">Vector</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">VectorConstRef</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>and offer a direct conversion to numpy for the Python interface.
+Accessing an element of <code class="docutils literal notranslate"><span class="pre">Vector</span></code>, <code class="docutils literal notranslate"><span class="pre">VectorRef</span></code> or <code class="docutils literal notranslate"><span class="pre">VectorConstRef</span></code> is the same as for an array pointer.</p>
+<p>The class itself has to inherit from <code class="docutils literal notranslate"><span class="pre">PyProblemDescription</span></code>.
+An example of the problem specific header is given in <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/python/examples/Crane2D</span></code> by</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;pygrampc_problem_description.hpp&quot;</span><span class="c1"> // &lt;pybind11/pybind11.h&gt; is already included here</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pybind11/stl.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cmath&gt;</span>
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">grampc</span><span class="p">;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Crane2D</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">PyProblemDescription</span><span class="w"> </span><span class="c1">// must be inherited with public</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">public</span><span class="o">:</span><span class="w"> </span><span class="c1">// writing the class fields public reduces overhead code for writing getters and setters</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Q_</span><span class="p">;</span>
+<span class="w">        </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">R_</span><span class="p">;</span>
+<span class="w">        </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">ScaleConstraint_</span><span class="p">;</span>
+<span class="w">        </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">MaxConstraintHeight_</span><span class="p">;</span>
+<span class="w">        </span><span class="n">typeRNum</span><span class="w"> </span><span class="n">MaxAngularDeflection_</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">public</span><span class="o">:</span>
+<span class="w">        </span><span class="n">Crane2D</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">ScaleConstraint</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">MaxConstraintHeight</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">MaxAngularDeflection</span><span class="p">);</span>
+
+<span class="w">        </span><span class="o">~</span><span class="n">Crane2D</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
+</pre></div>
+</div>
+<p>Differently from C and the C++ interface, no <code class="docutils literal notranslate"><span class="pre">ocp_dim()</span></code> function is present to define the problem dimensions.
+Instead, they are passed in the constructor of <code class="docutils literal notranslate"><span class="pre">PyProblemDescription</span></code> with e.g. for <code class="docutils literal notranslate"><span class="pre">Crane2D</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Crane2D</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">ScaleConstraint</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">MaxConstraintHeight</span><span class="p">,</span><span class="w"> </span><span class="n">ctypeRNum</span><span class="w"> </span><span class="n">MaxAngularDeflection</span><span class="p">)</span>
+<span class="o">:</span><span class="w"> </span><span class="n">PyProblemDescription</span><span class="p">(</span><span class="cm">/*Nx*/</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="cm">/*Nu*/</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="cm">/*Np*/</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*Ng*/</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*Nh*/</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="cm">/*NgT*/</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="cm">/*NhT*/</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span>
+<span class="w">  </span><span class="n">Q_</span><span class="p">(</span><span class="n">Q</span><span class="p">),</span>
+<span class="w">  </span><span class="n">R_</span><span class="p">(</span><span class="n">R</span><span class="p">),</span>
+<span class="w">  </span><span class="n">ScaleConstraint_</span><span class="p">(</span><span class="n">ScaleConstraint</span><span class="p">),</span>
+<span class="w">  </span><span class="n">MaxConstraintHeight_</span><span class="p">(</span><span class="n">MaxConstraintHeight</span><span class="p">),</span>
+<span class="w">  </span><span class="n">MaxAngularDeflection_</span><span class="p">(</span><span class="n">MaxAngularDeflection</span><span class="p">)</span>
+<span class="p">{}</span>
+</pre></div>
+</div>
+<p>After writing the problem specific code, the Python wrapper with pybind11 has to be written.
+The binding code is wrapped in the macro <code class="docutils literal notranslate"><span class="pre">PYBIND11_MODULE(module_name,</span> <span class="pre">module_reference)</span></code> which is the entry point for the Python interpreter when importing a pybind11 module.
+For the Crane2D example it is given by</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">PYBIND11_MODULE</span><span class="p">(</span><span class="n">crane_problem</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="cm">/** Imports pygrampc so this extensions module knows of the type grampc::PyProblemDescription, otherwise an import error like</span>
+<span class="cm">    * ImportError: generic_type: type &quot;Crane2D&quot; referenced unknown base type &quot;grampc::PyProblemDescription&quot;</span>
+<span class="cm">    * may occur, if the problem description is imported before pygrampc.</span>
+<span class="cm">    */</span>
+<span class="w">    </span><span class="n">pybind11</span><span class="o">::</span><span class="n">module_</span><span class="o">::</span><span class="k">import</span><span class="p">(</span><span class="s">&quot;pygrampc&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">pybind11</span><span class="o">::</span><span class="n">class_</span><span class="o">&lt;</span><span class="n">Crane2D</span><span class="p">,</span><span class="w"> </span><span class="n">PyProblemDescription</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">Crane2D</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Crane2D&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">...</span>
+</pre></div>
+</div>
+<p>At first, pygrampc is imported so our derived problem definition knows the already bound type <code class="docutils literal notranslate"><span class="pre">PyProblemDefinition</span></code>.
+This is just a convenience.
+After that, the Python class definition is written with <code class="docutils literal notranslate"><span class="pre">pybind11::class_&lt;&gt;</span></code>.
+Here, we start with our custom class, then the parent we are inheriting from, and also the used capsule for reference counting.
+A shared pointer is advisable since otherwise <code class="docutils literal notranslate"><span class="pre">Crane2D</span></code> can be prematurely destructed if no reference in Python is present.
+In the end of the line, we pass the module reference, here <code class="docutils literal notranslate"><span class="pre">m</span></code> and the class name in Python.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> function for Python is defined by</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+<span class="w">    </span><span class="p">.</span><span class="n">def</span><span class="p">(</span><span class="n">pybind11</span><span class="o">::</span><span class="n">init</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">typeRNum</span><span class="p">,</span><span class="w"> </span><span class="n">typeRNum</span><span class="p">,</span><span class="w"> </span><span class="n">typeRNum</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>where a type list of the C++ constructor is supplied.
+Note that for binding <code class="docutils literal notranslate"><span class="pre">std::vector&lt;&gt;</span></code> the header <code class="docutils literal notranslate"><span class="pre">pybind11/stl.h</span></code> has to be included.</p>
+<p>This is the theoretic bare minimum needed to initialize the C++ class in Python and pass to GRAMPC.
+It is convenient to also expose class fields or functions to Python.
+This can be done with</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="p">...</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;Nx&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Nx</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;Nu&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Nu</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;Np&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Np</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;Ng&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Ng</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;Nh&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Nh</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;NgT&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">NgT</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readonly</span><span class="p">(</span><span class="s">&quot;NhT&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">NhT</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">// make your custom fields available from python</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readwrite</span><span class="p">(</span><span class="s">&quot;Q&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">Q_</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readwrite</span><span class="p">(</span><span class="s">&quot;R&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">R_</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readwrite</span><span class="p">(</span><span class="s">&quot;MaxAngularDeflection&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">MaxAngularDeflection_</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readwrite</span><span class="p">(</span><span class="s">&quot;ScaleConstraint&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">ScaleConstraint_</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">def_readwrite</span><span class="p">(</span><span class="s">&quot;MaxConstraintHeight&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">Crane2D</span><span class="o">::</span><span class="n">MaxConstraintHeight_</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where in this case only fields are exposed.
+For a more detailed guide please look into the pybind11 documentation.</p>
+<p>The next step involves writing the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file for compiling our problem definition.
+We start with configuring the languages and finding Python, pybind11 and Eigen.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.15</span><span class="p">)</span>
+<span class="nb">project</span><span class="p">(</span><span class="s">crane_problem_project</span><span class="w"> </span><span class="s">LANGUAGES</span><span class="w"> </span><span class="s">CXX</span><span class="w"> </span><span class="s">C</span><span class="p">)</span>
+
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Python</span><span class="w"> </span><span class="s">REQUIRED</span><span class="w"> </span><span class="s">COMPONENTS</span><span class="w"> </span><span class="s">Interpreter</span><span class="w"> </span><span class="s">Development.Module</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">pybind11</span><span class="w"> </span><span class="s">CONFIG</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
+
+<span class="c"># Eigen 3.4 is required</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Eigen3</span><span class="w"> </span><span class="s">3.4</span><span class="w"> </span><span class="s">REQUIRED</span><span class="w"> </span><span class="s">NO_MODULE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then the path to the GRAMPC and PyGRAMPC header files has to be defined:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="c"># Path to &lt;grampc_root&gt;</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">GRAMPC_ROOT</span>
+<span class="w">    </span><span class="s">../../../</span>
+<span class="p">)</span>
+
+<span class="nb">include_directories</span><span class="p">(</span>
+<span class="w">    </span><span class="o">${</span><span class="nv">GRAMPC_ROOT</span><span class="o">}</span><span class="s">include</span><span class="w"> </span><span class="c"># include directory of GRAMPC</span>
+<span class="w">    </span><span class="o">${</span><span class="nv">GRAMPC_ROOT</span><span class="o">}</span><span class="s">python/include</span><span class="w"> </span><span class="c"># include directory of PyGRAMPC</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally the pybind11 module is defined with</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">pybind11_add_module</span><span class="p">(</span><span class="s">crane_problem</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="s">Crane2D.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">crane_problem</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">Eigen3::Eigen</span><span class="p">)</span><span class="w"> </span><span class="c"># linking against Eigen is necessary</span>
+<span class="nb">install</span><span class="p">(</span><span class="s">TARGETS</span><span class="w"> </span><span class="s">crane_problem</span><span class="w"> </span><span class="s">DESTINATION</span><span class="w"> </span><span class="s">.</span><span class="p">)</span><span class="w"> </span><span class="c"># copy the .pyd (Windows) or .so (Linux) to the correct installation folder where Python finds the extension</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">pybind11_add_module</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">add_executeable</span></code> from CMake.
+Here all source files and the target is defined.
+The install command is necessary to move the compiled module into <code class="docutils literal notranslate"><span class="pre">site-packages</span></code>, so Python can directly import the problem definition.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The CMake target in <code class="docutils literal notranslate"><span class="pre">pybind11_add_module</span></code> and the module name in <code class="docutils literal notranslate"><span class="pre">PYBIND11_MODULE</span></code> has to be same!</p>
+</div>
+<p>To actually make the problem definition importable by Python, it needs a proper Python module definition.
+This is done by supplying a <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file given by</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[build-system]</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;scikit-build-core&gt;=0.10&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;pybind11&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;scikit_build_core.build&quot;</span>
+
+<span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;crane_problem&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span>
+<span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compiled Crane2D problem for GRAMPC&quot;</span>
+
+<span class="k">[tool.scikit-build]</span>
+<span class="n">wheel</span><span class="p">.</span><span class="n">expand-macos-universal-tags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</pre></div>
+</div>
+<p>In <code class="docutils literal notranslate"><span class="pre">[build-system]</span></code> the requirements for building this Python module are defined, namely pybind11 and scikit-build-core.
+scikit-build-core takes care of building the extension with CMake and also installs the module into site-packages.</p>
+<p>With that, the Crane2D C++ problem definition can be installed with pip with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/python/examples/Crane2D
+$ pip install .
+</pre></div>
+</div>
+<p>and then imported by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">crane_problem</span> <span class="kn">import</span> <span class="n">Crane2D</span>
+</pre></div>
+</div>
+<p>For an example of the project layout, please refer to <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/python/examples/Crane2D</span></code>.</p>
+</section>
+<section id="problem-formulation-in-python">
+<h2>Problem Formulation in Python<a class="headerlink" href="#problem-formulation-in-python" title="Link to this heading">#</a></h2>
+<p>The Python interface also allow to write the problem definition in Python.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>The full speed of GRAMPC via Python is only reachable when writing the problem definition in C++! Writing the problem definition in Python can result in 100x longer computation times or more.</p>
+</div>
+<p>This leverages rapid prototyping without a compilation step, but should not be used for evaluating the computation times of GRAMPC.
+PyGRAMPC provides the class <code class="docutils literal notranslate"><span class="pre">ProblemDescription</span></code> which redirects the C function calls to Python.
+An example for defining the problem definition in Python is given in the DoubleIntegrator example by</p>
+<div class="literal-block-wrapper docutils container" id="lis-pythoninit">
+<div class="code-block-caption"><span class="caption-number">Listing 8 </span><span class="caption-text">Example for the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method in Python on the basis of the DoubleIntegrator example.</span><a class="headerlink" href="#lis-pythoninit" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pygrampc</span> <span class="kn">import</span> <span class="n">ProblemDescription</span>
+
+<span class="k">class</span> <span class="nc">DoubleIntegrator</span><span class="p">(</span><span class="n">ProblemDescription</span><span class="p">);</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">ProblemDescription</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Nx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">Nu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">Np</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Ng</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Nh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">NgT</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">NhT</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">CostIntegral</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CostTerminal</span> <span class="o">=</span> <span class="mf">1.0</span>
+</pre></div>
+</div>
+</div>
+<p>Like in C++, the problem dimensions are set in the constructor of <code class="docutils literal notranslate"><span class="pre">ProblemDescription</span></code>.
+Note that every field has to be set.
+Just like in the C++ interface, only <code class="docutils literal notranslate"><span class="pre">__init__()</span></code>, <code class="docutils literal notranslate"><span class="pre">ffct()</span></code> and <code class="docutils literal notranslate"><span class="pre">dfdx_vec()</span></code> are mandatory to implement.</p>
+<p>A sample function implementation looks like</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ffct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+    <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">t</span></code> is a float and <code class="docutils literal notranslate"><span class="pre">param</span></code> the <code class="docutils literal notranslate"><span class="pre">grampc_param</span></code> struct.
+The other parameters are numpy arrays, which point to memory allocated by GRAMPC.
+Thus, the results must explicitly write into the allocated memory so statements like</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">out</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>correctly set values to <code class="docutils literal notranslate"><span class="pre">out</span></code>.
+Note that <code class="docutils literal notranslate"><span class="pre">out</span> <span class="pre">=</span> <span class="pre">out</span> <span class="pre">+</span> <span class="pre">1</span></code> computes <code class="docutils literal notranslate"><span class="pre">out</span> <span class="pre">+</span> <span class="pre">1</span></code> and saves the result in the new variable <code class="docutils literal notranslate"><span class="pre">out</span></code>, which does not point to the allocated memory from GRAMPC.
+For a correct usage, please refer to the examples in <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/python/examples</span></code>.</p>
+</section>
+<section id="usage-in-python">
+<h2>Usage in Python<a class="headerlink" href="#usage-in-python" title="Link to this heading">#</a></h2>
+<p>The usage of GRAMPC in Python is described via the <code class="docutils literal notranslate"><span class="pre">DoubleIntegrator.py</span></code> example in <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/python/examples/DoubleIntegrator</span></code>.
+We first start with importing the relevant packages</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pygrampc</span> <span class="kn">import</span> <span class="n">ProblemDescription</span><span class="p">,</span> <span class="n">Grampc</span><span class="p">,</span> <span class="n">GrampcResults</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">solve_ivp</span>
+
+<span class="c1"># alternatively define your problem definition</span>
+<span class="c1"># as a C++ extension module or in a Python file</span>
+<span class="c1"># and import the corresponding problem definition</span>
+</pre></div>
+</div>
+<p>Here, the <code class="docutils literal notranslate"><span class="pre">solve_ivp</span></code> function from Scipy is used for the reference integration.
+Scipy is easily installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">scipy</span></code> into the current environment.
+In this example, the problem definition is directly written in the same file for rapid prototyping.
+Thus, it does not need to be imported.
+After that, GRAMPC is initialized:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+
+    <span class="o">...</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="s2">&quot;DoubleIntegrator.json&quot;</span>
+
+    <span class="c1"># initialize problem and GRAMPC</span>
+    <span class="n">Problem</span> <span class="o">=</span> <span class="n">DoubleIntegrator</span><span class="p">()</span>
+    <span class="n">grampc</span> <span class="o">=</span> <span class="n">Grampc</span><span class="p">(</span><span class="n">Problem</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">plot_prediction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We start with a so-called import guard with <code class="code docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;:</span></code> which only executes if the current file is run as a main file.
+With that, the problem definition in this file can be imported without executing e.g. our test code defined here.
+Then, the <code class="docutils literal notranslate"><span class="pre">DoubleIntegrator</span></code> class is initialized.
+After that, GRAMPC is initialized with <code class="docutils literal notranslate"><span class="pre">Problem</span></code> and also with a path to a json file with problem specific options.
+This options file is optional.
+We can also turn on prediction plots for debugging the current MPC formulation.</p>
+<p>Like in Matlab, the result struct <code class="docutils literal notranslate"><span class="pre">GrampcResults</span></code> is supplied, which mimics the result and statistic plots available in Matlab.
+It is constructed by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># construct solution structure</span>
+<span class="n">vec</span> <span class="o">=</span> <span class="n">GrampcResults</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span> <span class="n">Tsim</span><span class="p">,</span> <span class="n">plot_results</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot_statistics</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The specific MPC loop for the Double-Integrator is given by</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dt</span> <span class="o">=</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">dt</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">vec</span><span class="o">.</span><span class="n">CPUtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">grampc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="n">vec</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">grampc</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">)</span> <span class="ow">or</span> <span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">Tsim</span><span class="p">:</span>
+        <span class="k">break</span>
+
+    <span class="c1"># simulate system</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solve_ivp</span><span class="p">(</span><span class="n">grampc</span><span class="o">.</span><span class="n">ffct</span><span class="p">,</span> <span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">],</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">x0</span><span class="p">,</span>
+                    <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">grampc</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">unext</span><span class="p">,</span> <span class="n">grampc</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">pnext</span><span class="p">,</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+
+    <span class="c1"># set current time and state</span>
+    <span class="n">grampc</span><span class="o">.</span><span class="n">set_param</span><span class="p">({</span><span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">sol</span><span class="o">.</span><span class="n">y</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="s2">&quot;t0&quot;</span><span class="p">:</span> <span class="n">t</span> <span class="o">+</span> <span class="n">dt</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">grampc</span><span class="o">.</span><span class="n">sol</span><span class="o">.</span><span class="n">Tnext</span> <span class="o">&lt;=</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">Tmin</span> <span class="o">+</span> <span class="n">grampc</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">dt</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">grampc</span><span class="o">.</span><span class="n">opt</span><span class="o">.</span><span class="n">OptimTime</span><span class="p">):</span>
+        <span class="n">grampc</span><span class="o">.</span><span class="n">set_opt</span><span class="p">({</span><span class="s2">&quot;OptimTime&quot;</span><span class="p">:</span> <span class="s2">&quot;off&quot;</span><span class="p">})</span>
+        <span class="n">Tsim</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># plots of the grampc predictions</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">plotSteps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">grampc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+        <span class="n">vec</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">plotPause</span><span class="p">:</span>
+            <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Press Enter to continue...&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>First, we call <code class="docutils literal notranslate"><span class="pre">grampc.run()</span></code> which returns the computation time in milliseconds.
+After that, the solution struct is updated with the current results.
+With <code class="docutils literal notranslate"><span class="pre">solve_ivp</span></code> the reference integration is carried out, with the wrapped ffct like in Matlab.
+Here a custom reference integration or model can be implemented.
+<code class="docutils literal notranslate"><span class="pre">Grampc</span></code> also provides <code class="docutils literal notranslate"><span class="pre">set_param</span></code> and <code class="docutils literal notranslate"><span class="pre">set_opt</span></code> to change parameters and options in GRAMPC.
+You have to always pass a Python dict with the respective key-value pairs like</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="s2">&quot;u0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.05</span><span class="p">,]</span>
+<span class="p">}</span>
+<span class="n">grampc</span><span class="o">.</span><span class="n">set_param</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the end of the MPC loop, the prediction, results and statistic plots are plotted, if set to <code class="code docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>To run the example, either use your preferred python code editor, or run directly from the terminal with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;grampc_root&gt;/python/examples/DoubleIntegrator
+$ python DoubleIntegrator.py
+</pre></div>
+</div>
+<p>For the usage in Python code, please refer to the examples in <code class="docutils literal notranslate"><span class="pre">&lt;grampc</span> <span class="pre">root&gt;/python/examples</span></code>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="usage_matlab.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Using GRAMPC in Matlab/Simulink</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../tutorials/tutorials.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation-in-c">Problem Formulation in C++</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#problem-formulation-in-python">Problem Formulation in Python</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-in-python">Usage in Python</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

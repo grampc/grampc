@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Problem formulation and implementation &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'problem_formulation/problem_formulation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Problem implementation" href="implementation.html" />
+    <link rel="prev" title="Installation and structure of GRAMPC" href="../install.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Problem formulation and implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../algorithm/algorithm.html">Optimization algorithm and options</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../algorithm/misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/problem_formulation/problem_formulation.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Problem formulation and implementation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-problem-and-parameters">Optimization problem and parameters</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="problem-formulation-and-implementation">
+<span id="chap-problemformulation"></span><h1>Problem formulation and implementation<a class="headerlink" href="#problem-formulation-and-implementation" title="Link to this heading">#</a></h1>
+<p>GRAMPC provides a solver for nonlinear input and state constrained
+optimal control problems. It is in particular tailored to the
+application of real-time MPC with a moving or shrinking horizon with
+focus on a memory and time efficient implementation. Other applications
+concern the problem of moving horizon estimation and parameter
+estimation.</p>
+<p>This chapter describes the underlying optimization problem and how it
+can be implemented for a specific application in GRAMPC. In addition,
+the parameter structure of GRAMPC is introduced.</p>
+<section id="optimization-problem-and-parameters">
+<h2>Optimization problem and parameters<a class="headerlink" href="#optimization-problem-and-parameters" title="Link to this heading">#</a></h2>
+<p>GRAMPC allows one to cope with optimal control problems of the
+following type</p>
+<div class="math notranslate nohighlight" id="equation-eq-ocp">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-ocp" title="Link to this equation">#</a></span>\[ \begin{align}\begin{aligned}    \!\!\!\min_{\mb{u}, \mb{p}, T} \quad &amp; J(\mb{u}, \mb{p}, T;\mb{x}_0) = V(\mb{x}(T), \mb{p}, T) + \int_0^T l(\mb{x}(t), \mb{u}(t), \mb{p}, t) \, {\rm d}t\\    \textrm{s.t.} \quad &amp; \mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \,, \quad \mb{x}(t_0) = \mb{x}_0\\    &amp; \mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0} \,, \quad \mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}\\    &amp; \mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0} \,, \quad \mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}\\    &amp; \mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]\\    &amp; \mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right] \,,\quad  T \in \left[T_{\min}, T_{\max}\right]\end{aligned}\end{align} \]</div>
+<p>in the context of model predictive control, moving horizon estimation, and/or parameter estimation.
+The cost functional <span class="math notranslate nohighlight">\(J(\mb{u}, \mb{p}, T;\mb{x}_0)\)</span> to be minimized consists of the continuously differentiable terminal cost (Mayer term)
+<span class="math notranslate nohighlight">\(V:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R}\rightarrow \mathbb{R}\)</span> and integral cost (Lagrange term)
+<span class="math notranslate nohighlight">\(l:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}\)</span>
+with the state variables <span class="math notranslate nohighlight">\(\mb{x}\in \mathbb{R}^{N_{\mb{x}}}\)</span>, the control variables <span class="math notranslate nohighlight">\(\mb{u} \in \mathbb{R}^{N_{\mb{u}}}\)</span>,
+the parameters <span class="math notranslate nohighlight">\(\mb{p}\in\mathbb{R}^{N_{\mb{p}}}\)</span>, and the end time <span class="math notranslate nohighlight">\(T\in \mathbb{R}\)</span>.</p>
+<p>The cost functional <span class="math notranslate nohighlight">\(J(\mb{u}, \mb{p}, T;\mb{x}_0, t_0)\)</span> is
+minimized with respect to the optimization variables <span class="math notranslate nohighlight">\((\mb{u}, \mb{p}, T)\)</span> subject to the system
+dynamics <span class="math notranslate nohighlight">\(\mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\)</span> with the mass matrix
+<span class="math notranslate nohighlight">\(\mb{M}\in\mathbb{R}^{N_{\mb{x}}\times N_{\mb{x}}}\)</span>,
+the continuously differentiable right hand side
+<span class="math notranslate nohighlight">\(\mb{f}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{x}}}\)</span>, and the initial state <span class="math notranslate nohighlight">\(\mb{x}_0\)</span>.
+GRAMPC allows one to formulate terminal equality and inequality constraints
+<span class="math notranslate nohighlight">\(\mb{g}_T:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{g}_T}}\)</span>
+and
+<span class="math notranslate nohighlight">\(\mb{h}_T:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{h}_T}}\)</span>
+as well as general equality and inequality constraints
+<span class="math notranslate nohighlight">\(\mb{g}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{g}}}\)</span>
+and <span class="math notranslate nohighlight">\(\mb{h}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{h}}}\)</span>.
+In addition, the optimization variables are limited by the box
+constraints <span class="math notranslate nohighlight">\(\mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]\)</span>, <span class="math notranslate nohighlight">\(\mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right]\)</span> and <span class="math notranslate nohighlight">\(T \in \left[T_{\min}, T_{\max}\right]\)</span></p>
+<p>The terminal cost <span class="math notranslate nohighlight">\(V\)</span>, the integral cost <span class="math notranslate nohighlight">\(l\)</span>, as well as the system dynamics <span class="math notranslate nohighlight">\(\mb{f}\)</span> and all constraints <span class="math notranslate nohighlight">\((\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T})\)</span> contain an explicit time dependency with regard to the internal time <span class="math notranslate nohighlight">\(t \in [0, T]\)</span>.
+In the context of MPC, the internal time is distinguished from the global time <span class="math notranslate nohighlight">\(t_0+t \in [t_0, t_0+T]\)</span> where the initial time <span class="math notranslate nohighlight">\(t_0\)</span> and initial state <span class="math notranslate nohighlight">\(\mb{x}_0\)</span> correspond to the sampling instant <span class="math notranslate nohighlight">\(t_k\)</span> that is incremented by the sampling time <span class="math notranslate nohighlight">\(\Delta t&gt;0\)</span> in each MPC step <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>A detailed description about the implementation of the optimization problem <a class="reference internal" href="#equation-eq-ocp">(1)</a> in C code is given in <a class="reference internal" href="implementation.html#sec-problemimplementation"><span class="std std-ref">Problem implementation</span></a>.
+In addition, some parts of the problem can be configured by parameters (cf. the GRAMPC data structure <code class="docutils literal notranslate"><span class="pre">param</span></code>) and therefore do not require repeated compiling.
+A list of all parameters with types and allowed values is provided in the appendix (<a class="reference internal" href="../appendix.html#tab-listofparameters"><span class="std std-numref">Table 3</span></a>).
+Except for the horizon length <code class="docutils literal notranslate"><span class="pre">Thor</span></code> and the sampling time <code class="docutils literal notranslate"><span class="pre">dt</span></code>, all parameters are optional and initialized to default values.
+A description of all parameters is as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x0</span></code>: Initial state vector <span class="math notranslate nohighlight">\(\mb{x}(t_0)=\mb{x}_0\)</span> at the corresponding sampling time <span class="math notranslate nohighlight">\(t_0\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xdes</span></code>: Desired (constant) setpoint vector for the state variables <span class="math notranslate nohighlight">\(\mb{x}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">u0</span></code>: Initial value of the control vector <span class="math notranslate nohighlight">\(\mb{u}(t) = \mb{u}_0 = \text{const.}\)</span>, <span class="math notranslate nohighlight">\(t \in [0,T]\)</span> that is used in the first iteration of GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">udes</span></code>: Desired (constant) setpoint vector for the control variables <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">umin</span></code>, <code class="docutils literal notranslate"><span class="pre">umax</span></code> : Lower and upper bounds for the control variables <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">p0</span></code>: Initial value of the parameter vector <span class="math notranslate nohighlight">\(\mb{p} = \mb{p}_0\)</span> that is used in the first iteration of GRAMPC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pmin</span></code>, <code class="docutils literal notranslate"><span class="pre">pmax</span></code>: Lower and upper bounds for the parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Thor</span></code>: Prediction horizon <span class="math notranslate nohighlight">\(T\)</span> or initial value if the end time is optimized.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tmin</span></code>, <code class="docutils literal notranslate"><span class="pre">Tmax</span></code>: Lower and upper bound for the prediction horizon <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dt</span></code>: Sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span> of the considered system for model predictive control or moving horizon estimation. Required for prediction of next state <code class="docutils literal notranslate"><span class="pre">grampc.sol.xnext</span></code> and for the control shift, see <a class="reference internal" href="../algorithm/misc.html#sec-algopt-controlshift"><span class="std std-ref">Control shift</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t0</span></code>: Current sampling instance <span class="math notranslate nohighlight">\(t_0\)</span> that is provided in the <code class="docutils literal notranslate"><span class="pre">grampc.param</span></code> structure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userparam</span></code>: Further problem-specific parameters, e.g. system parameters or weights in the cost functions that are passed to the problem functions via a <code class="docutils literal notranslate"><span class="pre">void</span></code>-pointer in C or <code class="docutils literal notranslate"><span class="pre">typeRNum</span></code> array in MATLAB.</p></li>
+</ul>
+<p>Although GRAMPC uses a continuous-time formulation of the optimization problem <a class="reference internal" href="#equation-eq-ocp">(1)</a>, all trajectories are internally stored in discretized form with <code class="docutils literal notranslate"><span class="pre">Nhor</span></code> steps (cf. <a class="reference internal" href="../algorithm/numerical_integration.html#sec-algopt-integration"><span class="std std-ref">Numerical Integration</span></a>).
+This raises the question of whether all constraints are evaluated for the last trajectory point or only the terminal ones. In general, the constraints should be formulated in such a way that there are no conflicts.
+However, numerical difficulties can arise in some problems if constraints are formulated twice for the last point. Therefore, GRAMPC does not evaluate the constraints <span class="math notranslate nohighlight">\(\mb{g}\)</span> and <span class="math notranslate nohighlight">\(\mb{h}\)</span> for the last trajectory point if terminal constraints are defined, i.e. <span class="math notranslate nohighlight">\(N_{\mb{g}_T} + N_{\mb{h}_T} &gt; 0\)</span>.
+In contrast, if no terminal constraints are defined, the functions <span class="math notranslate nohighlight">\(\mb{g}\)</span> and <span class="math notranslate nohighlight">\(\mb{h}\)</span> are evaluated for all points.
+Note that the opposite behavior is easy to implement by including <span class="math notranslate nohighlight">\(\mb{g}\)</span> and <span class="math notranslate nohighlight">\(\mb{h}\)</span> in the terminal constraints <span class="math notranslate nohighlight">\(\mb{g}_T\)</span> and <span class="math notranslate nohighlight">\(\mb{h}_T\)</span>.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">Problem implementation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#problems-involving-explicit-odes">Problems involving explicit ODEs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#problems-with-discrete-time-systems">Problems with discrete-time systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#problems-involving-semi-implicit-odes-and-daes">Problems involving semi-implicit ODEs and DAEs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#finite-differences-and-gradient-check">Finite differences and gradient check</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#example-ball-on-plate-system">Example: Ball-on-plate system</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../install.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation and structure of GRAMPC</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="implementation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Problem implementation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-problem-and-parameters">Optimization problem and parameters</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

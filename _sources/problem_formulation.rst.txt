@@ -1,0 +1,521 @@
+.. _chap:ProblemFormulation:
+
+Problem formulation and implementation
+======================================
+
+GRAMPC provides a solver for nonlinear input and state constrained
+optimal control problems. It is in particular tailored to the
+application of real-time MPC with a moving or shrinking horizon with
+focus on a memory and time efficient implementation. Other applications
+concern the problem of moving horizon estimation and parameter
+estimation.
+
+This chapter describes the underlying optimization problem and how it
+can be implemented for a specific application in GRAMPC. In addition,
+the parameter structure of GRAMPC is introduced.
+
+Optimization problem and parameters
+-----------------------------------
+
+GRAMPC allows one to cope with optimal control problems of the
+following type
+
+.. math::
+    :label: OCP
+    
+   	\!\!\!\min_{\mb{u}, \mb{p}, T} \quad & J(\mb{u}, \mb{p}, T;\mb{x}_0) = V(\mb{x}(T), \mb{p}, T) + \int_0^T l(\mb{x}(t), \mb{u}(t), \mb{p}, t) \, {\rm d}t \\ 
+   	\textrm{s.t.} \quad & \mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \,, \quad \mb{x}(t_0) = \mb{x}_0 %\,,\quad t \in [0, T]
+   	\\ 
+   	&  \mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0} \,, \quad \mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}
+   	\\
+   	&  \mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0} \,, \quad \mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}
+   	\\
+   	& \mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right] %\,,\quad & t \in [0, T] & \
+   	\\
+   	& \mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right] \,,\quad  T \in \left[T_{\min}, T_{\max}\right]
+
+in the context of model predictive control, moving horizon estimation, and/or parameter estimation. 
+The cost functional :math:`J(\mb{u}, \mb{p}, T;\mb{x}_0)` to be minimized consists of the continuously differentiable terminal cost (Mayer term)
+:math:`V:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R}\rightarrow \mathbb{R}` and integral cost (Lagrange term)
+:math:`l:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}`
+with the state variables :math:`\mb{x}\in \mathbb{R}^{N_{\mb{x}}}`, the control variables :math:`\mb{u} \in \mathbb{R}^{N_{\mb{u}}}`,
+the parameters :math:`\mb{p}\in\mathbb{R}^{N_{\mb{p}}}`, and the end time :math:`T\in \mathbb{R}`.
+
+The cost functional :math:`J(\mb{u}, \mb{p}, T;\mb{x}_0, t_0)` is
+minimized with respect to the optimization variables :math:`(\mb{u}, \mb{p}, T)` subject to the system
+dynamics :math:`\mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)` with the mass matrix
+:math:`\mb{M}\in\mathbb{R}^{N_{\mb{x}}\times N_{\mb{x}}}`,
+the continuously differentiable right hand side
+:math:`\mb{f}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{x}}}`, and the initial state :math:`\mb{x}_0`. 
+GRAMPC allows one to formulate terminal equality and inequality constraints
+:math:`\mb{g}_T:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{g}_T}}`
+and
+:math:`\mb{h}_T:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{h}_T}}`
+as well as general equality and inequality constraints
+:math:`\mb{g}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{g}}}`
+and :math:`\mb{h}:\mathbb{R}^{N_{\mb{x}}}\times\mathbb{R}^{N_{\mb{u}}}\times\mathbb{R}^{N_{\mb{p}}}\times\mathbb{R} \rightarrow \mathbb{R}^{N_{\mb{h}}}`.
+In addition, the optimization variables are limited by the box
+constraints :math:`\mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]`, :math:`\mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right]` and :math:`T \in \left[T_{\min}, T_{\max}\right]`
+
+The terminal cost :math:`V`, the integral cost :math:`l`, as well as the system dynamics :math:`\mb{f}` and all constraints :math:`(\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T})` contain an explicit time dependency with regard to the internal time :math:`t`. 
+Note that in the context of MPC, the initial time :math:`t_0` and initial state :math:`\mb{x}_0` correspond to the sampling instant :math:`t_k` that is incremented by the sampling time :math:`\Delta t>0` in each MPC step :math:`k`.
+
+A detailed description about the implementation of the optimization problem :math:numref:`OCP` in C code is given in :ref:`sec:ProblemImplementation`. 
+In addition, some parts of the problem can be configured by parameters (cf. the GRAMPC data structure ``param``) and therefore do not require repeated compiling. 
+A list of all parameters with types and allowed values is provided in the appendix (Table :numref:`tab:ListOfParameters`). 
+Except for the horizon length ``Thor`` and the sampling time ``dt``, all parameters are optional and initialized to default values. 
+A description of all parameters is as follows:
+
+-  ``x0``: Initial state vector :math:`\mb{x}(t_0)=\mb{x}_0` at the corresponding sampling time :math:`t_0`.
+
+-  ``xdes``: Desired (constant) setpoint vector for the state variables :math:`\mb{x}`.
+
+-  ``u0``: Initial value of the control vector :math:`\mb{u}(t) = \mb{u}_0 = \text{const.}`, :math:`t \in [0,T]` that is used in the first iteration of GRAMPC.
+
+-  ``udes``: Desired (constant) setpoint vector for the control variables :math:`\mb{u}`.
+
+-  ``umin``, ``umax`` : Lower and upper bounds for the control variables :math:`\mb{u}`.
+
+-  ``p0``: Initial value of the parameter vector :math:`\mb{p} = \mb{p}_0` that is used in the first iteration of GRAMPC.
+
+-  ``pmin``, ``pmax``: Lower and upper bounds for the parameters :math:`\mb{p}`.
+
+-  ``Thor``: Prediction horizon :math:`T` or initial value if the end time is optimized.
+
+-  ``Tmin``, ``Tmax``: Lower and upper bound for the prediction horizon :math:`T`.
+
+-  ``dt``: Sampling time :math:`\Delta t` of the considered system for model predictive control or moving horizon estimation. Required for prediction of next state ``grampc.sol.xnext`` and for the control shift, see :ref:`sec:AlgOpt:ControlShift`.
+
+-  ``t0``: Current sampling instance :math:`t_0` that is provided in the ``grampc.param`` structure.
+
+-  ``userparam``: Further problem-specific parameters, e.g. system parameters or weights in the cost functions that are passed to the problem functions via a ``void``-pointer in C or ``typeRNum`` array in MATLAB.
+
+Although GRAMPC uses a continuous-time formulation of the optimization problem :math:numref:`OCP`, all trajectories are internally stored in discretized form with ``Nhor`` steps (cf. :ref:`sec:AlgOpt:Integration`). 
+This raises the question of whether all constraints are evaluated for the last trajectory point or only the terminal ones. In general, the constraints should be formulated in such a way that there are no conflicts. 
+However, numerical difficulties can arise in some problems if constraints are formulated twice for the last point. Therefore, GRAMPC does not evaluate the constraints :math:`\mb{g}` and :math:`\mb{h}` for the last trajectory point if terminal constraints are defined, i.e. :math:`N_{\mb{g}_T} + N_{\mb{h}_T} > 0`. 
+In contrast, if no terminal constraints are defined, the functions :math:`\mb{g}` and :math:`\mb{h}` are evaluated for all points. 
+Note that the opposite behavior is easy to implement by including :math:`\mb{g}` and :math:`\mb{h}` in the terminal constraints :math:`\mb{g}_T` and :math:`\mb{h}_T`.
+
+.. _sec:ProblemImplementation:
+
+Problem implementation
+----------------------
+
+Regardless of what kind of problem statement is considered (i.e. model predictive control, moving horizon estimation or parameter estimation), the optimization problem :math:numref:`OCP` must be implemented in C, cf. :numref:`fig:grampcGeneralStructure` 
+For this purpose, the C file template ``probfct_TEMPLATE.c`` is provided within the folder ``<grampc_root>/examples/TEMPLATE``, which allows one to describe the structure of the optimization problem :math:numref:`OCP`, the cost functional :math:`J` to be minimized, the system dynamics :math:`f`, and the constraints :math:`\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T}`.
+The number of C functions to be provided depends on the type of dynamics :math:`f` of the specific problem at hand.
+
+.. _sec:ProblemImplementation:Explicit:
+
+Problems involving explicit ODEs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A special case of the system dynamics :math:`f` and certainly the most important one concerns ordinary differential equations (ODEs) with explicit appearance of the first-order derivatives
+
+.. math::
+
+   \mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\,,
+
+corresponding to the identity mass matrix :math:`\mb{M}=\mb{I}` in OCP :math:numref:`OCP`. 
+In this case, the following functions of the C template file ``probfct_TEMPLATE.c`` have to be provided:
+
+-  ``ocp_dim``: Definition of the dimensions of the considered problem, i.e. the
+   number of state variables :math:`{N_{\mb{x}}}`, control
+   variables :math:`{N_{\mb{u}}}`, parameters
+   :math:`{N_{\mb{p}}}`, equality constraints
+   :math:`{N_{\mb{g}}}`, inequality constraints
+   :math:`{N_{\mb{h}}}`, terminal equality constraints
+   :math:`{N_{{\mb{g}}_T}}`, and terminal inequality constraints
+   :math:`N_{{\mb{h}}_T}`.
+
+-  ``ffct``: Formulation of the system dynamics function
+   :math:`\mb{f}`.
+
+-  ``dfdx_vec``, ``dfdu_vec``, ``dfdp_vec``: Matrix vector products
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}`,
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}`
+   and
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}`
+   for the system dynamics with an arbitrary vector
+   :math:`\mb{v}` of dimension :math:`N_x`.
+
+-  ``Vfct``, ``lfct``: Terminal and integral cost functions :math:`V` and :math:`l` of
+   the cost functional :math:`J`.
+
+-  ``dVdx``, ``dVdp``, ``dVdT``, ``dldx``, ``dldu``, ``dldp``: Gradients
+   :math:`\frac{\partial^{} V}{\partial \mb{x}^{}}`,
+   :math:`\frac{\partial^{} V}{\partial \mb{p}^{}}`,
+   :math:`\frac{\partial^{} V}{\partial T^{}}`,
+   :math:`\frac{\partial^{} l}{\partial \mb{x}^{}}`,
+   :math:`\frac{\partial^{} l}{\partial \mb{u}^{}}`, and
+   :math:`\frac{\partial^{} l}{\partial \mb{p}^{}}` of the cost
+   functions ``Vfct`` and ``lfct``.
+
+-  ``hfct``, ``gfct``: Inequality and equality constraint functions
+   :math:`\mb{h}` and :math:`\mb{g}` as defined in
+   :math:numref:`OCP`.
+
+-  ``hTfct``, ``gTfct``: Terminal inequality and equality constraint functions
+   :math:`\mb{h}_T` and :math:`\mb{g}_T` as defined in
+   :math:numref:`OCP`.
+
+-  ``dhdx_vec``, ``dhdu_vec``, ``dhdp_vec``: Matrix products
+   :math:`(\frac{\partial^{} \mb{h}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}`,
+   :math:`(\frac{\partial^{} \mb{h}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}`,
+   and
+   :math:`(\frac{\partial^{} \mb{h}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}`
+   for the inequality constraints with an arbitrary vector
+   :math:`\mb{v}` of dimension :math:`N_h`.
+
+-  ``dgdx_vec``, ``dgdu_vec``, ``dgdp_vec``: Matrix product functions
+   :math:`(\frac{\partial^{} \mb{g}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}`,
+   :math:`(\frac{\partial^{} \mb{g}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}`,
+   and
+   :math:`(\frac{\partial^{} \mb{g}}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}`
+   for the equality constraints with an arbitrary vector
+   :math:`\mb{v}` of dimension :math:`N_g`.
+
+-  ``dhTdx_vec``, ``dhTdu_vec``, ``dhTdp_vec``: Matrix product functions
+   :math:`(\frac{\partial^{} \mb{h}_T}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}`,
+   :math:`(\frac{\partial^{} \mb{h}_T}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}`,
+   and
+   :math:`(\frac{\partial^{} \mb{h}_T}{\partial T^{}})^\mathsf{T}\mb{v}`
+   for the terminal inequality constraints with an arbitrary vector
+   :math:`\mb{v}` of dimension :math:`N_{h_T}`.
+
+-  ``dgTdx_vec``, ``dgTdu_vec``, ``dgTdp_vec``: Matrix product functions
+   :math:`(\frac{\partial^{} \mb{g}_T}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}`,
+   :math:`(\frac{\partial^{} \mb{g}_T}{\partial \mb{p}^{}})^\mathsf{T}\mb{v}`,
+   and
+   :math:`(\frac{\partial^{} \mb{g}_T}{\partial T^{}})^\mathsf{T}\mb{v}`
+   for the terminal equality constraints with an arbitrary vector
+   :math:`\mb{v}` of dimension :math:`N_{g_T}`.
+
+The respective problem function templates only have to be filled in if the corresponding constraints and cost functions are defined for the problem at hand and depending on the actual choice of optimization variables (:math:`{\mb{u}}`, :math:`{\mb{p}}`, and/or :math:`{T}`). 
+For example, if only the control :math:`\mb{u}` is optimized, the partial derivatives with respect to :math:`\mb{p}` and :math:`T` are not required.
+
+The gradients :math:`\frac{\partial^{} V}{\partial \mb{x}^{}}`,
+:math:`\frac{\partial^{} V}{\partial \mb{p}^{}}`,
+:math:`\frac{\partial^{} V}{\partial T^{}}`,
+:math:`\frac{\partial^{} l}{\partial \mb{x}^{}}`,
+:math:`\frac{\partial^{} l}{\partial \mb{u}^{}}`, and
+:math:`\frac{\partial^{} l}{\partial \mb{p}^{}}` as well as the
+matrix product functions listed above appear in the partial derivatives
+:math:`H_{\mb{x}}`, :math:`H_{\mb{u}}` and
+:math:`H_{\mb{p}}` of the Hamiltonian :math:`H` within the
+gradient method (see :ref:`sec:AlgOpt:ProjGrad`). The
+matrix product formulation is chosen over the definition of Jacobians
+(e.g. :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}` instead of :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}`)
+in order to avoid unnecessary zero multiplications for sparse matrices or alternatively the usage of sparse numerics.
+
+.. _`sec:ProblemImplementation:Discrete`:
+
+Problems with time-discrete Systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+GRAMPC also allows for time-discrete system dynamics of the form
+
+.. math::
+
+   	\mb{x}_{k+1} = \mb{f}(\mb{x}_k, \mb{u}_k, \mb{p}_k, t_k)\,.
+
+For this case the same functions as in
+:ref:`sec:ProblemImplementation:Explicit` 
+are used to implement the problem description.
+
+.. _`sec:ProblemImplementation:Implicit`:
+
+Problems involving semi-implicit ODEs and DAEs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Beside explicit ODEs, GRAMPC supports semi-implicit ODEs with mass
+matrix :math:`\mb{M} \neq \mb{I}` and DAEs with
+:math:`\mb{M}` being singular. The underlying numerical
+integrations of the dynamics :math:`f` is
+carried out using the integrator
+RODAS :footcite:`Hairer:Book:1996:Stiff` :footcite:`Rodas:Webpage:2018`. In
+this case, additional C functions must be provided and several
+RODAS-specific options must be set, cf. :ref:`sec:AlgOpt:IntegrationRodas` and :ref:`sec:setting_opt_par`. 
+Especially, the option
+``IMAS = 1`` must be set to indicate that a mass matrix is given. The
+numerical integrations performed with RODAS can be accelerated by
+providing partial derivatives. In summary, the following additional C
+functions are used by GRAMPC for semi-implicit ODEs and DAE systems:
+
+-  ``Mfct``, ``Mtrans``: Definition of the mass matrix :math:`\mb{M}` and its
+   transpose :math:`\mb{M}^\mathsf{T}`, which is required for
+   the adjoint dynamics, cf. :ref:`sec:AlgOpt:ProjGrad` in
+   the projected gradient algorithm. The matrices must be specified
+   column-wise. If the mass matrix has a band structure, only the
+   respective elements above and below the main diagonal are specified.
+   This only applies if the options ``IMAS = 1`` and ``MLJAC < N_x`` are
+   selected. Non-existent elements above or below the main diagonal must
+   be filled with zeros so that the same number of elements is specified
+   for each column.
+
+-  ``dfdx``, ``dfdxtrans``: The Jacobians
+   :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}` and
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}=\frac{\partial^{2} H}{\partial \mb{x}\partial \mb{\lambda}}`
+   are provided by these functions if the option =\ :math:`1` is set.
+   This allows one to evaluate the right hand sides of the canonical
+   equations time efficiently. The Jacobians must be implemented in
+   vector form by arranging the successive columns for
+   :math:`\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}}` and
+   :math:`(\frac{\partial^{} \mb{f}}{\partial \mb{x}^{}})^\mathsf{T}`.
+   If the option ``MLJAC < N_x`` is set to exploit the band structure of
+   the Jacobians, only the corresponding elements above and below the
+   main diagonal must be specified.
+
+-  ``dfdt``, ``dHdxdt``: The partial derivatives
+   :math:`\frac{\partial^{} \mb{f}}{\partial t^{}}` and
+   :math:`\frac{\partial^{2} H}{\partial \mb{x}\partial t}`
+   allow for evaluating the right hand sides of the canonical equations
+   time efficiently, if the problem explicitly depends on time
+   :math:`t`. These functions must only be provided if the options
+   ``IFCN = 1`` and ``IDFX = 1`` are used.
+
+An MPC example with a semi-implicit system dynamics is included in ``<grampc_root>/examples(Reactor_PDE)``.
+The problem formulation is derived from a quasi-linear
+diffusion-convection-reaction system that is spatially discretized using
+finite elements.
+
+.. _`sec:ball-on-plate`:
+
+Example: Ball-on-plate system
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The appropriate definition of the C functions of the template
+``probfct_TEMPLATE`` is described for the example of a ball-on-plate
+system :footcite:`Richter2012` in the context of MPC. 
+The problem is also included in ``<grampc_root>/examples(BallOnPlate)``. 
+The underlying optimization problem reads as
+
+.. math::
+    :label: BallOnPlate
+    
+    % cost
+    \min_{u(\cdot)} \quad &J(u;\mb{x}_0) = \frac{1}{2}\Delta\mb{x}^\mathsf{T}(T) \mb{P} \Delta \mb{x}(T)+\frac{1}{2}\int_{0}^{T} \Delta \mb{x}^\mathsf{T}(\tau) \mb{Q} \Delta\mb{x}(\tau) + R \Delta u^2 \,{\rm d}\tau \\
+    % dynamics and intial condition
+    \text{s.t.} \quad & \begin{bmatrix} \dot x_1 \\ \dot x_2\end{bmatrix} 
+    = \begin{bmatrix} 0 & 1 \\ 0 & 0\end{bmatrix}
+    \begin{bmatrix} x_1\\ x_2\end{bmatrix} +
+    \begin{bmatrix} -0.04 \\ -7.01\end{bmatrix}u \,, \quad \begin{bmatrix} x_1(0)\\ x_2(0)\end{bmatrix} = \begin{bmatrix} x_{k,1}\\ x_{k,2}\end{bmatrix}\\
+    % state constraints
+    & \begin{bmatrix} -0.2\\-0.1\end{bmatrix}\le\begin{bmatrix} x_1\\ x_2 \end{bmatrix}\le\begin{bmatrix} 0.01\\0.1\end{bmatrix} \,, \quad |u| \le 0.0524
+
+The cost functional in :math:numref:`BallOnPlate` penalizes the state and input error :math:`\Delta \mb{x}=\mb{x}-\mb{x}_\text{des}` and :math:`\Delta u=u-u_\text{des}` in a quadratic manner using the weights
+
+.. math::
+   \mb{P}=\mb{Q} = \begin{bmatrix} 100 & 0 \\ 0 & 10\end{bmatrix}, \quad
+   R = 1.
+
+The system dynamics in :math:numref:`BallOnPlate`
+describes a simplified linear model of a single axis of a ball-on-plate
+system :footcite:`Richter2012`. An optimal solution of the
+optimization problem has to satisfy the input and state
+constraints present in :math:numref:`BallOnPlate`.
+
+The user must provide the C functions and to describe the general
+structure and the system dynamics of the optimization problem, also see :ref:`sec:ProblemImplementation`. 
+As shown in :numref:`lis:GenStruct`, the C function ``ocp_dim`` is used to
+define the number of states, control inputs, and number of (terminal)
+inequality and equality constraints. Note that GRAMPC uses the generic
+type ``typeInt`` for integer values. The word size of this integer type can be
+changed in the header file ``grampc_macro.h`` within the folder ``<grampc_root>/include``. 
+This is particularly advantageous with regard to implementing GRAMPC on embedded hardware.
+
+.. code-block:: c
+   :caption: Settings of the general structure of optimization problem :math:numref:`BallOnPlate`.
+   :name: lis:GenStruct
+
+   /** OCP dimensions **/
+   void ocp_dim(typeInt *Nx, typeInt *Nu, typeInt *Np, typeInt *Ng, typeInt *Nh, 
+                typeInt *NgT, typeInt *NhT, typeUSERPARAM *userparam)
+   { 
+     *Nx = 2;	*Nu = 1;	*Np = 0;
+     *Nh = 4;	*Ng = 0;	
+     *NhT = 0;	*NgT = 0;
+   }
+
+The system dynamics are described by the C function ``ffct`` shown in
+:numref:`lis:SysDyn`. The example is given in explicit
+ODE form, for which the functions ``Mfct`` and ``Mtrans`` for the mass matrix :math:`M` are
+not required. Similar to the generic integer type ``typeInt``, the data type ``typeRNum`` is
+used to adress floating point numbers of different word sizes, e.g.
+float or double (cf. the header file ``grampc_macro.h`` included in the folder ``<grampc_root>/include``).
+
+.. code-block:: c
+   :caption: Formulation of the system dynamics of optimization problem :math:numref:`BallOnPlate`.
+   :name: lis:SysDyn
+
+   /** System function f(t,x,u,p,userparam) **/
+   void ffct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+             ctypeRNum *u, ctypeRNum *p, 
+             typeUSERPARAM *userparam)
+   {
+     out[0] = x[1]-0.04*u[0];
+     out[1] =     -7.01*u[0];
+   }
+
+The cost functions are defined via the functions ``lfct`` and ``Vfct``, cf. :numref:`lis:Cost`.
+Note that the input argument ``userparam`` is used to parametrize the cost functional in a generic way.
+
+.. code-block:: c
+   :caption: Formulation of the cost functional of optimization problem :math:numref:`BallOnPlate`.
+   :name: lis:Cost
+
+   /** Integral cost l(t,x(t),u(t),p,xdes,udes,userparam) **/
+   void lfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+             ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam)
+   {
+     ctypeRNum* pCost = (ctypeRNum*)userparam;
+     ctypeRNum* xdes = param->xdes;
+     ctypeRNum* udes = param->udes;
+     out[0] = (pCost[0] * (x[0] - xdes[0]) * (x[0] - xdes[0])
+              + pCost[1] * (x[1] - xdes[1]) * (x[1] - xdes[1])
+              + pCost[2] * (u[0] - udes[0]) * (u[0] - udes[0])) / 2;
+   }
+
+   /** Terminal cost V(T,x(T),p,xdes,userparam) **/
+   void Vfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, ctypeRNum *x, 
+             ctypeRNum *p, typeUSERPARAM *userparam)
+   {
+     ctypeRNum* pCost = (ctypeRNum*)userparam;
+     ctypeRNum* xdes = param->xdes;
+     out[0] = (pCost[3] * (x[0] - xdes[0]) * (x[0] - xdes[0])
+              + pCost[4] * (x[1] - xdes[1]) * (x[1] - xdes[1])) / 2;
+   }
+
+:numref:`lis:Constraints` shows the formulation
+of the inequality constraints
+:math:`\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}`.
+For the sake of completeness,
+:numref:`lis:Constraints` also contains the
+corresponding functions for equality constraints
+:math:`\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}`,
+terminal inequality constraints
+:math:`\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}`
+as well as terminal equality constraints
+:math:`\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}`,
+which are not defined for the ball-on-plate example. Similar to the
+formulation of the cost functional, the input argument ``userparam`` is used to
+parametrize the inequality constraints.
+
+.. code-block:: c
+    :caption: Formulation of the state constraints of optimization problem :math:numref:`BallOnPlate`.
+    :name: lis:Constraints
+
+    /** Inequality constraints h(t,x(t),u(t),p,uperparam) <= 0 **/
+    void hfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+            ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+        ctypeRNum* pSys = (ctypeRNum*)userparam;
+
+        out[0] =  pSys[5] - x[0];
+        out[1] = -pSys[6] + x[0];
+        out[2] =  pSys[7] - x[1];
+        out[3] = -pSys[8] + x[1];
+    }
+
+    /** Equality constraints g(t,x(t),u(t),p,uperparam) = 0 **/
+    void gfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+                ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+    }
+
+    /** Terminal inequality constraints hT(T,x(T),p,uperparam) <= 0 **/
+    void hTfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, ctypeRNum *x, 
+                ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+    }
+
+    /** Terminal equality constraints gT(T,x(T),p,uperparam) = 0 **/
+    void gTfct(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, ctypeRNum *x, 
+                ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+    }
+
+The Jacobians of the single functions defined in
+:numref:`lis:SysDyn` to :numref:`lis:Constraints`
+with respect to state :math:`\mb{x}` and control
+:math:`\mb{u}` are required for evaluating the optimality
+conditions of optimization problem
+:math:numref:`BallOnPlate` within the gradient
+algorithm, see :ref:`sec:AlgOpt:ProjGrad`. If applicable,
+the Jacobians of the above-mentioned functions are also required with
+respect to the optimization variables :math:`\mb{p}` and
+:math:`T`. :numref:`lis:SysDynJacx` shows the
+corresponding Jacobians for the ball-on-plate example. For the matrix
+product functions ``dfdx_vec``, ``dfdu_vec``, and ``dhdx_vec``, the pointer to a generic vector ``vec`` is
+passed as input argument that corresponds to the adjoint state,
+respectively a vector that accounts for the Lagrange multiplier and
+penalty term of state constraints,
+cf. :ref:`sec:AlgOpt:BasicAlgorithm`. Note that ``vec`` is of
+appropriate dimension for the respective matrix product function,
+i.e. of dimension :math:`N_{\mb{x}}` or
+:math:`N_{\mb{h}}`. A complete C function template and further
+examples concerning the problem formulation are included in the GRAMPC
+software package.
+
+.. code-block:: c
+    :caption: Jacobians of the system dynamics and inequality constraint.
+    :name: lis:SysDynJacx
+
+    /** Jacobian df/dx multiplied by vector vec, i.e. (df/dx)^T*vec or vec^T*(df/dx) **/
+    void dfdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x,
+                    ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, typeUSERPARAM *userparam)
+    {
+        out[0] = 0;
+        out[1] = vec[0];
+    }
+
+    /** Jacobian df/du multiplied by vector vec, i.e. (df/du)^T*vec or vec^T*(df/du) **/
+    void dfdu_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x,
+                    ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, typeUSERPARAM *userparam)
+    {
+        out[0] = (typeRNum)(-0.04)*vec[0] - (typeRNum)(7.01)*vec[1];
+    }
+
+
+    /** Gradient dl/dx **/
+    void dldx(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+                ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+        ctypeRNum* pCost = (ctypeRNum*)userparam;
+        ctypeRNum* xdes = param->xdes;
+        
+        out[0] = pCost[0] * (x[0] - xdes[0]);
+        out[1] = pCost[1] * (x[1] - xdes[1]);
+    }
+    /** Gradient dl/du **/
+    void dldu(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+                ctypeRNum *u, ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+        ctypeRNum* pCost = (ctypeRNum*)userparam;
+        ctypeRNum* udes = param->udes;
+        
+        out[0] = pCost[2] * (u[0] - udes[0]);
+    }
+
+    /** Gradient dV/dx **/
+    void dVdx(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum T, ctypeRNum *x, 
+                ctypeRNum *p, typeUSERPARAM *userparam)
+    {
+        ctypeRNum* pCost = (ctypeRNum*)userparam;
+        ctypeRNum* xdes = param->xdes;
+        
+        out[0] = pCost[3] * (x[0] - xdes[0]);
+        out[1] = pCost[4] * (x[1] - xdes[1]);
+    }
+
+    /** Jacobian dh/dx multiplied by vector vec, i.e. (dh/dx)^T*vec or vec^T*(dg/dx) **/
+    void dhdx_vec(const typeGRAMPCparam *param, typeRNum *out, ctypeRNum t, ctypeRNum *x, 
+                    ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, typeUSERPARAM *userparam)
+    {
+        out[0] = -vec[0] + vec[1];
+        out[1] = -vec[2] + vec[3];
+    }
+    ...
+
+
+.. footbibliography::

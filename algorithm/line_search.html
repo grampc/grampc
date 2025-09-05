@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Line search &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'algorithm/line_search';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Update of multipliers and penalties" href="multiplier_update.html" />
+    <link rel="prev" title="Numerical Integration" href="numerical_integration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/algorithm/line_search.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Line search</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaptive-line-search">Adaptive line search</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicit-line-search">Explicit line search</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fallback-strategy-for-explicit-line-search">Fallback strategy for explicit line search</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="line-search">
+<span id="sec-algopt-linesearch"></span><h1>Line search<a class="headerlink" href="#line-search" title="Link to this heading">#</a></h1>
+<p>The projected gradient method as part of the GRAMPC algorithm
+<a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>
+requires the solution of the line search
+problem <a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-linesearchproblem">
+<span class="eqno">(6)<a class="headerlink" href="#equation-eq-algopt-linesearchproblem" title="Link to this equation">#</a></span>\[\min_{\alpha} \bar{J} \left(
+    \mb{\psi}_{\mb{u}} \left( \mb{u}^{i|j} - \alpha \mb{d}_{\mb{u}}^{i|j} \right),
+    \mb{\psi}_{\mb{p}} \left( \mb{p}^{i|j} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}}^{i|j} \right),
+    \psi_{T} \left( T^{i|j} - \gamma_{T} \alpha d_{T}^{i|j} \right);
+    \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+\right)\,.\]</div>
+<p>GRAMPC implements two efficient strategies to solve this problem in an
+approximate manner. The following options apply to both line search
+methods that are detailed below
+(<a class="reference internal" href="#sec-algopt-linesearchadaptive"><span class="std std-ref">Adaptive line search</span></a> and
+<a class="reference internal" href="#sec-algopt-linesearchexplicit"><span class="std std-ref">Explicit line search</span></a>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchType</span></code>: This option selects either the adaptive line search strategy (value
+<code class="docutils literal notranslate"><span class="pre">adaptive</span></code>) or the explicit approach (value <code class="docutils literal notranslate"><span class="pre">explicit1</span></code> or <code class="docutils literal notranslate"><span class="pre">explicit2</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchExpAutoFallback</span></code>: If this option is activated, the automatic fallback strategy is
+used in the case that the explicit formulas result in negative step sizes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchMax</span></code>: This option sets the maximum value <span class="math notranslate nohighlight">\(\alpha_{\max}\)</span> of the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchMin</span></code>: This option sets the minimum value <span class="math notranslate nohighlight">\(\alpha_{\min}\)</span> of the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchInit</span></code>: Indicates the initial value <span class="math notranslate nohighlight">\(\alpha_{\text{init}}&gt;0\)</span> for the
+step size <span class="math notranslate nohighlight">\(\alpha\)</span>. If the adaptive line search is used, the
+sample point <span class="math notranslate nohighlight">\(\alpha_2\)</span> is set
+to <span class="math notranslate nohighlight">\(\alpha_2 = \alpha_{\text{init}}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimParamLineSearchFactor</span></code>: This option sets the adaptation factor
+<span class="math notranslate nohighlight">\(\gamma_{\mb{p}}\)</span> that weights the update of the
+parameter vector <span class="math notranslate nohighlight">\(\mb{p}\)</span> against the update of the
+control <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimTimeLineSearchFactor</span></code>: This option sets the adaptation factor <span class="math notranslate nohighlight">\(\gamma_{T}\)</span> that
+weights the update of the end time <span class="math notranslate nohighlight">\(T\)</span> against the update of
+the control <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+</ul>
+<section id="adaptive-line-search">
+<span id="sec-algopt-linesearchadaptive"></span><h2>Adaptive line search<a class="headerlink" href="#adaptive-line-search" title="Link to this heading">#</a></h2>
+<p>An appropriate way to determine the step size is the adaptive line
+search approach from <a class="footnote-reference brackets" href="#footcite-intech-graichenkaepernick2012" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>,
+where a polynomial approximation of the cost <span class="math notranslate nohighlight">\(\bar J\)</span> is used and an adaptation of
+the search intervals is performed. More precisely, the cost functional
+is evaluated at three sample points
+<span class="math notranslate nohighlight">\(\alpha_1 &lt; \alpha_2 &lt; \alpha_3\)</span> with
+<span class="math notranslate nohighlight">\(\alpha_2=\frac{1}{2}\left(\alpha_1+\alpha_3\right)\)</span>, which are
+used to construct a quadratic polynomial of the cost according to</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-ls-adapt-approx">
+<span class="eqno">(7)<a class="headerlink" href="#equation-eq-algopt-ls-adapt-approx" title="Link to this equation">#</a></span>\[\begin{split}\bar{J}\left(
+    \mb{\psi}_{\mb{u}} \left(\mb{u} ^{i|j} - \alpha \mb{d}_{\mb{u}} ^{i|j}\right),
+    \mb{\psi}_{\mb{p}} \left(\mb{p} ^{i|j} - \gamma_{\mb{p}}\alpha \mb{d}_{\mb{p}} ^{i|j}\right),
+    \psi_{T} \left(T ^{i|j} - \gamma_{T}\alpha   d_{T} ^{i|j} \right);
+    \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+\right)\\
+\approx \Phi(\alpha) = p_0 + p_1 \alpha + p_2 \alpha^2 \,.\end{split}\]</div>
+<figure class="align-default" id="fig-algopt-ls-adapt">
+<img alt="../_images/ls_adapt.svg" src="../_images/ls_adapt.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Adaptation of line search interval.</span><a class="headerlink" href="#fig-algopt-ls-adapt" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Subsequently, a step size <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> is computed by minimizing
+the cost approximation <a class="reference internal" href="#equation-eq-algopt-ls-adapt-approx">(7)</a>. If
+necessary, the interval <span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> is adapted for the
+next gradient iteration in the following way</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-intervaladaptation">
+<span class="eqno">(8)<a class="headerlink" href="#equation-eq-algopt-intervaladaptation" title="Link to this equation">#</a></span>\[\begin{split}[\alpha_1,\alpha_3] &amp; \leftarrow
+\begin{cases}
+\hfill \kappa\,[\alpha_1,\alpha_3] &amp; \text{if} \ \alpha \geq
+\alpha_3 - \varepsilon_{\alpha}(\alpha_3-\alpha_1) \ \text{and} \
+\alpha_3 \leq \alpha_{\max} \ \text{and} \
+|\Phi(\alpha_1)-\Phi(\alpha_3)| &gt;  \varepsilon_{\phi}
+\\[1.5ex]
+\hfill \frac{1}{\kappa} \,[\alpha_1,\alpha_3] &amp; \text{if} \ \alpha \leq
+\alpha_1 + \varepsilon_{\alpha}(\alpha_3-\alpha_1) \ \text{and} \
+\alpha_1 \geq \alpha_{\min}\ \text{and} \
+|\Phi(\alpha_1)-\Phi(\alpha_3)| &gt; \varepsilon_{\phi}
+\\[1.5ex]
+\hfill[\alpha_1,\alpha_3] &amp; \text{otherwise}
+\end{cases} \\[1.5ex]
+%
+\alpha_2 &amp; \leftarrow \frac{1}{2}\left(\alpha_1+\alpha_3\right)\end{split}\]</div>
+<p>with the adaptation factor <span class="math notranslate nohighlight">\(\kappa &gt; 1\)</span>, the interval tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_{\alpha} \in (0,0.5)\)</span>, the absolute cost tolerance
+<span class="math notranslate nohighlight">\({\varepsilon_{\phi}\in[0,\infty)}\)</span> for adapting the interval and
+the interval bounds <span class="math notranslate nohighlight">\(\alpha_{\max}&gt;\alpha_{\min}&gt;0\)</span>.
+The modification <a class="reference internal" href="#equation-eq-algopt-intervaladaptation">(8)</a> of
+the line search interval tracks the minimum point <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> of
+the line search problem in the case when <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> is either
+outside of the interval <span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> or close to one of
+the outer bounds <span class="math notranslate nohighlight">\(\alpha_1\)</span>, <span class="math notranslate nohighlight">\(\alpha_3\)</span>, as illustrated in
+<a class="reference internal" href="#fig-algopt-ls-adapt"><span class="std std-numref">Fig. 2</span></a>. The adaptation factor
+<span class="math notranslate nohighlight">\(\kappa\)</span> accounts for scaling as well as shifting of the interval
+<span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> in the next gradient iteration, if
+<span class="math notranslate nohighlight">\(\alpha^{j}\)</span> lies in the vicinity of the interval bounds
+<span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> as specified by the interval tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_\alpha\)</span>. This adaptive strategy allows one to track
+the minimum of the line search problem <a class="reference internal" href="#equation-eq-algopt-linesearchproblem">(6)</a> over
+the gradient iterations <span class="math notranslate nohighlight">\(j\)</span> and MPC steps <span class="math notranslate nohighlight">\(k\)</span>, while
+guaranteeing a fixed number of operations in view of a real-time MPC
+implementation. The absolute tolerance <span class="math notranslate nohighlight">\(\varepsilon_{\phi}\)</span> of the
+difference in the (scaled) costs at the interval bounds
+<span class="math notranslate nohighlight">\(|\Phi(\alpha_1)-\Phi(\alpha_3)|\)</span> avoids oscillations of the
+interval width in regions where the cost function <span class="math notranslate nohighlight">\(\bar{J}\)</span> is
+almost constant.</p>
+<p>The following options apply specifically to the adaptive line search
+strategy:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptAbsTol</span></code>: This option sets the absolute tolerance <span class="math notranslate nohighlight">\(\varepsilon_{\phi}\)</span>
+of the difference in costs at the interval bounds <span class="math notranslate nohighlight">\(\alpha_1\)</span>
+and <span class="math notranslate nohighlight">\(\alpha_2\)</span>. If the difference in the (scaled) costs on
+these bounds falls below <span class="math notranslate nohighlight">\(\varepsilon_{\phi}\)</span>, the adaption of
+the interval is stopped in order to avoid oscillations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchAdaptFactor</span></code>: This option sets the adaptation factor <span class="math notranslate nohighlight">\(\kappa &gt; 1\)</span> in
+<a class="reference internal" href="#equation-eq-algopt-intervaladaptation">(8)</a>
+that determines how much the line search interval can be adapted from
+one gradient iteration to the next.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalTol</span></code>: This option sets the interval tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_{\alpha} \in (0,0.5)\)</span> in
+<a class="reference internal" href="#equation-eq-algopt-intervaladaptation">(8)</a>
+that determines for which values of <span class="math notranslate nohighlight">\(\alpha\)</span> the adaption is
+performed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchIntervalFactor</span></code>: This option sets the interval factor <span class="math notranslate nohighlight">\(\beta \in (0,1)\)</span> that
+specifies the interval bounds <span class="math notranslate nohighlight">\([\alpha_1,\alpha_3]\)</span> according
+to <span class="math notranslate nohighlight">\(\alpha_1 = \alpha_2 (1 - \beta)\)</span> and
+<span class="math notranslate nohighlight">\(\alpha_3 = \alpha_2 (1 + \beta)\)</span>, whereby the mid sample point
+is initialized as <span class="math notranslate nohighlight">\(\alpha_2 = \alpha_\text{init}\)</span>.</p></li>
+</ul>
+</section>
+<section id="explicit-line-search">
+<span id="sec-algopt-linesearchexplicit"></span><h2>Explicit line search<a class="headerlink" href="#explicit-line-search" title="Link to this heading">#</a></h2>
+<p>An alternative way to determine the step size in order to further reduce
+the computational effort for time-critical problems is the explicit line
+search approach originally discussed in <a class="footnote-reference brackets" href="#footcite-barzilai1988" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>
+and adapted in <a class="footnote-reference brackets" href="#footcite-kaepernick2013" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a> for the optimal
+control case. The motivation is to minimize the difference between two
+consecutive control updates <span class="math notranslate nohighlight">\(u_k^{i|j}(\tau)\)</span> and
+<span class="math notranslate nohighlight">\(u_k^{i|j+1}(\tau)\)</span> in the unconstrained case and additionally
+assuming the same step size <span class="math notranslate nohighlight">\(\alpha^{i|j}\)</span>, i.e.</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-ls-expl-prob">
+<span class="eqno">(9)<a class="headerlink" href="#equation-eq-algopt-ls-expl-prob" title="Link to this equation">#</a></span>\[\begin{split}\alpha^{i|j} &amp;= \underset{\alpha &gt; 0}{\arg\min} \; \Bigl\| {\mb{u}}^{i|j+1} - {\mb{u}}^{i|j} \Bigr\|^2_{L^2_m[0,T]} + \Bigl\| {\mb{p}}^{i|j+1} - {\mb{p}}^{i|j} \Bigr\|^2_2 + \Bigl| {T}^{i|j+1} - {T}^{i|j} \Bigr| \\
+&amp;= \underset{\alpha &gt; 0}{\arg\min} \; \Bigl\| \underbrace{{\mb{u}}^{i|j} - {\mb{u}}^{j-1}}_{=:\Delta {\mb{u}}^{i|j}}- \alpha \underbrace{\left(\mb{d}^{i|j}_{\mb{u}}-\mb{d}^{j-1}_{\mb{u}}\right)}_{=:\Delta \mb{d}^{i|j}_{\mb{u}}} \Bigr\|^2_{L^2_m[0,T]} + \Bigl\| \underbrace{{\mb{p}}^{i|j} - {\mb{p}}^{j-1}}_{=:\Delta {\mb{p}}^{i|j}}- \gamma_{\mb{p}} \alpha \underbrace{\left(\mb{d}^{i|j}_{\mb{p}}-\mb{d}^{j-1}_{\mb{p}}\right)}_{=:\Delta \mb{d}^{i|j}_{\mb{p}}} \Bigr\|^2_2 \\
+&amp; \qquad\qquad +\Bigl\| \underbrace{{T}^{i|j} - {T}^{j-1}}_{=:\Delta {T}^{i|j}}- \gamma_{T} \alpha \underbrace{\left({d}^{i|j}_{T}-{d}^{j-1}_{T}\right)}_{=:\Delta {d}^{i|j}_{T}} \Bigr\|^2_2\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\| z \|^2_{L^2_m[0,T]} = \langle z,z \rangle :=\int_0^T z^\mathsf{T}(t) z(t) \, {\rm d}t\)</span>.</p>
+<figure class="align-default" id="fig-algopt-ls-explicit">
+<img alt="../_images/ls_explicit.svg" src="../_images/ls_explicit.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Motivation for the explicit line search strategy.</span><a class="headerlink" href="#fig-algopt-ls-explicit" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><a class="reference internal" href="#fig-algopt-ls-explicit"><span class="std std-numref">Fig. 3</span></a> illustrates the general idea
+behind <a class="reference internal" href="#equation-eq-algopt-ls-expl-prob">(9)</a>. To solve
+<a class="reference internal" href="#equation-eq-algopt-ls-expl-prob">(9)</a>, consider the
+following function</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-q-alpha">
+<span class="eqno">(10)<a class="headerlink" href="#equation-eq-algopt-q-alpha" title="Link to this equation">#</a></span>\[\begin{split}q(\alpha) : &amp; =
+\Bigl\| \Delta u_k^{j} - \alpha \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]}
+\\
+&amp; = \int_{0}^{T} \left( \Delta u_k^{j} - \alpha \Delta d_k^{j} \right)^\mathsf{T}
+\left( \Delta u_k^{j} - \alpha \Delta d_k^{j} \right) \, {\rm d}t
+\\
+&amp; = \int_{0}^{T} \left(\Delta u_k^{j}\right)^\mathsf{T}\Delta u_k^{j} \, {\rm d}t
++ \alpha^2 \int_{0}^{T} \left(\Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t
+- 2 \alpha \int_{0}^{T} \left(\Delta u_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t.\end{split}\]</div>
+<p>The minimum has to satisfy the stationarity condition</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial^{} q(\alpha)}{\partial \alpha^{}} =
+2 \alpha \int_{0}^{T} \left(\Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t
+- 2 \int_{0}^{T} \left(\Delta u_k^{j} \right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t
+= 0 .\]</div>
+<p>A suitable step size <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> then follows to</p>
+<div class="math notranslate nohighlight">
+\[\alpha^{j} =
+\frac{\int_{0}^{T} \left( \Delta u_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t}
+{\int_{0}^{T} \left( \Delta d_k^{j}\right)^\mathsf{T}\Delta d_k^{j} \, {\rm d}t}
+= \frac{\langle \Delta u_k^{j},\Delta d_k^{j}\rangle}
+{\langle \Delta d_k^{j},\Delta d_k^{j} \rangle} \,.\]</div>
+<p>Another way to compute an appropriate step size for the control update
+can be achieved by reformulating
+<a class="reference internal" href="#equation-eq-algopt-q-alpha">(10)</a> in the following way:</p>
+<div class="math notranslate nohighlight">
+\[\label{eq:AlgOpt:OptStepSizeQbar}
+q(\alpha) =
+\Bigl\| \Delta u_k^{j} - \alpha \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]} =
+\alpha^2 \Bigl\| \frac{1}{\alpha} \Delta u_k^{j} - \Delta d_k^{j} \Bigr\|^2_{L^2_m[0,T]}
+=: \alpha^2 \bar q(\alpha).\]</div>
+<p>In the subsequent, the new function <span class="math notranslate nohighlight">\(\bar q(\alpha)\)</span> is minimized
+w.r.t. the step size leading to a similar solution</p>
+<div class="math notranslate nohighlight">
+\[\label{eq:AlgOpt:OptStepSize2}
+\alpha^{j} = \frac{\langle\Delta u^{j}, \Delta u^{j} \rangle}
+{\langle \Delta u^{j}, \Delta d_k^{j} \rangle} \,.\]</div>
+<p>For the original problem <a class="reference internal" href="#equation-eq-algopt-ls-expl-prob">(9)</a>, the solution</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-ls-expl1">
+<span class="eqno">(11)<a class="headerlink" href="#equation-eq-algopt-ls-expl1" title="Link to this equation">#</a></span>\[\alpha^{i|j} =
+\frac{\langle \Delta \mb{u}^{i|j},\Delta\mb{d}^{i|j}_{\mb{u}}\rangle
+    +\gamma_{\mb{p}} \langle \Delta\mb{p}^{i|j},\Delta\mb{d}^{i|j}_{\mb{p}}\rangle
+    +\gamma_{T} \Delta T^{i|j}\Delta{d}^{i|j}_{T}}
+{\langle \Delta\mb{d}^{i|j}_{\mb{u}},\Delta \mb{d}^{i|j}_{\mb{u}} \rangle
+    + \gamma_{\mb{p}}^2 \langle{\Delta\mb{d}^{i|j}_{\mb{p}}}^\mathsf{T}\Delta \mb{d}^{i|j}_{\mb{p}}\rangle
+    + \gamma_{T}^2\big( \Delta {d}^{i|j}_{T}\big)^2}\]</div>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-ls-expl2">
+<span class="eqno">(12)<a class="headerlink" href="#equation-eq-algopt-ls-expl2" title="Link to this equation">#</a></span>\[\alpha^{i|j} =
+\frac{\langle \Delta \mb{u}^{i|j}, \Delta\mb{u}^{i|j}\rangle
+    + \gamma_{\mb{p}} \langle\Delta\mb{p}^{i|j}, \Delta\mb{p}^{i|j} \rangle
+    + \gamma_{T} \big(\Delta T^{i|j}\big)^2}
+{\langle \Delta\mb{u}^{i|j}, \Delta \mb{d}^{i|j}_{\mb{u}} \rangle
+    + \gamma_{\mb{p}}^2 \langle\Delta\mb{p}^{i|j}, \Delta \mb{d}^{i|j}_{\mb{p}} \rangle
+    + \gamma_{T}^2 \Delta {T}^{i|j} \Delta {d}^{i|j}_{T}}\]</div>
+<p>follows.</p>
+<p>In the GRAMPC implementation, both approaches <a class="reference internal" href="#equation-eq-algopt-ls-expl1">(11)</a> and
+<a class="reference internal" href="#equation-eq-algopt-ls-expl2">(12)</a> are available.
+In addition, the step size <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> is bounded by the upper and
+lower values <span class="math notranslate nohighlight">\(\alpha_{\max} &gt; \alpha_{\min} &gt; 0\)</span>. However, if the
+originally computed step size <span class="math notranslate nohighlight">\(\alpha^{j}\)</span> is less than zero <a class="footnote-reference brackets" href="#id6" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>,
+either the initial step size <span class="math notranslate nohighlight">\(\alpha^{j} = \alpha_\text{init}\)</span> or
+the automatic fallback strategy that is detailed in the next subsection
+is used in order to achieve a valid step size. The fallback strategy is
+set with the following option (only available for the explicit line
+search strategies):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LineSearchExpAutoFallback</span></code>: If this option is activated, the automatic fallback strategy is
+used in the case that the explicit formulas result in negative step sizes.</p></li>
+</ul>
+</section>
+<section id="fallback-strategy-for-explicit-line-search">
+<span id="sec-algopt-linesearchfallback"></span><h2>Fallback strategy for explicit line search<a class="headerlink" href="#fallback-strategy-for-explicit-line-search" title="Link to this heading">#</a></h2>
+<p>While the initial step size can be used as fallback solution if the
+explicit step size computation yields negative values, it often requires
+problem-specific tuning of <span class="math notranslate nohighlight">\(\alpha_\text{init}\)</span> for achieving
+optimal performance. As alternative, GRAMPC implements an automatic
+fallback strategy that is based on the idea of using at most 1% of the
+control range defined by <code class="docutils literal notranslate"><span class="pre">umax</span></code> and <code class="docutils literal notranslate"><span class="pre">umin</span></code>. For this purpose, the maximum absolute
+value
+<span class="math notranslate nohighlight">\(\mb{d}^{i|j}_{\mb{u},\text{max}} = \| \mb{d}_{\mb{u}} ^{i|j}(t) \|_{L^\infty}\)</span>
+of the search direction
+<span class="math notranslate nohighlight">\(\mb{d}_{\mb{u}} ^{i|j}(t)\)</span> over the horizon is
+determined. Subsequently, the step size</p>
+<div class="math notranslate nohighlight">
+\[    \alpha^{i|j} = \frac{1}{100} \cdot \min_{k\in\{1,\dots,N_{\mb{u}}\}}\left\lbrace
+\frac{u_{\text{max},k}- u_{\text{min},k}} {d_{\mb{u},\text{max},k}^{i|j}}  \right\rbrace\]</div>
+<p>follows as the minimal step size required to perform a step of 1% with
+respect to the range of at least one control in at least one time step.
+Additionally, the step size is limited to 10% of the maximum step size
+<span class="math notranslate nohighlight">\(\alpha_{\max}\)</span>. Since this strategy requires reasonable limits
+for the controls, it is only executed if <code class="docutils literal notranslate"><span class="pre">LineSearchExpAutoFallback</span></code> is activated and if these
+limits are defined by the user. Furthermore, this strategy can only be
+used if <code class="docutils literal notranslate"><span class="pre">OptimControl</span></code> is switched <code class="docutils literal notranslate"><span class="pre">on</span></code>. In all other case, the initial step size
+<span class="math notranslate nohighlight">\(\alpha^{j}=\alpha_\text{init}\)</span> will be used as fallback solution.</p>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">1</a><span class="fn-bracket">]</span></span>
+<p>It can be shown that the step size <span class="math notranslate nohighlight">\(\alpha\)</span> is negative if the cost function is locally non-convex.</p>
+</aside>
+</aside>
+<div class="docutils container" id="id7">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-englert-oe-2019" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">2</a><span class="fn-bracket">]</span></span>
+<p>T. Englert, A. Völz, F. Mesmer, S. Rhein, and K. Graichen. A software framework for embedded nonlinear model predictive control using a gradient-based augmented Lagrangian approach (GRAMPC). <em>Optimization and Engineering</em>, 20(3):769–809, 2019. <a class="reference external" href="doi.org/10.1007/s11081-018-9417-2">doi.org/10.1007/s11081-018-9417-2</a>. <a class="reference external" href="https://doi.org/10.1007/s11081-018-9417-2">doi:10.1007/s11081-018-9417-2</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-intech-graichenkaepernick2012" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">3</a><span class="fn-bracket">]</span></span>
+<p>K. Graichen and B. Käpernick. A real-time gradient method for nonlinear model predictive control. In T. Zheng, editor, <em>Frontiers of Model Predictive Control</em>, pages 9–28. InTech, 2012.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-barzilai1988" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">4</a><span class="fn-bracket">]</span></span>
+<p>J. Barzilai and J. M. Borwein. Two-point step size gradient methods. <em>SIAM Journal on Numerical Analysis</em>, 8(1):141–148, 1988.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-kaepernick2013" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">5</a><span class="fn-bracket">]</span></span>
+<p>B. Käpernick and K. Graichen. Model predictive control of an overhead crane using constraint substitution. In <em>Proceedings of the American Control Conference (ACC)</em>, 3973–3978. 2013.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="numerical_integration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Numerical Integration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="multiplier_update.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Update of multipliers and penalties</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adaptive-line-search">Adaptive line search</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explicit-line-search">Explicit line search</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fallback-strategy-for-explicit-line-search">Fallback strategy for explicit line search</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

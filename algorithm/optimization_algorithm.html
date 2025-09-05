@@ -1,0 +1,687 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Optimization algorithm &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'algorithm/optimization_algorithm';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Numerical Integration" href="numerical_integration.html" />
+    <link rel="prev" title="Optimization algorithm and options" href="algorithm.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="line_search.html">Line search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multiplier_update.html">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/algorithm/optimization_algorithm.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Optimization algorithm</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#augmented-lagrangian-method">Augmented Lagrangian method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#projected-gradient-method">Projected gradient method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithmic-structure">Algorithmic structure</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="optimization-algorithm">
+<span id="sec-algopt-basicalgorithm"></span><h1>Optimization algorithm<a class="headerlink" href="#optimization-algorithm" title="Link to this heading">#</a></h1>
+<p>The optimization algorithm of GRAMPC is based on an augmented
+Lagrangian formulation with an inner projected gradient method as
+minimization step and an outer multiplier and penalty update. This
+section gives a brief sketch of the algorithm. Note that a more detailed
+description is given in <a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<section id="augmented-lagrangian-method">
+<span id="sec-algopt-auglag"></span><h2>Augmented Lagrangian method<a class="headerlink" href="#augmented-lagrangian-method" title="Link to this heading">#</a></h2>
+<p>GRAMPC implements the augmented Lagrangian approach to handle the equality and inequality constraints of the OCP.
+The constraints are adjoined to the integral cost function using the time-dependent multipliers
+<span class="math notranslate nohighlight">\(\mb{\mu}= [\mb{\mu}_{\mb{g}}^\mathsf{T}, \mb{\mu}_{\mb{h}}^\mathsf{T}]^\mathsf{T}\)</span>
+and penalties <span class="math notranslate nohighlight">\(\mb{c}= [\mb{c}_{\mb{g}}^\mathsf{T},\mb{c}_{\mb{h}}^\mathsf{T}]^\mathsf{T}\)</span>.
+Similarly, multipliers
+<span class="math notranslate nohighlight">\(\mb{\mu}_T = [\mb{\mu}_{\mb{g}_T}^\mathsf{T}, \mb{\mu}_{\mb{h}_T}^\mathsf{T}]^\mathsf{T}\)</span>
+and penalties
+<span class="math notranslate nohighlight">\(\mb{c}_T = [\mb{c}_{\mb{g}_T}^\mathsf{T}, \mb{c}_{\mb{h}_T}^\mathsf{T}]^\mathsf{T}\)</span>
+are used for the terminal constraints.
+Where appropriate, the syntax
+<span class="math notranslate nohighlight">\(\mb{\bar \mu} = (\mb{\mu}_{\mb{g}}, \mb{\mu}_{\mb{h}}, \mb{\mu}_{\mb{g}_T}, \mb{\mu}_{\mb{h}_T})\)</span>
+and
+<span class="math notranslate nohighlight">\(\mb{\bar c} = (\mb{c}_{\mb{g}}, \mb{c}_{\mb{h}}, \mb{c}_{\mb{g}_T}, \mb{c}_{\mb{h}_T})\)</span>
+is used to denote all multipliers and penalties.
+The algorithm requires a reformulation of the inequality constraints that leads to the transformed functions (see <a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for details)</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}_{\mb{h}}, \mb{c}_{\mb{h}}) &amp;=
+\mb{\max}\left\{ \mb{h}(\mb{x}, \mb{u}, \mb{p}, t), -\mb{C}_{\mb{h}}^{-1} \mb{\mu}_{\mb{h}} \right\}
+\\
+\mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T}, \mb{c}_{\mb{h}_T}) &amp;=
+\mb{\max}\left\{ \mb{h}_T(\mb{x}, \mb{p}, T), -\mb{C}_{\mb{h}_T}^{-1} \mb{\mu}_{\mb{h}_T} \right\}\end{split}\]</div>
+<p>with the component-wise <strong>max</strong>-function and the diagonal matrix syntax <span class="math notranslate nohighlight">\(\mb{C}= {\rm diag}(\mb{c})\)</span>.
+The augmented Lagrangian function is defined as</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-auglag">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-algopt-auglag" title="Link to this equation">#</a></span>\[\bar J(\mb{u}, \mb{p}, T, \mb{\bar \mu}, \mb{\bar c};\mb{x}_0) =
+\bar V(\mb{x}, \mb{p}, T, \mb{\mu}_T, \mb{c}_T)
++ \int_0^T \bar l(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) \, \mathrm dt\]</div>
+<p>with the augmented terminal cost term</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\bar V(\mb{x}, \mb{p}, T, \mb{\mu}_T, \mb{c}_T) =\,&amp; V(\mb{x}, \mb{p}, T)
++ \mb{\mu}_{\mb{g}_T}^\mathsf{T}\, \mb{g}_T(\mb{x}, \mb{p}, T)
++ \frac12 \| \mb{g}_T(\mb{x}, \mb{p}, T) \|^2_{\mb{C}_{\mb{g}_T}}
+\nonumber\\
+&amp;+ \mb{\mu}_{\mb{h}_T}^\mathsf{T}\, \mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T},\mb{c}_{\mb{h}_T})
++ \frac12 \| \mb{\bar h}_T(\mb{x}, \mb{p}, T, \mb{\mu}_{\mb{h}_T},\mb{c}_{\mb{h}_T}) \|^2_{\mb{C}_{\mb{h}_T}}\end{split}\]</div>
+<p>and the augmented integral cost term</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\bar l(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) =\,&amp; l(\mb{x}, \mb{u}, \mb{p}, t)
++ \mb{\mu}_{\mb{g}}^\mathsf{T}\, \mb{g}(\mb{x}, \mb{u}, \mb{p}, t)
++ \frac12 \| \mb{g}(\mb{x}, \mb{u}, \mb{p}, t) \|^2_{\mb{C}_{\mb{g}}}
+\nonumber\\
+&amp;+ \mb{\mu}_{\mb{h}}^\mathsf{T}\, \mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu_h},\mb{c_h})
++ \frac12 \| \mb{\bar h}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu_h},\mb{c_h}) \|^2_{\mb{C}_{\mb{h}}} \,.\end{split}\]</div>
+<p>Instead of solving the original problem, the algorithm solves the max-min-problem</p>
+<div class="math notranslate nohighlight" id="equation-eq-maxmin">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-maxmin" title="Link to this equation">#</a></span>\[\begin{split}\max_{\mb{\bar\mu}} \, \min_{\mb{u}, \mb{p}, T} \quad&amp;
+\bar{ J}(\mb{u}, \mb{p}, T, \mb{\bar\mu}, \mb{\bar c}; \mb{x}_0)
+\\
+\textrm{s.t.} \quad&amp; \mb{M} \mb{\dot x}(t) = \mb{f}(\mb{x}, \mb{u}, \mb{p}, t)
+\,,\quad
+\mb{x}(0) = \mb{x}_0
+\\
+&amp; \mb{u}(t) \in [\mb{u}_{\min}, \mb{u}_{\max}] %\,,\quad t \in [0, T]
+\,,\quad
+t\in[0,T]
+\\
+&amp; \mb{p} \in [\mb{p}_{\min}, \mb{p}_{\max}]
+\,,\quad
+T \in [T_{\min}, T_{\max}] \,,\end{split}\]</div>
+<p>whereby the augmented Lagrangian function <span class="math notranslate nohighlight">\(\bar{J}\)</span> is maximized with respect to the multipliers <span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span> and minimized with respect to the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span>, the parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span> and the end time <span class="math notranslate nohighlight">\(\mb{T}\)</span>.
+Note that the full set of optimization variables <span class="math notranslate nohighlight">\((\mb{u},\mb{p},T)\)</span> is considered in what follows for the sake of completeness.
+The max-min-problem <a class="reference internal" href="#equation-eq-maxmin">(4)</a> corresponds to the dual problem of <a class="reference internal" href="../problem_formulation/problem_formulation.html#equation-eq-ocp">(1)</a> in the case of <span class="math notranslate nohighlight">\(\mb{\bar c} = \mb{0}\)</span>.
+The maximization step is performed by steepest ascent using the constraint residual as direction and the penalty parameter as step size.
+See <a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for a detailed description of the augmented Lagrangian algorithm.</p>
+</section>
+<section id="projected-gradient-method">
+<span id="sec-algopt-projgrad"></span><h2>Projected gradient method<a class="headerlink" href="#projected-gradient-method" title="Link to this heading">#</a></h2>
+<p>GRAMPC uses a projected gradient method to solve the inner
+minimization problem subject to the dynamics
+<span class="math notranslate nohighlight">\(\mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\)</span> as well as the box constraints
+<span class="math notranslate nohighlight">\(\mb{u}(t) \in \left[\mb{u}_{\min}, \mb{u}_{\max}\right]\)</span> and
+<span class="math notranslate nohighlight">\(\mb{p} \in \left[\mb{p}_{\min}, \mb{p}_{\max}\right]\)</span>.
+The algorithm is based on the first-order optimality conditions that can be compactly stated using the Hamiltonian</p>
+<div class="math notranslate nohighlight">
+\[H(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) =
+\bar{ l}(\mb{x}, \mb{u}, \mb{p}, t, \mb{\mu}, \mb{c}) + \mb{\lambda}^\mathsf{T}\mb{f}(\mb{x}, \mb{u}, \mb{p}, t)\]</div>
+<p>with the adjoint states <span class="math notranslate nohighlight">\(\mb{\lambda}\)</span>.
+The canonical equations are then given by</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-optcondlambda">
+<span class="eqno">(5)<a class="headerlink" href="#equation-eq-algopt-optcondlambda" title="Link to this equation">#</a></span>\[ \begin{align}\begin{aligned}\mb{M}\mb{\dot x} &amp;= \mb{f} (\mb{x}, \mb{u}, \mb{p}, t) \,, &amp;\mb{x}(0) &amp;= \mb{x}_0 \,,\\\mb{M}^\mathsf{T}\mb{\dot \lambda} &amp;= -H_{\mb{x}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) \,, &amp;\mb{M}^\mathsf{T}\mb{\lambda}(T) &amp;= \bar{ V}_{\mb{x}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T)\end{aligned}\end{align} \]</div>
+<p>consisting of the original dynamics <span class="math notranslate nohighlight">\(\mb{\dot x}\)</span> and the adjoint dynamics <span class="math notranslate nohighlight">\(\mb{\dot \lambda}\)</span>.
+The canonical equations can be iteratively solved in forward and backward time for given initial values of the optimization variables.
+In each iteration and depending on the optimization variables of the actual problem to be solved, the gradients</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mb{d}_{\mb{u}} &amp;= H_{\mb{u}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c})
+\\
+\mb{d}_{\mb{p}} &amp;= \bar V_{\mb{p}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T) +     \int_0^T H_{\mb{p}}(\mb{x}, \mb{u}, \mb{p}, \mb{\lambda}, t, \mb{\mu}, \mb{c}) \, {\rm d}t
+\\
+d_T &amp;= \bar V_T(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T) + H(\mb{x}(T), \mb{u}(T), \mb{p}, \mb{\lambda}(T), T, \mb{\mu}(T), \mb{c}(T))\end{split}\]</div>
+<p>with respect to the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span>, parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span>,
+and end time <span class="math notranslate nohighlight">\(T\)</span> are used to formulate a line search problem</p>
+<div class="math notranslate nohighlight">
+\[\min_{\alpha} \bar{J} \left(
+  \mb{\psi}_{\mb{u}} \left( \mb{u} - \alpha \mb{d}_{\mb{u}} \right),
+  \mb{\psi}_{\mb{p}} \left( \mb{p} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}} \right),
+  \psi_{T} \left( T - \gamma_{T} \alpha d_{T} \right);
+  \mb{\bar \mu}, \mb{\bar c}, \mb{x}_0
+\right)\]</div>
+<p>with projection functions <span class="math notranslate nohighlight">\(\mb{\psi}_{\mb{u}}\)</span>,
+<span class="math notranslate nohighlight">\(\mb{\psi}_{\mb{p}}\)</span> and <span class="math notranslate nohighlight">\(\psi_{T}\)</span> and,
+finally, to update the optimization variables according to</p>
+<div class="math notranslate nohighlight">
+\[\mb{u} \leftarrow \mb{\psi}_{\mb{u}} \left( \mb{u} - \alpha \mb{d}_{\mb{u}} \right)
+\,,\quad
+\mb{p} \leftarrow \mb{\psi}_{\mb{p}} \left( \mb{p} - \gamma_{\mb{p}} \alpha \mb{d}_{\mb{p}} \right)
+\,,\quad
+T \leftarrow \psi_{T} \left( T - \gamma_{T} \alpha d_{T} \right) \,.\]</div>
+<p>See <a class="footnote-reference brackets" href="#footcite-intech-graichenkaepernick2012" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-kaepernick2014" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+for a detailed description of the projected gradient algorithm.
+GRAMPC provides two methods for the approximate solution of the line search
+problem, which are explained in <a class="reference internal" href="line_search.html#sec-algopt-linesearch"><span class="std std-ref">Line search</span></a>.</p>
+</section>
+<section id="algorithmic-structure">
+<span id="sec-algopt-structure"></span><h2>Algorithmic structure<a class="headerlink" href="#algorithmic-structure" title="Link to this heading">#</a></h2>
+<div class="proof algorithm admonition" id="alg:AlgOpt:GrampcAlgorithm">
+<p class="admonition-title"><span class="caption-number">Algorithm 1 </span> (Basic algorithmic structure of GRAMPC.)</p>
+<section class="algorithm-content" id="proof-content">
+<p>Optional: Shift trajectories by sampling time <span class="math notranslate nohighlight">\(\Delta t\)</span></p>
+<dl>
+<dt><strong>For</strong> <span class="math notranslate nohighlight">\(i = 1\)</span> to <span class="math notranslate nohighlight">\(i_{max}\)</span> <strong>do</strong></dt><dd><dl>
+<dt><strong>For</strong> <span class="math notranslate nohighlight">\(j = 1\)</span> to <span class="math notranslate nohighlight">\(j_{max}\)</span> <strong>do</strong></dt><dd><dl>
+<dt><strong>If</strong> <span class="math notranslate nohighlight">\(i &gt; 1\)</span> and <span class="math notranslate nohighlight">\(j = 1\)</span> <strong>then</strong></dt><dd><p>Set <span class="math notranslate nohighlight">\(\mb x^{i|j} =\mb x^{i-1}\)</span></p>
+</dd>
+<dt><strong>else</strong></dt><dd><p>Compute <span class="math notranslate nohighlight">\(\mb x^{i|j}\)</span> by forward time integration of system dynamics</p>
+<p>Evaluate all constraints</p>
+</dd>
+</dl>
+<p><strong>End If</strong></p>
+<p>Compute <span class="math notranslate nohighlight">\(\mb \lambda^{i|j}\)</span> by backward time integration of adjoint system</p>
+<p>Evaluate gradients <span class="math notranslate nohighlight">\(\mb{d_u}^{i|j}\)</span>, <span class="math notranslate nohighlight">\(\mb{d_p}^{i|j}\)</span> and <span class="math notranslate nohighlight">\(d_T^{i|j}\)</span></p>
+<p>Solve line search problem to determine step size <span class="math notranslate nohighlight">\(\alpha^{i|j}\)</span></p>
+<p>Update controls <span class="math notranslate nohighlight">\(\mb u^{i|j+1}\)</span>, parameters <span class="math notranslate nohighlight">\(\mb p^{i|j+1}\)</span> and end time <span class="math notranslate nohighlight">\(T^{i|j+1}\)</span></p>
+<dl class="simple">
+<dt><strong>If</strong> minimization is converged <strong>then</strong></dt><dd><p>Break inner loop</p>
+</dd>
+</dl>
+<p><strong>End If</strong></p>
+</dd>
+</dl>
+<p><strong>End For</strong></p>
+<p>Set <span class="math notranslate nohighlight">\(\mb u^i = \mb u^{i|j+1}\)</span>, <span class="math notranslate nohighlight">\(\mb p^i = \mb p^{i|j+1}\)</span> and <span class="math notranslate nohighlight">\(\mb T^i = \mb T^{i|j+1}\)</span></p>
+<p>Compute <span class="math notranslate nohighlight">\(\mb x^i\)</span> by forward time integration of system dynamics</p>
+<p>Evaluate all constraints</p>
+<p>Update multipliers <span class="math notranslate nohighlight">\(\mb{\bar{\mu}}^{i+1}\)</span> and penalties <span class="math notranslate nohighlight">\(\mb{\bar{c}}^{i+1}\)</span></p>
+<dl class="simple">
+<dt><strong>If</strong> minimization is converged &amp; constraint thresholds are satisfied <strong>then</strong></dt><dd><p>Break outer loop</p>
+</dd>
+</dl>
+<p><strong>End If</strong></p>
+</dd>
+</dl>
+<p><strong>End For</strong></p>
+<p>Compute cost <span class="math notranslate nohighlight">\(J\)</span> and norm of constraints</p>
+</section>
+</div><p>The basic structure of the algorithm that is implemented in the main calling function <code class="docutils literal notranslate"><span class="pre">grampc_run</span></code> is outlined in
+<a class="reference internal" href="#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>.
+The projected gradient method is realized in the inner loop and consists
+of the forward and backward integration of the canonical equations as
+well as the update of the optimization variables based on the gradient
+and the approximate solution of the line search problem. The outer loop
+corresponds to the augmented Lagrangian method consisting of the
+solution of the inner minimization problem and the update of the
+multipliers and penalty parameters.</p>
+<p>As an alternative to the augmented Lagrangian framework, the user can
+choose external penalty functions in GRAMPC that handle the equality
+and inequality constraints as “soft” constraints. In this case, the
+multipliers <span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span> are fixed at zero and only the
+penalty parameters are updated in the outer loop. Note that the user can
+set the options <code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseFactor</span></code> and <code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code> to <span class="math notranslate nohighlight">\(1.0\)</span> in order to keep the penalty
+parameters at the initial value <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code>. The single steps of the algorithm and
+the related options are described in more detail in the following sections.</p>
+<p>The following options can be used to adjust the basic algorithm. The
+corresponding default values are listed in
+<a class="reference internal" href="../appendix.html#tab-listofoptions"><span class="std std-numref">Table 4</span></a> in the appendix.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code>: Sets the maximum number of augmented Lagrangian iterations
+<span class="math notranslate nohighlight">\(i_\text{max} \geq 1\)</span>. If the option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is activated, the
+algorithm evaluates the convergence criterion and terminates if the
+inner minimization converged and all constraints are satisfied within
+the tolerance defined by <code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code>: Sets the maximum number of gradient iterations <span class="math notranslate nohighlight">\(j_\text{max} \geq 1\)</span>. If the option <code class="docutils literal notranslate"><span class="pre">ConvergenceCheck</span></code> is activated, the algorithm terminates the inner loop
+as soon as the convergence criterion is fulfilled.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">EqualityConstraints</span></code>: Equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t) = \mb{0}\)</span>
+can be disabled by the option value <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InequalityConstraints</span></code>: To disable inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t) \le \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TerminalEqualityConstraints</span></code>: To disable terminal equality constraints
+<span class="math notranslate nohighlight">\(\mb{g}_T(\mb{x}(T), \mb{p}, T) = \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TerminalInequalityConstraints</span></code>: To disable terminal inequality constraints
+<span class="math notranslate nohighlight">\(\mb{h}_T(\mb{x}(T), \mb{p}, T) \le \mb{0}\)</span>,
+set this option to <code class="docutils literal notranslate"><span class="pre">off</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsHandling</span></code>: State constraints are handled either by means of the augmented
+Lagrangian approach (option value <code class="docutils literal notranslate"><span class="pre">auglag</span></code>) or as soft constraints by outer
+penalty functions (option value <code class="docutils literal notranslate"><span class="pre">extpen</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimControl</span></code>: Specifies whether the cost functional should be minimized with
+respect to the control variable <span class="math notranslate nohighlight">\(\mb{u}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimParam</span></code>: Specifies whether the cost functional should be minimized with
+respect to the optimization parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OptimTime</span></code>: Specifies whether the cost functional should be minimized with
+respect the horizon length <span class="math notranslate nohighlight">\(T\)</span> (free end time problem) or if
+<span class="math notranslate nohighlight">\(T\)</span> is kept constant.</p></li>
+</ul>
+<div class="docutils container" id="id7">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-englert-oe-2019" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>,<a role="doc-backlink" href="#id6">4</a>)</span>
+<p>T. Englert, A. Völz, F. Mesmer, S. Rhein, and K. Graichen. A software framework for embedded nonlinear model predictive control using a gradient-based augmented Lagrangian approach (GRAMPC). <em>Optimization and Engineering</em>, 20(3):769–809, 2019. <a class="reference external" href="doi.org/10.1007/s11081-018-9417-2">doi.org/10.1007/s11081-018-9417-2</a>. <a class="reference external" href="https://doi.org/10.1007/s11081-018-9417-2">doi:10.1007/s11081-018-9417-2</a>.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-intech-graichenkaepernick2012" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
+<p>K. Graichen and B. Käpernick. A real-time gradient method for nonlinear model predictive control. In T. Zheng, editor, <em>Frontiers of Model Predictive Control</em>, pages 9–28. InTech, 2012.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-kaepernick2014" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
+<p>B. Käpernick and K. Graichen. The gradient based nonlinear model predictive control software GRAMPC. In <em>Proceedings of the European Control Conference (ECC)</em>, 1170–1175. Strasbourg (France), 2014.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="algorithm.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Optimization algorithm and options</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="numerical_integration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Numerical Integration</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#augmented-lagrangian-method">Augmented Lagrangian method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#projected-gradient-method">Projected gradient method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithmic-structure">Algorithmic structure</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

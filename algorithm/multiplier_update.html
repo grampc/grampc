@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Update of multipliers and penalties &#8212; grampc 2.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=6fea359b"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>window.MathJax = {"tex": {"macros": {"mb": ["\\boldsymbol{#1}", 1]}}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'algorithm/multiplier_update';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Convergence criterion" href="misc.html" />
+    <link rel="prev" title="Line search" href="line_search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">grampc 2.3 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimization_algorithm.html">Optimization algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numerical_integration.html">Numerical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="line_search.html">Line search</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Update of multipliers and penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="misc.html">Convergence criterion</a></li>
+
+
+
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../usage/usage.html">Usage of GRAMPC</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_c.html">Using GRAMPC in C</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_cpp.html">Using GRAMPC in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_matlab.html">Using GRAMPC in Matlab/Simulink</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/usage_python.html">Using GRAMPC in Python</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/PMSM.html">Model predictive control of a PMSM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DoubleIntegrator.html">Optimal control of a double integrator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/CSTR.html">Moving horizon estimation of a CSTR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/DAE.html">Differential algebraic equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/Constraints.html">Constraint Tuning</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix.html">Appendix</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/algorithm/multiplier_update.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Update of multipliers and penalties</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-of-lagrangian-multipliers">Update of Lagrangian multipliers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-of-penalty-parameters">Update of penalty parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimation-of-minimal-penalty-parameter">Estimation of minimal penalty parameter</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="update-of-multipliers-and-penalties">
+<span id="sec-algopt-updatemultpen"></span><h1>Update of multipliers and penalties<a class="headerlink" href="#update-of-multipliers-and-penalties" title="Link to this heading">#</a></h1>
+<p>GRAMPC handles general nonlinear constraints using an augmented
+Lagrangian approach or, alternatively, using an external penalty method.
+The key to the efficient solution of constrained problems using these
+approaches are the updates of the multipliers in the outer loop for
+<span class="math notranslate nohighlight">\(i = 1,\, \dots,\, i_\text{max}\)</span>.</p>
+<section id="update-of-lagrangian-multipliers">
+<span id="sec-algopt-updatemult"></span><h2>Update of Lagrangian multipliers<a class="headerlink" href="#update-of-lagrangian-multipliers" title="Link to this heading">#</a></h2>
+<p>The outer loop of the GRAMPC algorithm in <a class="reference internal" href="optimization_algorithm.html#alg:AlgOpt:GrampcAlgorithm">Algorithm 1</a>
+maximizes the augmented Lagrangian function with respect to the
+multipliers <span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span>. This update is carried out in
+the direction of steepest ascent that is given by the constraint
+residual. The penalty parameter is used as step size, as it is typically
+done in augmented Lagrangian methods.</p>
+<p>For an arbitrary equality constraint
+<span class="math notranslate nohighlight">\(g^{i} = g(\mb{x}^{i}, \dots)\)</span> with multiplier
+<span class="math notranslate nohighlight">\(\mu_g^{i}\)</span>, penalty <span class="math notranslate nohighlight">\(c_g^i\)</span>, and tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_g\)</span>, the update is defined by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_g^{i+1} = \zeta_{g}(\mu_g^{i}, c_g^{i}, g^{i}, \varepsilon_g)
+=
+\begin{cases}
+\mu_g^{i} + (1-\rho) c_g^{i} g^{i}
+&amp; \text{if } \left|g^{i}\right| &gt;  \varepsilon_g
+\, \land \,
+\eta^{i} \leq \varepsilon_\text{rel,u}
+\\
+{\mu}_g^{i}
+&amp; \text{else} \,.
+\end{cases}\end{split}\]</div>
+<p>The update is not performed if the constraint is satisfied within its
+tolerance <span class="math notranslate nohighlight">\(\varepsilon\)</span> or if the inner minimization is not
+sufficiently converged, which is checked by the maximum relative
+gradient <span class="math notranslate nohighlight">\(\eta^i\)</span> (see <a class="reference internal" href="misc.html#equation-eq-algopt-relgrad">(17)</a> for the definition) and the
+threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span>. Similarly, for an inequality
+constraint <span class="math notranslate nohighlight">\(\bar h^{i} = \bar h(\mb{x}^{i}, \dots)\)</span> with multiplier
+<span class="math notranslate nohighlight">\(\mu_h^{i}\)</span>, penalty <span class="math notranslate nohighlight">\(c_h^{i}\)</span>, and tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_h\)</span>, the update is defined by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mu_h^{i+1} = \zeta_{h}(\mu_h^{i}, c_h^{i}, \bar h^{i}, \varepsilon_h)
+=
+\begin{cases}
+\mu_h^{i} + (1-\rho) c_h^{i} \bar h^{i}
+&amp; \text{if } \left(\bar h^{i} &gt; \varepsilon_h
+\, \land \,
+\eta^{i} \leq \varepsilon_\text{rel,u} \right)
+\, \lor \,
+\bar h^{i} &lt; 0
+\\
+\mu_h^{i}
+&amp; \text{else} \,.
+\end{cases}\end{split}\]</div>
+<p>Similar update rules are used for the terminal equality and terminal
+inequality constraints.</p>
+<p>GRAMPC provides several means to increase the robustness of the
+multiplier update, which may be required if few iterations
+<span class="math notranslate nohighlight">\(j_\text{max}\)</span> are used for the suboptimal solution of the inner
+minimization problem. The damping factor <span class="math notranslate nohighlight">\(\rho \in [0, 1)\)</span> can be
+used to scale the step size of the steepest ascent and the tolerance
+<span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span> can be used to skip the multiplier
+update in case that the minimization is not sufficiently converged.
+Furthermore, the multipliers are limited by lower and upper bounds
+<span class="math notranslate nohighlight">\(\mu_g \in [-\mu_\text{max}, \mu_\text{max}]\)</span> for equalities and
+<span class="math notranslate nohighlight">\(\mu_h \leq \mu_\text{max}\)</span> for inequalities, respectively, to
+avoid unlimited growth. A status flag is set if one of the multipliers
+reaches this bound and the user should check the problem formulation as
+this case indicates an ill-posed or even infeasible optimization
+problem.</p>
+<p>The following options can be used to adjust the update of the Lagrangian
+multipliers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MultiplierMax</span></code>: Upper bound <span class="math notranslate nohighlight">\(\mu_\text{max}\)</span> and lower bound
+<span class="math notranslate nohighlight">\(-\mu_\text{max}\)</span> for the Lagrangian multpliers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MultiplierDampingFactor</span></code>: Damping factor <span class="math notranslate nohighlight">\(\rho \in [0,1)\)</span> for the multiplier update.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AugLagUpdateGradientRelTol</span></code>: Threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span> for the maximum relative
+gradient of the inner minimization problem.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>: Thresholds
+<span class="math notranslate nohighlight">\((\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}\)</span>
+for the equality, inequality, terminal equality, and terminal
+inequality constraints.</p></li>
+</ul>
+</section>
+<section id="update-of-penalty-parameters">
+<span id="sec-algopt-updatepen"></span><h2>Update of penalty parameters<a class="headerlink" href="#update-of-penalty-parameters" title="Link to this heading">#</a></h2>
+<p>The penalty parameters <span class="math notranslate nohighlight">\(\mb{\bar c}\)</span> are adapted in each
+outer iteration according to a heuristic rule that is motivated by the
+LANCELOT package <a class="footnote-reference brackets" href="#footcite-conn2013" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a><a class="footnote-reference brackets" href="#footcite-nocedal2006" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. A carefully
+tuned adaptation of the penalties can speed-up the convergence
+significantly and is therefore highly recommended (also see
+<a class="reference internal" href="#sec-algopt-estimpenmin"><span class="std std-ref">Estimation of minimal penalty parameter</span></a> and the tutorial in
+<a class="reference internal" href="../tutorials/PMSM.html#sec-tut-pmsm"><span class="std std-ref">Model predictive control of a PMSM</span></a>). Note that the penalty parameters are
+also updated if external penalties are used instead of the augmented
+Lagrangian method, i.e. <code class="docutils literal notranslate"><span class="pre">ConstraintsHandling</span></code> is set to <code class="docutils literal notranslate"><span class="pre">extpen</span></code>. In order to keep the
+penalty parameters at the initial value <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code>, the options <code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseFactor</span></code> and <code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code> can be set to
+<span class="math notranslate nohighlight">\(1.0\)</span>, which basically deactivates the penalty update.</p>
+<p>For an arbitrary equality constraint
+<span class="math notranslate nohighlight">\(g^{i} = g(\mb{x}^{i}, \dots)\)</span> with penalty <span class="math notranslate nohighlight">\(c_g^i\)</span>
+and tolerance <span class="math notranslate nohighlight">\(\varepsilon_g\)</span>, the update is defined by</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-updatepeng">
+<span class="eqno">(13)<a class="headerlink" href="#equation-eq-algopt-updatepeng" title="Link to this equation">#</a></span>\[\begin{split}c_g^{i+1} = \xi_g(c_g^{i}, g^{i}, g^{i-1}, \varepsilon_g)
+=
+\begin{cases}
+\beta_{\mathrm{in}} \, c_g^{i}
+&amp;\text{if } \left|g^{i}\right| \geq \gamma_{\mathrm{in}} \left|g^{i-1}\right|
+\, \land \,
+\left|g^{i}\right| &gt; \varepsilon_g
+\, \land \,
+\eta^{i} \leq \varepsilon_\text{rel,u}
+\\
+\beta_{\mathrm{de}} \, c_g^{i}
+&amp;\text{else if } \left|g^{i}\right| \leq \gamma_{\mathrm{de}} \, \varepsilon_g
+\\
+c_g^{i}
+&amp; \textrm{else} \,.
+\end{cases}\end{split}\]</div>
+<p>The penalty <span class="math notranslate nohighlight">\(c_g^{i}\)</span> is increased by the factor
+<span class="math notranslate nohighlight">\(\beta_\text{in}&gt; 1\)</span> if the (sub-optimal) solution of the inner minimization problem
+does not generate sufficient progress in the constraint, which is rated
+by the factor <span class="math notranslate nohighlight">\(\gamma_\text{in} &gt; 0\)</span> and compared to the previous
+iteration <span class="math notranslate nohighlight">\(i-1\)</span>. This update is skipped if the inner minimization
+is not sufficiently converged, which is checked by the maximum relative
+gradient <span class="math notranslate nohighlight">\(\eta^i\)</span> and the threshold
+<span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span>. The penalty <span class="math notranslate nohighlight">\(c_g^{i}\)</span> is
+decreased by the factor <span class="math notranslate nohighlight">\(\beta_\text{de} &lt; 1\)</span> if the constraint
+<span class="math notranslate nohighlight">\(g^{i}\)</span> is sufficiently satisfied within its tolerance, whereby
+currently the constant factor <span class="math notranslate nohighlight">\(\gamma_\text{de} = 0.1\)</span> is used.
+The setting <span class="math notranslate nohighlight">\(\beta_\text{in} = \beta_\text{de} = 1\)</span> can be used to
+keep the penalty constant, i.e., to deactivate the penalty adaptation.
+Similarly, for an inequality constraint
+<span class="math notranslate nohighlight">\(\bar h^{i} = \bar h(\mb{x}^{i}, \dots)\)</span> with penalty
+<span class="math notranslate nohighlight">\(c_h^i\)</span> and tolerance <span class="math notranslate nohighlight">\(\varepsilon_h\)</span>, the update is defined
+by</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-updatepenh">
+<span class="eqno">(14)<a class="headerlink" href="#equation-eq-algopt-updatepenh" title="Link to this equation">#</a></span>\[\begin{split}c_h^{i+1} = \xi_h(c_h^{i}, \bar h^{i}, \bar h^{i-1}, \varepsilon_h)
+=
+\begin{cases}
+\beta_{\mathrm{in}} \, c_h^{i}
+&amp;\text{if } \bar h^{i} \geq \gamma_{\mathrm{in}} \bar h^{i-1}
+\, \land \,
+\bar h^{i} &gt; \varepsilon_h
+\, \land \,
+\eta^{i} \leq \varepsilon_\text{rel,u}
+\\
+\beta_{\mathrm{de}} \, c_h^{i}
+&amp; \text{else if } \bar h^{i} \leq \gamma_{\mathrm{de}} \, \varepsilon_h
+\\
+c_h^{i}
+&amp; \textrm{else} \,.
+\end{cases}\end{split}\]</div>
+<p>Similar update rules are used for the terminal equality and inequality
+constraints. In analogy to the multiplier update, the penalty parameters
+are restricted to upper and lower bounds <span class="math notranslate nohighlight">\(c_\text{max} \gg
+c_\text{min} &gt; 0\)</span> in order to avoid unlimited growth as well as
+negligible values.</p>
+<p>The following options can be used to adjust the update of the penalty
+parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyMax</span></code>: This option sets the upper bound <span class="math notranslate nohighlight">\(c_\text{max}\)</span> of the
+penalty parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code>: This option sets the lower bound <span class="math notranslate nohighlight">\(c_\text{min}\)</span> of the
+penalty parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseFactor</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\beta_\text{in}\)</span> by which
+penalties are increased.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyDecreaseFactor</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\beta_\text{de}\)</span> by which
+penalties are decreased.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PenaltyIncreaseThreshold</span></code>: This option sets the factor <span class="math notranslate nohighlight">\(\gamma_\text{in}\)</span> that rates the
+progress in the constraints between the last two iterates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AugLagUpdateGradientRelTol</span></code>: Threshold <span class="math notranslate nohighlight">\(\varepsilon_\text{rel,u}\)</span> for the maximum relative
+gradient of the inner minimization problem.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>: Thresholds
+<span class="math notranslate nohighlight">\((\mb{\varepsilon_{\mb{g}}}, \mb{\varepsilon_{\mb{h}}}, \mb{\varepsilon_{\mb{g_T}}}, \mb{\varepsilon_{\mb{h_T}}}) \in \mathbb{R}^{N_{c}}\)</span>
+for the equality, inequality, terminal equality, and terminal
+inequality constraints.</p></li>
+</ul>
+</section>
+<section id="estimation-of-minimal-penalty-parameter">
+<span id="sec-algopt-estimpenmin"></span><h2>Estimation of minimal penalty parameter<a class="headerlink" href="#estimation-of-minimal-penalty-parameter" title="Link to this heading">#</a></h2>
+<p>In real-time or embedded MPC applications, where only a limited number
+of iterations per step is computed, it is crucial that the penalty
+parameter is not decreased below a certain threshold
+<span class="math notranslate nohighlight">\(c_\text{min}\)</span>. This lower bound should be large enough that an
+inactive constraint that becomes active is still sufficiently penalized
+in the augmented Lagrangian cost functional. However, it should not be
+chosen too high to prevent ill-conditioning. A suitable value of
+<span class="math notranslate nohighlight">\(c_\text{min}\)</span> tailored to the given MPC problem therefore is of
+importance to ensure a high performance of GRAMPC.</p>
+<p>In order to support the user, GRAMPC offers the routine <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> to compute a
+problem-specific estimate of <span class="math notranslate nohighlight">\(c_\text{min}\)</span>. The basic idea behind
+this estimation is to determine <span class="math notranslate nohighlight">\(c_\text{min}\)</span> such that the
+actual costs <span class="math notranslate nohighlight">\(J\)</span> are in the same order of magnitude as the squared
+constraints multiplied by <span class="math notranslate nohighlight">\(c_\text{min}\)</span>, see
+equation <a class="reference internal" href="optimization_algorithm.html#equation-eq-algopt-auglag">(3)</a>. This approach
+requires initial values for the states <span class="math notranslate nohighlight">\(\mb{x}\)</span>, controls
+<span class="math notranslate nohighlight">\(\mb{u}\)</span>, and cost <span class="math notranslate nohighlight">\(J\)</span>. If the GRAMPC structure
+includes only default values, i.e. zeros (cold start), the estimation
+function <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> can be called with the argument <code class="docutils literal notranslate"><span class="pre">rungrampc=1</span></code> to perform one optimization
+or MPC step, where the possible maximum numbers of gradient iterations <code class="docutils literal notranslate"><span class="pre">MaxGradIter</span></code>
+and augmented Lagrangian iterations <code class="docutils literal notranslate"><span class="pre">MaxMultIter</span></code> are limited to 20. Afterwards, the
+estimated value for <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code> is set as detailed below and, if <code class="docutils literal notranslate"><span class="pre">rungrampc=1</span></code>, the initial
+states <span class="math notranslate nohighlight">\(\mb{x}\)</span>, controls <span class="math notranslate nohighlight">\(\mb{u}\)</span> and costs
+<span class="math notranslate nohighlight">\(J\)</span> are reset.</p>
+<p>Based on the initial values, a first estimate of the minimal penalty
+parameter is computed according to</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-c1">
+<span class="eqno">(15)<a class="headerlink" href="#equation-eq-algopt-c1" title="Link to this equation">#</a></span>\[\hat{c}_\text{min}^\text{I}
+%= \frac{\tfrac{1}{2}\,|J|\,(N_{\vm{g}}+N_{\vm{h}})}
+%{\|\vm g(\vm x(t), \vm u(t), \vm p, t)\|_{L_1}^2+\|\vm h(\vm x(t), \vm u(t), \vm p, t)\|_{L_1}^2 }
+%+ \frac{\tfrac{1}{2}\,|J|\,(N_{\vm{g}_T}+N_{\vm{h}_T})} {\|\vm g_T(\vm x(T), \vm p, T)\|_{1}^2+\|\vm h_T(\vm x(T), \vm p, T)\|_{1}^2}
+= \frac{2\,|J| %\,(N_{\vm{g}} + N_{\vm{h}} + N_{\vm{g}_T} + N_{\vm{h}_T})
+}
+{\|\mb{g}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\|_{L_2}^2 + \|\mb{h}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\|_{L_2}^2 + \|\mb{g}_T(\mb{x}(T), \mb{p}, T)\|_{2}^2 + \|\mb{h}_T(\mb{x}(T), \mb{p}, T)\|_{2}^2}\]</div>
+<p>However, if the inequality constraints are initially inactive and are
+far away from their bounds (i.e. large negative values are returned),
+the estimate <span class="math notranslate nohighlight">\(\hat{c}_\text{min}^\text{I}\)</span> may be too small.</p>
+<p>To deal with these cases, a second estimate for the minimal penalty
+parameter</p>
+<div class="math notranslate nohighlight" id="equation-eq-algopt-c2">
+<span class="eqno">(16)<a class="headerlink" href="#equation-eq-algopt-c2" title="Link to this equation">#</a></span>\[\hat{c}_\text{min}^\text{II}
+%= \kappa \left(\frac{\tfrac{1}{2}\,|J|}
+%{T \max\{\|\vm{\varepsilon}_{\vm{g}}\|_1,\,\|\vm{\varepsilon}_{\vm{h}}\|_1\}^2}
+%+ \frac{\tfrac{1}{2}\,|J|}
+%{\max\{\|\vm{\varepsilon}_{\vm{g}_T}\|_1,\,\|\vm{\varepsilon}_{\vm{h}_T}\|_1\}^2}\right)
+= \frac{2\,|J|}
+{
+T \left(\|\mb{\varepsilon}_{\mb{g}}\|_2^2 +
+\|\mb{\varepsilon}_{\mb{h}}\|_2^2\right) +
+\|\mb{\varepsilon}_{\mb{g}_T}\|_2^2 +
+\|\mb{\varepsilon}_{\mb{h}_T}\|_2^2}\]</div>
+<p>is computed in the same spirit using the constraint tolerances (see <code class="docutils literal notranslate"><span class="pre">ConstraintsAbsTol</span></code>,
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_{\mb{g}}\)</span>,
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_{\mb{h}}\)</span>,
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_{\mb{g}_T}\)</span> and
+<span class="math notranslate nohighlight">\(\mb{\varepsilon}_{\mb{h}_T}\)</span>) instead of the
+constraint values <a class="footnote-reference brackets" href="#id4" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Since the norms of the tolerances are summed,
+more conservative values for <span class="math notranslate nohighlight">\(c_\text{min}\)</span> are estimated and
+therefore instabilities can be avoided. Note that it is recommended to
+scale all constraints so that they are in the same order of magnitude,
+see e.g. the PMSM example in <a class="reference internal" href="../tutorials/PMSM.html#sec-tut-pmsm"><span class="std std-ref">Model predictive control of a PMSM</span></a>.</p>
+<p>Finally, the minimal penalty parameter</p>
+<div class="math notranslate nohighlight">
+\[\hat{c}_\text{min} = \min\left\{
+\max\left\{\hat{c}_\text{min}^\text{I} ,\,
+\kappa \, \hat{c}_\text{min}^\text{II} \right\} ,\,
+\frac{c_\text{max}}{500}\right\}\]</div>
+<p>is chosen as the maximum of <a class="reference internal" href="#equation-eq-algopt-c1">(15)</a> and
+<a class="reference internal" href="#equation-eq-algopt-c2">(16)</a> and additionally limited to
+<span class="math notranslate nohighlight">\(0.2\%\)</span> of the maximum penalty parameter <span class="math notranslate nohighlight">\(c_\text{max}\)</span>.
+This limitation ensures reasonable values even with very small
+constraint tolerances. The relation factor <span class="math notranslate nohighlight">\(\kappa\)</span> has been
+determined to <span class="math notranslate nohighlight">\(10^{-6}\)</span> on the basis of various example systems.
+Please note that this estimation is intended to assist the user in
+making an initial guess. Problem-specific tuning of <code class="docutils literal notranslate"><span class="pre">PenaltyMin</span></code> can lead to further
+performance improvements and is therefore recommended. All MPC example
+problems in <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples</span></code> contain an initial call of <code class="docutils literal notranslate"><span class="pre">grampc_estim_penmin</span></code> to estimate
+<span class="math notranslate nohighlight">\(\hat{c}_\text{min}\)</span> and, as alternative, manually tuned values
+that can further enhance the performance of GRAMPC for fixed numbers
+of iterations.</p>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>The integration behind the <span class="math notranslate nohighlight">\(L^2\)</span>-norm can be replaced by a multiplication by the horizon length <span class="math notranslate nohighlight">\(T\)</span>, as the constraint tolerances <span class="math notranslate nohighlight">\(\epsilon_g\)</span> and <span class="math notranslate nohighlight">\(\epsilon_h\)</span> are no functions of time.</p>
+</aside>
+</aside>
+<div class="docutils container" id="id5">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-conn2013" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>A. R. Conn, G.I.M. Gould, and P. L. Toint. <em>LANCELOT: A Fortran Package for Large-Scale Nonlinear Optimization (Release A)</em>. Springer-Verlag, Berlin, Germany, 1992.</p>
+</aside>
+<aside class="footnote brackets" id="footcite-nocedal2006" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">3</a><span class="fn-bracket">]</span></span>
+<p>J. Nocedal and S. Wright. <em>Numerical Optimization</em>. Springer Science &amp; Business Media, New York, USA, 2006.</p>
+</aside>
+</aside>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="line_search.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Line search</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="misc.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Convergence criterion</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-of-lagrangian-multipliers">Update of Lagrangian multipliers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-of-penalty-parameters">Update of penalty parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#estimation-of-minimal-penalty-parameter">Estimation of minimal penalty parameter</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Andreas Völz, Thore Wietzke, Knut Graichen
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
