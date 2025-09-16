@@ -47,7 +47,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Optimization algorithm and options" href="../algorithm/algorithm.html" />
-    <link rel="prev" title="Problem formulation and implementation" href="problem_formulation.html" />
+    <link rel="prev" title="Optimization problem and parameters" href="optimization_problem.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -156,6 +156,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="problem_formulation.html">Problem formulation and implementation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="optimization_problem.html">Optimization problem and parameters</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Problem implementation</a></li>
 </ul>
 </details></li>
@@ -352,15 +353,15 @@ document.write(`
                   
   <section id="problem-implementation">
 <span id="sec-problemimplementation"></span><h1>Problem implementation<a class="headerlink" href="#problem-implementation" title="Link to this heading">#</a></h1>
-<p>Regardless of what kind of problem statement is considered (i.e. model predictive control, moving horizon estimation or parameter estimation), the optimization problem <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a> must be implemented in C, cf. <a class="reference internal" href="../install.html#fig-grampcgeneralstructure"><span class="std std-numref">Fig. 1</span></a>
-For this purpose, the C file template <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> is provided within the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATE</span></code>, which allows one to describe the structure of the optimization problem <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>, the cost functional <span class="math notranslate nohighlight">\(J\)</span> to be minimized, the system dynamics <span class="math notranslate nohighlight">\(f\)</span>, and the constraints <span class="math notranslate nohighlight">\(\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T}\)</span>.
+<p>Regardless of what kind of problem statement is considered (i.e. model predictive control, moving horizon estimation or parameter estimation), the optimization problem <a class="reference internal" href="optimization_problem.html#equation-eq-ocp">(1)</a> must be implemented in C, cf. <a class="reference internal" href="../install.html#fig-grampcgeneralstructure"><span class="std std-numref">Fig. 1</span></a>
+For this purpose, the C file template <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> is provided within the folder <code class="docutils literal notranslate"><span class="pre">&lt;grampc_root&gt;/examples/TEMPLATE</span></code>, which allows one to describe the structure of the optimization problem <a class="reference internal" href="optimization_problem.html#equation-eq-ocp">(1)</a>, the cost functional <span class="math notranslate nohighlight">\(J\)</span> to be minimized, the system dynamics <span class="math notranslate nohighlight">\(f\)</span>, and the constraints <span class="math notranslate nohighlight">\(\mb{g}, \mb{g}_\text{T}, \mb{h}, \mb{h}_\text{T}\)</span>.
 The number of C functions to be provided depends on the type of dynamics <span class="math notranslate nohighlight">\(f\)</span> of the specific problem at hand.</p>
 <section id="problems-involving-explicit-odes">
 <span id="sec-problemimplementation-explicit"></span><h2>Problems involving explicit ODEs<a class="headerlink" href="#problems-involving-explicit-odes" title="Link to this heading">#</a></h2>
 <p>A special case of the system dynamics <span class="math notranslate nohighlight">\(f\)</span> and certainly the most important one concerns ordinary differential equations (ODEs) with explicit appearance of the first-order derivatives</p>
 <div class="math notranslate nohighlight">
 \[\mb{\dot x}(t) = \mb{f}(\mb{x}(t), \mb{u}(t), \mb{p}, t)\,,\]</div>
-<p>corresponding to the identity mass matrix <span class="math notranslate nohighlight">\(\mb{M}=\mb{I}\)</span> in OCP <a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.
+<p>corresponding to the identity mass matrix <span class="math notranslate nohighlight">\(\mb{M}=\mb{I}\)</span> in OCP <a class="reference internal" href="optimization_problem.html#equation-eq-ocp">(1)</a>.
 In this case, the following functions of the C template file <code class="docutils literal notranslate"><span class="pre">probfct_TEMPLATE.c</span></code> have to be provided:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">ocp_dim</span></code>: Definition of the dimensions of the considered problem, i.e. the
@@ -392,10 +393,10 @@ the cost functional <span class="math notranslate nohighlight">\(J\)</span>.</p>
 functions <code class="docutils literal notranslate"><span class="pre">Vfct</span></code> and <code class="docutils literal notranslate"><span class="pre">lfct</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">hfct</span></code>, <code class="docutils literal notranslate"><span class="pre">gfct</span></code>: Inequality and equality constraint functions
 <span class="math notranslate nohighlight">\(\mb{h}\)</span> and <span class="math notranslate nohighlight">\(\mb{g}\)</span> as defined in
-<a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.</p></li>
+<a class="reference internal" href="optimization_problem.html#equation-eq-ocp">(1)</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">hTfct</span></code>, <code class="docutils literal notranslate"><span class="pre">gTfct</span></code>: Terminal inequality and equality constraint functions
 <span class="math notranslate nohighlight">\(\mb{h}_T\)</span> and <span class="math notranslate nohighlight">\(\mb{g}_T\)</span> as defined in
-<a class="reference internal" href="problem_formulation.html#equation-eq-ocp">(1)</a>.</p></li>
+<a class="reference internal" href="optimization_problem.html#equation-eq-ocp">(1)</a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dhdx_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhdu_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">dhdp_vec</span></code>: Matrix products
 <span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}}{\partial \mb{x}^{}})^\mathsf{T}\mb{v}\)</span>,
 <span class="math notranslate nohighlight">\((\frac{\partial^{} \mb{h}}{\partial \mb{u}^{}})^\mathsf{T}\mb{v}\)</span>,
@@ -825,12 +826,12 @@ software package.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="problem_formulation.html"
+       href="optimization_problem.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Problem formulation and implementation</p>
+        <p class="prev-next-title">Optimization problem and parameters</p>
       </div>
     </a>
     <a class="right-next"
@@ -887,7 +888,7 @@ By Andreas Völz, Thore Wietzke, Knut Graichen
 
   <p class="copyright">
     
-      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      © Copyright 2025, Andreas Völz, Thore Wietzke, Knut Graichen.
       <br/>
     
   </p>

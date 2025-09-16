@@ -156,6 +156,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/optimization_problem.html">Optimization problem and parameters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
 </ul>
 </details></li>
@@ -418,7 +419,7 @@ t\in[0,T]
 T \in [T_{\min}, T_{\max}] \,,\end{split}\]</div>
 <p>whereby the augmented Lagrangian function <span class="math notranslate nohighlight">\(\bar{J}\)</span> is maximized with respect to the multipliers <span class="math notranslate nohighlight">\(\mb{\bar \mu}\)</span> and minimized with respect to the controls <span class="math notranslate nohighlight">\(\mb{u}\)</span>, the parameters <span class="math notranslate nohighlight">\(\mb{p}\)</span> and the end time <span class="math notranslate nohighlight">\(\mb{T}\)</span>.
 Note that the full set of optimization variables <span class="math notranslate nohighlight">\((\mb{u},\mb{p},T)\)</span> is considered in what follows for the sake of completeness.
-The max-min-problem <a class="reference internal" href="#equation-eq-maxmin">(4)</a> corresponds to the dual problem of <a class="reference internal" href="../problem_formulation/problem_formulation.html#equation-eq-ocp">(1)</a> in the case of <span class="math notranslate nohighlight">\(\mb{\bar c} = \mb{0}\)</span>.
+The max-min-problem <a class="reference internal" href="#equation-eq-maxmin">(4)</a> corresponds to the dual problem of <a class="reference internal" href="../problem_formulation/optimization_problem.html#equation-eq-ocp">(1)</a> in the case of <span class="math notranslate nohighlight">\(\mb{\bar c} = \mb{0}\)</span>.
 The maximization step is performed by steepest ascent using the constraint residual as direction and the penalty parameter as step size.
 See <a class="footnote-reference brackets" href="#footcite-englert-oe-2019" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> for a detailed description of the augmented Lagrangian algorithm.</p>
 </section>
@@ -654,7 +655,7 @@ By Andreas Völz, Thore Wietzke, Knut Graichen
 
   <p class="copyright">
     
-      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      © Copyright 2025, Andreas Völz, Thore Wietzke, Knut Graichen.
       <br/>
     
   </p>

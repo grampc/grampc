@@ -30,7 +30,7 @@
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=ca93fcec" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -155,8 +155,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation and structure of GRAMPC</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../problem_formulation/implementation.html">Problem implementation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../problem_formulation/problem_formulation.html">Problem formulation and implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="algorithm.html">Optimization algorithm and options</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -510,7 +509,7 @@ proper terminal condition <span class="math notranslate nohighlight">\(\mb{\lamb
 must be specified as follows</p>
 <div class="math notranslate nohighlight">
 \[\mb{\lambda}(T) = \underbrace{\left(\mb{M}^\mathsf{T}\right)^{-1}\bar{ V}_{\mb{x}}(\mb{x}(T), \mb{p}, T, \mb{\mu}_T, \mb{c}_T)}_{\texttt{dVdx}}\]</div>
-<p>cf. Equation <a class="reference internal" href="optimization_algorithm.html#equation-eq-algopt-optcondlambda">(5)</a>.
+<p>cf. Equation <a class="reference internal" href="optimization_algorithm.html#equation-eq-algopt-optcondlambda">(3)</a>.
 In the case of a DAE system, the mass matrix is singular and therefore
 only the elements of the mass matrix for the differential equations are
 inverted. For an example of using RODAS and the respective options, take
@@ -603,7 +602,7 @@ By Andreas Völz, Thore Wietzke, Knut Graichen
 
   <p class="copyright">
     
-      © Copyright 2024, Andreas Völz, Thore Wietzke, Knut Graichen.
+      © Copyright 2025, Andreas Völz, Thore Wietzke, Knut Graichen.
       <br/>
     
   </p>

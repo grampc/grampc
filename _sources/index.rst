@@ -14,7 +14,7 @@ Version 2.3
     
     Chair of Automatic Control
     Friedrich-Alexander-Universität Erlangen-Nürnberg
-:Date: 2024-05-27
+:Date: 2025-09-11
 
 .. toctree::
     :maxdepth: 2
