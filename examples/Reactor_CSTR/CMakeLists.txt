@@ -4,13 +4,6 @@ add_executable(Reactor_CSTR
 )
 target_link_libraries(Reactor_CSTR grampc ${grampc_link_math})
 
-add_executable(Reactor_CSTR_Finite_Diff
-    main_REACTOR_CSTR.c
-    probfct_REACTOR_CSTR.c
-)
-target_link_libraries(Reactor_CSTR_Finite_Diff grampc ${grampc_link_math})
-target_compile_definitions(Reactor_CSTR_Finite_Diff PRIVATE FINITE_DIFF)
-
 add_executable(Reactor_CSTR_fixedsize
     ${grampc_source_files}
     main_REACTOR_CSTR.c

@@ -14,7 +14,7 @@
 
 
 #include "grampc.h"
-#include <time.h>
+#include "timing.h"
 
 #define NX	6
 #define NU	2
@@ -57,7 +57,7 @@ int main()
 	FILE *file_x, *file_u, *file_p, *file_T, *file_J, *file_Ncfct, *file_Npen, *file_iter, *file_status, *file_t;
 #endif
 
-	clock_t tic, toc;
+	typeTime tic, toc;
 	typeRNum *CPUtimeVec;
 	typeRNum CPUtime = 0;
 
@@ -142,10 +142,10 @@ int main()
 	printf("MPC running ...\n");
 	for (iMPC = 0; iMPC <= MaxSimIter; iMPC++) {
 		/* run grampc */
-		tic = clock();
+		timer_now(&tic);
 		grampc_run(grampc);
-		toc = clock();
-		CPUtimeVec[iMPC] = (typeRNum)((toc - tic) * 1000 / CLOCKS_PER_SEC);
+		timer_now(&toc);
+		CPUtimeVec[iMPC] = timer_diff_ms(&tic, &toc);
 
 		/* check solver status */
 		if (grampc->sol->status > 0) {
@@ -189,8 +189,9 @@ int main()
 #endif
 
 	for (i = 0; i <= MaxSimIter; i++) {
-		CPUtime = CPUtime + CPUtimeVec[i] / (MaxSimIter + 1);
+		CPUtime = CPUtime + CPUtimeVec[i];
 	}
+	CPUtime = CPUtime / (MaxSimIter + 1);
 
 	grampc_free(&grampc);
 	free(CPUtimeVec);
