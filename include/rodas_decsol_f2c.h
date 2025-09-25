@@ -3944,7 +3944,7 @@ L77:
 		for (i__ = 1; i__ <= i__1; ++i__) {
 			cont[i__] = y[i__] + cont[i__];
 		}
-		(*fcn)(n, x, &cont[1], &f1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+		ffctRodas(n, x, &cont[1], &f1[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 		++(*nfcn);
 		i__1 = *n;
 		for (i__ = 1; i__ <= i__1; ++i__) {
@@ -4510,7 +4510,7 @@ L77:
 		for (i__ = 1; i__ <= i__1; ++i__) {
 			cont[i__] = y[i__] + cont[i__];
 		}
-		(*fcn)(n, x, &cont[1], &ff[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
+		ffctRodas(n, x, &cont[1], &ff[1], tvec, xvec, uvec, pvec, dcdxvec, grampc, pfct);
 		++(*nfcn);
 		i__1 = *n;
 		for (i__ = 1; i__ <= i__1; ++i__) {
