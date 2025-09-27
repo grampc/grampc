@@ -48,51 +48,12 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
-#ifdef INTEGER_STAR_8	/* Adjust for typeLInt*8. */
-typedef long long longint;		/* system-dependent */
-typedef unsigned long long ulongint;	/* system-dependent */
-#define qbit_clear(a,b)	((a) & ~((ulongint)1 << (b)))
-#define qbit_set(a,b)	((a) |  ((ulongint)1 << (b)))
-#endif
-
 #define TRUE_ (1)
 #define FALSE_ (0)
-
-/* I/O stuff */
-#ifdef f2c_i2
-/* for -i2 */
-typedef short flag;
-typedef short ftnlen;
-typedef short ftnint;
-#else
-typedef long int flag;
-typedef long int ftnlen;
-typedef long int ftnint;
-#endif
-
-/*external read, write*/
-typedef struct
-{
-	flag cierr;
-	ftnint ciunit;
-	flag ciend;
-	char *cifmt;
-	ftnint cirec;
-} cilist;
 
 #ifndef DABS
 #define DABS(x) ((x) >= 0. ? (x) : -(x))
 #endif
-
-#ifdef __cplusplus
-typedef int /* Unknown procedure type */(*U_fp)(.);
-typedef /* Subroutine */ int(*S_fp)(.);
-#else
-typedef int /* Unknown procedure type */(*U_fp)();
-typedef /* Subroutine */ int(*S_fp)();
-#endif
-
-
 
 /* this code was originally in f2c_extractedfcts.h */
 
@@ -136,40 +97,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-/* ----------------------
-dummy output functions
----------------------- */
-typeLInt e_wsle(void)
-{
-	return(-1);
-}
-
-typeLInt s_wsle(cilist *dummy)
-{
-	return(-1);
-}
-
-typeLInt do_lio(typeLInt *dummy1, typeLInt *dummy2, char *dummy3, ftnlen dummy4)
-{
-	return(-1);
-}
-
-typeLInt e_wsfe(void)
-{
-	return(-1);
-}
-
-typeLInt do_fio(typeLInt *dummy1, char *dummy2, ftnlen dummy3)
-{
-	return(-1);
-}
-
-typeLInt s_wsfe(cilist *dummy)
-{
-	return(-1);
-};
-
 
 
 #endif
