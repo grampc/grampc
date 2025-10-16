@@ -49,9 +49,11 @@ void init_rws_parameters(const typeGRAMPC *grampc) {
 		scale_parameters(grampc->rws->p, grampc->param->p0, grampc);
 	}
 	else {
-		MatCopy(grampc->rws->p, grampc->param->p0, 1, grampc->param->Np);
+		if (grampc->param->Np > 0)
+			MatCopy(grampc->rws->p, grampc->param->p0, 1, grampc->param->Np);
 	}
-	MatCopy(grampc->rws->pprev, grampc->rws->p, 1, grampc->param->Np);
+	if (grampc->param->Np > 0)
+		MatCopy(grampc->rws->pprev, grampc->rws->p, 1, grampc->param->Np);
 }
 
 void init_rws_linesearch(const typeGRAMPC *grampc) {
