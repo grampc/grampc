@@ -316,7 +316,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 			cfctprev = grampc->rws->cfctprev + i * grampc->param->Nc;
 			dcdx = grampc->rws->dcdx + i * grampc->param->Nx;
 			dcdu = grampc->rws->dcdu + i * grampc->param->Nu;
-			dcdp = grampc->rws->dcdp + i * grampc->param->Np;
+			if (grampc->rws->dcdp)
+				dcdp = grampc->rws->dcdp + i * grampc->param->Np;
 			thresholds = grampc->rws->cfctAbsTol;
 			cScale = grampc->opt->cScale;
 
