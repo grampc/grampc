@@ -212,7 +212,8 @@ void grampc_run(const typeGRAMPC *grampc)
 	}
 	else {
 		MatCopy(grampc->sol->unext, u, 1, grampc->param->Nu);
-		MatCopy(grampc->sol->pnext, p, 1, grampc->param->Np);
+		if (grampc->sol->pnext)
+			MatCopy(grampc->sol->pnext, p, 1, grampc->param->Np);
 		grampc->sol->Tnext = T[0];
 	}
 
@@ -316,7 +317,8 @@ void evaluate_constraints(ctypeRNum *t, ctypeRNum *u, ctypeRNum *p, const typeBo
 			cfctprev = grampc->rws->cfctprev + i * grampc->param->Nc;
 			dcdx = grampc->rws->dcdx + i * grampc->param->Nx;
 			dcdu = grampc->rws->dcdu + i * grampc->param->Nu;
-			dcdp = grampc->rws->dcdp + i * grampc->param->Np;
+			if (grampc->rws->dcdp)
+				dcdp = grampc->rws->dcdp + i * grampc->param->Np;
 			thresholds = grampc->rws->cfctAbsTol;
 			cScale = grampc->opt->cScale;
 
