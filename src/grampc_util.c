@@ -267,7 +267,10 @@ void MatCopy(typeRNum *C, ctypeRNum *A, ctypeInt n1, ctypeInt n2)
 {
 	/* matrix copy C = A *
 	 * A,C: (n1 x n2)    */
-	memcpy(C, A, n1*n2 * sizeof(*C));
+	typeInt i;
+	for (i = 0; i < n1*n2; i++) {
+		C[i] = A[i];
+	}
 }
 
 void MatAdd(typeRNum *C, ctypeRNum *A, ctypeRNum *B, ctypeInt n1, ctypeInt n2)
