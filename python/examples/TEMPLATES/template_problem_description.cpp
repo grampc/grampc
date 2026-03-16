@@ -14,7 +14,7 @@
 #include "template_problem_description.hpp"
 
 TemplateProblemDescription::TemplateProblemDescription()
- : PyProblemDescription(/*Nx*/ -1, /*Nu*/ -1, /*Np*/ -1, /*Ng*/ -1, /*Nh*/ -1, /*NgT*/ -1, /*NhT*/ -1)
+ : ProblemDescription(/*Nx*/ -1, /*Nu*/ -1, /*Np*/ -1, /*Ng*/ -1, /*Nh*/ -1, /*NgT*/ -1, /*NhT*/ -1)
 {}
 /** System function f(t,x,u,p)
 ------------------------------------ **/
@@ -208,13 +208,13 @@ void TemplateProblemDescription::Mtrans(VectorRef out, const GrampcParam& param)
 
 PYBIND11_MODULE(template, m)
 {
-    /** Imports pygrampc so this extensions module knows of the type grampc::PyProblemDescription, otherwise an import error like
-     * ImportError: generic_type: type "TemplateProblemDescription" referenced unknown base type "grampc::PyProblemDescription"
+    /** Imports pygrampc so this extensions module knows of the type grampc::ProblemDescription, otherwise an import error like
+     * ImportError: generic_type: type "TemplateProblemDescription" referenced unknown base type "grampc::ProblemDescription"
      * may occur, if the problem description is imported before pygrampc.
      */
     pybind11::module_::import("pygrampc");
 
-    pybind11::class_<TemplateProblemDescription, PyProblemDescription, std::shared_ptr<TemplateProblemDescription>>(m, "TemplateProblemDescription")
+    pybind11::class_<TemplateProblemDescription, ProblemDescription, std::shared_ptr<TemplateProblemDescription>>(m, "TemplateProblemDescription")
         .def(pybind11::init<>())
         .def_readonly("Nx", &TemplateProblemDescription::Nx)
         .def_readonly("Nu", &TemplateProblemDescription::Nu)

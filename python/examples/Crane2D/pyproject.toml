@@ -7,5 +7,11 @@ name = "crane_problem"
 version = "1.0"
 description="Compiled Crane2D problem for GRAMPC"
 
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib"
+]
+
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true

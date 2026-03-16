@@ -17,7 +17,7 @@ extern "C"
 {
     void ocp_dim(typeInt *Nx, typeInt *Nu, typeInt *Np, typeInt *Ng, typeInt *Nh, typeInt *NgT, typeInt *NhT, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         *Nx = problem->Nx;
         *Nu = problem->Nu;
         *Np = problem->Np;
@@ -29,7 +29,7 @@ extern "C"
 
     void ffct(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -41,7 +41,7 @@ extern "C"
     
     void dfdx_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nx);
@@ -54,7 +54,7 @@ extern "C"
 
     void dfdu_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nu);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nx);
@@ -67,7 +67,7 @@ extern "C"
 
     void dfdp_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nx);
@@ -80,7 +80,7 @@ extern "C"
 
     void lfct(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, 1);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -92,7 +92,7 @@ extern "C"
 
     void dldx(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -104,7 +104,7 @@ extern "C"
 
     void dldu(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nu);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -116,7 +116,7 @@ extern "C"
 
     void dldp(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -128,7 +128,7 @@ extern "C"
 
     void Vfct(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, 1);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -139,7 +139,7 @@ extern "C"
 
     void dVdx(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -150,7 +150,7 @@ extern "C"
 
     void dVdp(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -161,7 +161,7 @@ extern "C"
 
     void dVdT(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, 1);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -172,7 +172,7 @@ extern "C"
 
     void gfct(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Ng);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -184,7 +184,7 @@ extern "C"
 
     void dgdx_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Ng);
@@ -197,7 +197,7 @@ extern "C"
 
     void dgdu_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nu);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Ng);
@@ -210,7 +210,7 @@ extern "C"
 
     void dgdp_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Ng);
@@ -223,7 +223,7 @@ extern "C"
 
     void hfct(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nh);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -235,7 +235,7 @@ extern "C"
 
     void dhdx_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nh);
@@ -248,7 +248,7 @@ extern "C"
 
     void dhdu_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nu);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nh);
@@ -261,7 +261,7 @@ extern "C"
 
     void dhdp_vec(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nh);
@@ -274,7 +274,7 @@ extern "C"
 
     void gTfct(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->NgT);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -285,7 +285,7 @@ extern "C"
 
     void dgTdx_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NgT);
@@ -297,7 +297,7 @@ extern "C"
 
     void dgTdp_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NgT);
@@ -309,7 +309,7 @@ extern "C"
 
     void dgTdT_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, 1);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NgT);
@@ -321,7 +321,7 @@ extern "C"
 
     void hTfct(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->NhT);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> pMap(p, problem->Np);
@@ -332,7 +332,7 @@ extern "C"
 
     void dhTdx_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NhT);
@@ -344,7 +344,7 @@ extern "C"
 
     void dhTdp_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Np);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NhT);
@@ -356,7 +356,7 @@ extern "C"
 
     void dhTdT_vec(typeRNum *out, ctypeRNum T, ctypeRNum *x, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM* userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, 1);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->NhT);
@@ -368,7 +368,7 @@ extern "C"
 
     void dfdx(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Rodas_Jac); //Nx * (MLJAC + MUJAC + 1)
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -380,7 +380,7 @@ extern "C"
 
     void dfdxtrans(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Rodas_Jac); //Nx * (MLJAC + MUJAC + 1)
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -392,7 +392,7 @@ extern "C"
 
     void dfdt(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> uMap(u, problem->Nu);
@@ -404,7 +404,7 @@ extern "C"
 
     void dHdxdt(typeRNum *out, ctypeRNum t, ctypeRNum *x, ctypeRNum *u, ctypeRNum *p, ctypeRNum *vec, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Nx);
         Eigen::Map<const grampc::Vector> xMap(x, problem->Nx);
         Eigen::Map<const grampc::Vector> vecMap(vec, problem->Nx);
@@ -417,7 +417,7 @@ extern "C"
 
     void Mfct(typeRNum *out, const typeGRAMPCparam *param, typeUSERPARAM *userparam) // Auf Python Seite eine Matrix?
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Rodas_M); //Nx * (MLMAS + MUMAS + 1)
         grampc::GrampcParam paramMap(param);
         
@@ -426,7 +426,7 @@ extern "C"
 
     void Mtrans(typeRNum *out, const typeGRAMPCparam *param, typeUSERPARAM *userparam)
     {
-        grampc::PyProblemDescription* problem = (grampc::PyProblemDescription*) userparam;
+        grampc::ProblemDescription* problem = (grampc::ProblemDescription*) userparam;
         Eigen::Map<grampc::Vector> outMap(out, problem->Rodas_M); //Nx * (MLMAS + MUMAS + 1)
         grampc::GrampcParam paramMap(param);
         

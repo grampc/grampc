@@ -14,7 +14,7 @@
 #include "pygrampc_problem_description.hpp"
 using namespace grampc;
 
-class TemplateProblemDescription : public PyProblemDescription
+class TemplateProblemDescription : public ProblemDescription
 {
 public:
     TemplateProblemDescription();

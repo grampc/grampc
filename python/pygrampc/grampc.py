@@ -81,7 +81,7 @@ class Grampc(GrampcBinding):
         "ShiftControl": ValidatorOptions(("on", "off"), "Enum"),
         "IntegralCost": ValidatorOptions(("on", "off"), "Enum"),
         "TerminalCost": ValidatorOptions(("on", "off"), "Enum"),
-        "IntegratorCost": ValidatorOptions(("trapezoidal", "simpson"), "Enum"),
+        "IntegratorCost": ValidatorOptions(("trapezoidal", "simpson", "discrete"), "Enum"),
         "Integrator": ValidatorOptions(("erk1", "erk2", "erk3", "erk4", "ruku45", "rodas", "discrete"), "Enum"),
         "LineSearchType": ValidatorOptions(("adaptive", "explicit1", "explicit2"), "Enum"),
         "LineSearchExpAutoFallback": ValidatorOptions(("on", "off"), "Enum"),
@@ -453,17 +453,17 @@ class GrampcResults:
                 self.constr[index, 0:self._id.g] = grampc.gfct(0.0, self.x[index, :], self.u[index, :], self.p[index, :], grampc.param)
 
             if grampc.param.Nh:
-                self.constr[index, self._id.g:self._id.h] = grampc.hfct(self.t[index], self.x[index, :], self.u[index, :], self.p[index, :], grampc.param)
+                self.constr[index, self._id.g:self._id.h] = grampc.hfct(0.0, self.x[index, :], self.u[index, :], self.p[index, :], grampc.param)
 
             self.mult[index, :] = grampc.rws.mult[0:self._id.h, 0]
             self.pen[index, :] = grampc.rws.pen[0:self._id.h, 0]
 
         if self._terminal_constraints:
             if grampc.param.NgT:
-                self.constrT[index, 0:grampc.param.NgT] = grampc.gTfct(self.t[index], self.x[index, :], self.p[index, :], grampc.param)
+                self.constrT[index, 0:grampc.param.NgT] = grampc.gTfct(0.0, self.x[index, :], self.p[index, :], grampc.param)
 
             if grampc.param.NhT:
-                self.constrT[index, grampc.param.NgT:grampc.param.Ng+grampc.param.NhT] = grampc.hTfct(self.t[index], self.x[index, :], self.p[index, :], grampc.param)
+                self.constrT[index, grampc.param.NgT:grampc.param.Ng+grampc.param.NhT] = grampc.hTfct(0.0, self.x[index, :], self.p[index, :], grampc.param)
 
             self.multT[index, :] = grampc.rws.mult[self._id.h:self._id.hT, -1]
             self.penT[index, :] = grampc.rws.pen[self._id.h:self._id.hT, -1]

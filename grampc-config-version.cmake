@@ -1,0 +1,16 @@
+set(PACKAGE_VERSION @grampc_VERSION@)
+
+if("${PACKAGE_FIND_VERSION_MAJOR}" EQUAL "@grampc_VERSION_MAJOR@")
+    if("${PACKAGE_FIND_VERSION_MINOR}" EQUAL "@grampc_VERSION_MINOR@")
+        set(PACKAGE_VERSION_EXACT TRUE)
+    else()
+        set(PACKAGE_VERSION_UNSUITABLE TRUE)
+    endif()
+else()
+    if("${PACKAGE_FIND_VERSION_MAJOR}" EQUAL 0)
+        # assume compatability if no specific version is requested
+        set(PACKAGE_VERSION_COMPATIBLE TRUE)
+    else()
+        set(PACKAGE_VERSION_UNSUITABLE TRUE)
+    endif()
+endif()

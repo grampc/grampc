@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
-project(grampc)
+project(grampc VERSION 2.3)
+
+set(grampc_include_dest "include/grampc-${PROJECT_VERSION}")
+set(grampc_lib_dest "lib/grampc-${PROJECT_VERSION}")
 
 # link_directories should treat paths as relative to the source dir
 cmake_policy(SET CMP0015 NEW)
+# NEW behavior for this policy is to set VERSION as documented by the project() command
+cmake_policy(SET CMP0048 NEW)
 
 # Libraries should be created with position independent code
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -52,6 +57,10 @@ list(APPEND grampc_source_files
 list(TRANSFORM grampc_source_files PREPEND ${CMAKE_SOURCE_DIR}/)
 # Compile GRAMPC as library
 add_library(grampc ${grampc_source_files})
+target_include_directories(grampc PUBLIC 
+    $<BUILD_INTERFACE:${grampc_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${grampc_include_dest}>
+)
 
 if(PYGRAMPC) # True when invoked via pip
     add_subdirectory(python)
@@ -61,6 +70,13 @@ else()
 
     # Add C++ interface
     add_subdirectory(cpp)
+    
+    # installation
+    configure_file(grampc-config-version.cmake ${CMAKE_CURRENT_BINARY_DIR}/grampc-config-version.cmake @ONLY)
+    install(DIRECTORY include/ DESTINATION ${grampc_include_dest})
+    install(TARGETS grampc EXPORT grampc DESTINATION ${grampc_lib_dest})
+    install(EXPORT grampc DESTINATION ${grampc_lib_dest})
+    install(FILES grampc-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/grampc-config-version.cmake DESTINATION ${grampc_lib_dest})
 endif()
 
 # Display warning message to notify users about the change in probfct signatures

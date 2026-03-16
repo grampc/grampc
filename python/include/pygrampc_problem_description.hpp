@@ -14,143 +14,24 @@
 #ifndef PYPROBLEM_DESCRIPTION_HPP
 #define PYPROBLEM_DESCRIPTION_HPP
 
-extern "C"
-{
-    #include "grampc.h"
-}
-
-#include "pygrampc_types.hpp"
-#include <memory>
+#include "problem_description.hpp"
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 
 namespace grampc
 {
-    class PyProblemDescription
-    {
-        public:
-            ctypeInt Nx;
-            ctypeInt Nu;
-            ctypeInt Np;
-            ctypeInt Ng;
-            ctypeInt Nh;
-            ctypeInt NgT;
-            ctypeInt NhT;
-            typeInt Rodas_Jac = 0;
-            typeInt Rodas_M = 0;
-
-        public:
-            PyProblemDescription(ctypeInt Nx, ctypeInt Nu, ctypeInt Np, ctypeInt Ng, ctypeInt Nh, ctypeInt NgT, ctypeInt NhT) 
-             : Nx(Nx), Nu(Nu), Np(Np), Ng(Ng), Nh(Nh), NgT(NgT), NhT(NhT)
-            {}
-
-            virtual ~PyProblemDescription() {}
-
-            /** System function f(t,x,u,p,userparam)
-            ------------------------------------ **/
-            virtual void ffct(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) = 0;
-            /** Jacobian df/dx multiplied by vector vec, i.e. (df/dx)^T*vec or vec^T*(df/dx) **/
-            virtual void dfdx_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) = 0;
-            /** Jacobian df/du multiplied by vector vec, i.e. (df/du)^T*vec or vec^T*(df/du) **/
-            virtual void dfdu_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian df/dp multiplied by vector vec, i.e. (df/dp)^T*vec or vec^T*(df/dp) **/
-            virtual void dfdp_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-
-
-            /** Integral cost l(t,x(t),u(t),p,xdes,udes,userparam)
-            -------------------------------------------------- **/
-            virtual void lfct(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dl/dx **/
-            virtual void dldx(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dl/du **/
-            virtual void dldu(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dl/dp **/
-            virtual void dldp(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-
-
-            /** Terminal cost V(T,x,p) */
-            virtual void Vfct(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dV/dx **/
-            virtual void dVdx(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dV/dp **/
-            virtual void dVdp(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-            /** Gradient dV/dT **/
-            virtual void dVdT(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-
-
-            /** Equality constraints g(t,x,u,p) = 0 */
-            virtual void gfct(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian dg/dx multiplied by vector vec, i.e. (dg/dx)^T*vec or vec^T*(dg/dx) **/
-            virtual void dgdx_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dg/du multiplied by vector vec, i.e. (dg/du)^T*vec or vec^T*(dg/du) **/
-            virtual void dgdu_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dg/dp multiplied by vector vec, i.e. (dg/dp)^T*vec or vec^T*(dg/dp) **/
-            virtual void dgdp_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-
-
-            /** Inequality constraints h(t,x,u,p) < 0 */
-            virtual void hfct(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian dh/dx multiplied by vector vec, i.e. (dh/dx)^T*vec or vec^T*(dh/dx) **/
-            virtual void dhdx_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dh/du multiplied by vector vec, i.e. (dh/du)^T*vec or vec^T*(dh/du) **/
-            virtual void dhdu_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dh/dp multiplied by vector vec, i.e. (dh/dp)^T*vec or vec^T*(dh/dp) **/
-            virtual void dhdp_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-
-
-            /** Terminal equality constraints gT(T,x,p) = 0 */
-            virtual void gTfct(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian dgT/dx multiplied by vector vec, i.e. (dgT/dx)^T*vec or vec^T*(dgT/dx) **/
-            virtual void dgTdx_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dgT/dp multiplied by vector vec, i.e. (dgT/dp)^T*vec or vec^T*(dgT/dp) **/
-            virtual void dgTdp_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dgT/dT multiplied by vector vec, i.e. (dgT/dT)^T*vec or vec^T*(dgT/dT) **/
-            virtual void dgTdT_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-
-
-            /** Terminal inequality constraints hT(T,x,p) < 0 */
-            virtual void hTfct(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian dhT/dx multiplied by vector vec, i.e. (dhT/dx)^T*vec or vec^T*(dhT/dx) **/
-            virtual void dhTdx_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dhT/dp multiplied by vector vec, i.e. (dhT/dp)^T*vec or vec^T*(dhT/dp) **/
-            virtual void dhTdp_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Jacobian dhT/dT multiplied by vector vec, i.e. (dhT/dT)^T*vec or vec^T*(dhT/dT) **/
-            virtual void dhTdT_vec(VectorRef out, ctypeRNum T, VectorConstRef x, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-
-
-            /** Additional functions required for semi-implicit systems
-            M*dx/dt(t) = f(t0+t,x(t),u(t),p) using the solver RODAS
-            ------------------------------------------------------- **/
-            /** Jacobian df/dx in vector form (column-wise) **/
-            virtual void dfdx(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian df/dx in vector form (column-wise) **/
-            virtual void dfdxtrans(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian df/dt **/
-            virtual void dfdt(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) {}
-            /** Jacobian d(dH/dx)/dt  **/
-            virtual void dHdxdt(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, VectorConstRef vec, const GrampcParam& param) {}
-            /** Mass matrix in vector form (column-wise, either banded or full matrix) **/
-            virtual void Mfct(VectorRef out, const GrampcParam& param) {}
-            /** Transposed mass matrix in vector form (column-wise, either banded or full matrix) **/
-            virtual void Mtrans(VectorRef out, const GrampcParam& param) {}
-    };
-    
-    // Alias
-    typedef std::shared_ptr<PyProblemDescription> ProblemDescriptionPtr;
-    typedef std::shared_ptr<const PyProblemDescription> ProblemDescriptionConstPtr;
-
     /* Template class needed for overriting C++ functions in python*/
-    class PyProblem : public PyProblemDescription
+    class PyProblem : public ProblemDescription
     {
         public:
             /* Inherit the constructor*/
-            using PyProblemDescription::PyProblemDescription;
+            using ProblemDescription::ProblemDescription;
 
             void ffct(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConstRef u, VectorConstRef p, const GrampcParam& param) override 
             {
                 PYBIND11_OVERRIDE_PURE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     ffct,
                     out, t, x, u, p, param);
             }
@@ -159,7 +40,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE_PURE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdx_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -168,7 +49,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdu_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -177,7 +58,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdp_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -186,7 +67,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     lfct,
                     out, t, x, u, p, param);
             }
@@ -195,7 +76,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dldx,
                     out, t, x, u, p, param);
             }
@@ -204,7 +85,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dldu,
                     out, t, x, u, p, param);
             }
@@ -213,7 +94,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dldp,
                     out, t, x, u, p, param);
             }
@@ -222,7 +103,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     Vfct,
                     out, t, x, p, param);
             }
@@ -231,7 +112,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dVdx,
                     out, t, x, p, param);
             }
@@ -240,7 +121,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dVdp,
                     out, t, x, p, param);
             }
@@ -249,7 +130,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dVdT,
                     out, t, x, p, param);
             }
@@ -258,7 +139,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     gfct,
                     out, t, x, u, p, param);
             }
@@ -267,7 +148,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgdx_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -276,7 +157,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgdu_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -284,7 +165,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgdp_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -293,7 +174,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     hfct,
                     out, t, x, u, p, param);
             }
@@ -302,7 +183,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhdx_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -311,7 +192,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhdu_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -319,7 +200,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhdp_vec,
                     out, t, x, u, p, vec, param);
             }
@@ -328,7 +209,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     gTfct,
                     out, t, x, p, param);
             }
@@ -337,7 +218,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgTdx_vec,
                     out, t, x, p, vec, param);
             }
@@ -346,7 +227,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgTdp_vec,
                     out, t, x, p, vec, param);
             }
@@ -355,7 +236,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dgTdT_vec,
                     out, t, x, p, vec, param);
             }
@@ -364,7 +245,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     hTfct,
                     out, t, x, p, param);
             }
@@ -373,7 +254,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhTdx_vec,
                     out, t, x, p, vec, param);
             }
@@ -382,7 +263,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhTdp_vec,
                     out, t, x, p, vec, param);
             }
@@ -391,7 +272,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dhTdT_vec,
                     out, t, x, p, vec, param);
             }
@@ -400,7 +281,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdx,
                     out, t, x, u, p, param);
             }
@@ -409,7 +290,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdxtrans,
                     out, t, x, u, p, param);
             }
@@ -418,7 +299,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dfdt,
                     out, t, x, u, p, param);
             }
@@ -427,7 +308,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     dHdxdt,
                     out, t, x, u, p, vec, param);
             }
@@ -436,7 +317,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     Mfct,
                     out, param);
             }
@@ -444,7 +325,7 @@ namespace grampc
             {
                 PYBIND11_OVERRIDE(
                     void, 
-                    PyProblemDescription, 
+                    ProblemDescription, 
                     Mtrans,
                     out, param);
             }

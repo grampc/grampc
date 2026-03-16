@@ -11,14 +11,14 @@
  * GRAMPC is distributed under the BSD-3-Clause license, see LICENSE.txt
  *
  */
-#include "pygrampc_problem_description.hpp"
+#include <pygrampc_problem_description.hpp>
 #include <vector>
 #include <pybind11/stl.h>
 #include <cmath>
 
 using namespace grampc;
 
-class Crane2D : public PyProblemDescription
+class Crane2D : public ProblemDescription
 {
     public:
         std::vector<typeRNum> Q_;

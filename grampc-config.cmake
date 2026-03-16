@@ -1,0 +1,10 @@
+get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(${SELF_DIR}/grampc.cmake)
+
+# Check whether math library needs to be linked again (Yes with GCC, no with MSVC)
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+    set(grampc_link_math m)
+else()
+    set(grampc_link_math "")
+endif()

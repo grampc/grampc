@@ -68,5 +68,8 @@ if __name__ == "__main__":
             if plotPause:
                 input("Press Enter to continue...")
 
+        # comment in for more reactive plots
+        # plt.pause(1e-6)
+
     vec.plot()
     plt.show()

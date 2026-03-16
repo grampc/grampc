@@ -28,6 +28,7 @@ dependencies = [
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
+wheel.install-dir = "pygrampc"
 
 [tool.scikit-build.cmake.define]
 PYGRAMPC = true

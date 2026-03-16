@@ -14,7 +14,7 @@
 #include "Crane2D.hpp"
 
 Crane2D::Crane2D(std::vector<typeRNum> Q, std::vector<typeRNum> R, ctypeRNum ScaleConstraint, ctypeRNum MaxConstraintHeight, ctypeRNum MaxAngularDeflection)
- : PyProblemDescription(/*Nx*/ 6, /*Nu*/ 2, /*Np*/ 0, /*Ng*/ 0, /*Nh*/ 3, /*NgT*/ 0, /*NhT*/ 0),
+ : ProblemDescription(/*Nx*/ 6, /*Nu*/ 2, /*Np*/ 0, /*Ng*/ 0, /*Nh*/ 3, /*NgT*/ 0, /*NhT*/ 0),
    Q_(Q),
    R_(R),
    ScaleConstraint_(ScaleConstraint),
@@ -120,13 +120,13 @@ void Crane2D::dhdu_vec(VectorRef out, ctypeRNum t, VectorConstRef x, VectorConst
 
 PYBIND11_MODULE(crane_problem, m)
 {
-    /** Imports pygrampc so this extensions module knows of the type grampc::PyProblemDescription, otherwise an import error like
-     * ImportError: generic_type: type "Crane2D" referenced unknown base type "grampc::PyProblemDescription"
+    /** Imports pygrampc so this extensions module knows of the type grampc::ProblemDescription, otherwise an import error like
+     * ImportError: generic_type: type "Crane2D" referenced unknown base type "grampc::ProblemDescription"
      * may occur, if the problem description is imported before pygrampc.
      */
     pybind11::module_::import("pygrampc");
 
-    pybind11::class_<Crane2D, PyProblemDescription, std::shared_ptr<Crane2D>>(m, "Crane2D")
+    pybind11::class_<Crane2D, ProblemDescription, std::shared_ptr<Crane2D>>(m, "Crane2D")
         .def(pybind11::init<std::vector<typeRNum>, std::vector<typeRNum>, typeRNum, typeRNum, typeRNum>())
         .def_readonly("Nx", &Crane2D::Nx)
         .def_readonly("Nu", &Crane2D::Nu)
