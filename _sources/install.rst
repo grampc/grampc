@@ -74,9 +74,16 @@ If only the toolbox shall be build, one can issue
 
 ::
 
-    cmake --build . --target grampc
+    cmake --build . --target grampc grampc_cpp
 
 which only compiles the GRAMPC library.
+To install the library type
+
+::
+
+    cmake --install .
+
+After installation, GRAMPC can be found via ``find_package(grampc)`` in CMake without specifying ``<grampc_root>``.
 
 .. _sec:InstallMatlab:
 
@@ -126,7 +133,7 @@ The GRAMPC installation under Matlab proceeds in two steps:
 
    -  :code:`>> make debug verbose` activates the debug option as well as the verbose mode.
 
-   Similar to the compiling procedure in C as described in :ref:`sec:InstallC`, the ``make`` command compiles the source files to generate object files within ``<grampc root>/matlab/bin``, which can now be used to solve a suitable problem in Matlab.
+   Similar to the compiling procedure in C as described in :ref:`sec:InstallC`, the ``make`` command compiles the source files to generate object files within ``<grampc_root>/matlab/bin``, which can now be used to solve a suitable problem in Matlab.
 
 .. _sec:InstallPython:
 
@@ -135,7 +142,7 @@ Installation of GRAMPC for use in Python
 
 .. versionadded:: v2.3
 
-The Python interface of GRAMPC uses pybind11 https://github.com/pybind/pybind11 and Eigen 3.4 https://eigen.tuxfamily.org/index.php?title=Main_Page. 
+The Python interface of GRAMPC uses pybind11 https://github.com/pybind/pybind11 and Eigen 3.4 https://libeigen.gitlab.io/. 
 First, download Eigen 3.4 and follow the steps in ``INSTALL``, so its header files are available through the ``find_package()`` command in CMake.
 Make sure the run the installation for Eigen with administration rights.
 Then, the interface is installed through
@@ -144,7 +151,7 @@ Then, the interface is installed through
 
    pip install .
 
-assuming you are within ``<grampc root>``, or directly from github with
+assuming you are within ``<grampc_root>``, or directly from github with
 
 ::
 
@@ -175,7 +182,7 @@ optimization. As illustrated in :numref:`fig:grampcGeneralStructure`, the GRAMPC
 implemented in plain C with a user-friendly interface to C++, Matlab/Simulink, and dSpace.
 
 A specific problem can be implemented in GRAMPC using the C template
-``probfct_TEMPLATE.c`` included in the folder ``<grampc root>/examples/TEMPLATES``. 
+``probfct_TEMPLATE.c`` included in the folder ``<grampc_root>/examples/TEMPLATES``. 
 A more detailed discussion about this step can be found in :ref:`chap:ProblemFormulation`. The workspace of a GRAMPC project
 as well as algorithmic options and parameters are stored by the
 structure variable ``grampc``. While several parameter settings are
@@ -191,6 +198,6 @@ the need to recompile the ``grampc`` project every time.
 
     General structure of GRAMPC (gray - C code, white - Matlab code).
 
-A specific example contained in the folder ``<grampc root>/examples`` can be 
+A specific example contained in the folder ``<grampc_root>/examples`` can be 
 compiled in C as well as in Matlab and linked against the GRAMPC toolbox. 
 A more detailed discussion on this step can be found in :ref:`chap:grampcStructure`.

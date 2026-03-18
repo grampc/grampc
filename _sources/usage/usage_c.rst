@@ -292,7 +292,7 @@ The examples can be compiled by running the following commands in a (Cygwin) ter
     $ make
 
 The make command compiles the file ``main_*.c`` and links it against the GRAMPC toolbox, i.e., against the GRAMPC library within ``<grampc_root>/libs``. 
-Note that compiling an application example in the folder ``<grampc root>/examples/`` requires the previous compilation of the GRAMPC toolbox as described in :ref:`chap:install`.
+Note that compiling an application example in the folder ``<grampc_root>/examples/`` requires the previous compilation of the GRAMPC toolbox as described in :ref:`chap:install`.
 As a result, the executable ``startMPC`` is generated, which can now be used to solve and/or design the MPC problem.
 
 With CMake, one can specify the build target with

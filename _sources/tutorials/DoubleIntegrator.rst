@@ -47,7 +47,7 @@ the terminal equality constraints are formulated in GRAMPC via the functions ``g
 The number of terminal equality constraints is set to ``NgT`` =2 in the function ``ocp_dim``. Similarly,
 the inequality constraint is formulated by means of the functions ``hfct`` , ``dhdx_vec`` and ``dhdu_vec`` and setting to ``Nh`` =1 in ``ocp_dim``.
 More details on implementing the OCP can be found in
-:ref:`sec:ProblemImplementation` and in the example provided in the folder ``<grampc root>/examples/Double Integrator``.
+:ref:`sec:ProblemImplementation` and in the example provided in the folder ``<grampc_root>/examples/Double Integrator``.
 
 The options ``OptimControl`` and ``OptimTime`` are activated to optimize not only the control
 variable :math:`u` but also the end time :math:`T`. The lower and upper

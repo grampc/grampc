@@ -25,8 +25,8 @@ They are defined by
 and offer a direct conversion to numpy for the Python interface.
 Accessing an element of ``Vector``, ``VectorRef`` or ``VectorConstRef`` is the same as for an array pointer.
 
-The class itself has to inherit from ``PyProblemDescription``.
-An example of the problem specific header is given in ``<grampc root>/python/examples/Crane2D`` by
+The class itself has to inherit from ``ProblemDescription``.
+An example of the problem specific header is given in ``<grampc_root>/python/examples/Crane2D`` by
 
 .. code-block:: cpp
 
@@ -37,7 +37,7 @@ An example of the problem specific header is given in ``<grampc root>/python/exa
 
     using namespace grampc;
 
-    class Crane2D : public PyProblemDescription // must be inherited with public
+    class Crane2D : public ProblemDescription // must be inherited with public
     {
         public: // writing the class fields public reduces overhead code for writing getters and setters
             std::vector<typeRNum> Q_;
@@ -52,12 +52,12 @@ An example of the problem specific header is given in ``<grampc root>/python/exa
             ~Crane2D() {}
 
 Differently from C and the C++ interface, no ``ocp_dim()`` function is present to define the problem dimensions.
-Instead, they are passed in the constructor of ``PyProblemDescription`` with e.g. for ``Crane2D``:
+Instead, they are passed in the constructor of ``ProblemDescription`` with e.g. for ``Crane2D``:
 
 .. code-block:: cpp
 
     Crane2D::Crane2D(std::vector<typeRNum> Q, std::vector<typeRNum> R, ctypeRNum ScaleConstraint, ctypeRNum MaxConstraintHeight, ctypeRNum MaxAngularDeflection)
-    : PyProblemDescription(/*Nx*/ 6, /*Nu*/ 2, /*Np*/ 0, /*Ng*/ 0, /*Nh*/ 3, /*NgT*/ 0, /*NhT*/ 0),
+    : ProblemDescription(/*Nx*/ 6, /*Nu*/ 2, /*Np*/ 0, /*Ng*/ 0, /*Nh*/ 3, /*NgT*/ 0, /*NhT*/ 0),
       Q_(Q),
       R_(R),
       ScaleConstraint_(ScaleConstraint),
@@ -73,13 +73,13 @@ For the Crane2D example it is given by
 
     PYBIND11_MODULE(crane_problem, m)
     {
-        /** Imports pygrampc so this extensions module knows of the type grampc::PyProblemDescription, otherwise an import error like
-        * ImportError: generic_type: type "Crane2D" referenced unknown base type "grampc::PyProblemDescription"
+        /** Imports pygrampc so this extensions module knows of the type grampc::ProblemDescription, otherwise an import error like
+        * ImportError: generic_type: type "Crane2D" referenced unknown base type "grampc::ProblemDescription"
         * may occur, if the problem description is imported before pygrampc.
         */
         pybind11::module_::import("pygrampc");
 
-        pybind11::class_<Crane2D, PyProblemDescription, std::shared_ptr<Crane2D>>(m, "Crane2D")
+        pybind11::class_<Crane2D, ProblemDescription, std::shared_ptr<Crane2D>>(m, "Crane2D")
         ...
 
 At first, pygrampc is imported so our derived problem definition knows the already bound type ``PyProblemDefinition``.
@@ -137,33 +137,25 @@ We start with configuring the languages and finding Python, pybind11 and Eigen.
     find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
     find_package(pybind11 CONFIG REQUIRED)
 
-    # Eigen 3.4 is required
     find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 
-Then the path to the GRAMPC and PyGRAMPC header files has to be defined:
+PyGRAMPC is now also supplied as a package, so it can be found with
 
 .. code-block:: cmake
 
-    # Path to <grampc_root>
-    set(GRAMPC_ROOT
-        ../../../
-    )
-    
-    include_directories(
-        ${GRAMPC_ROOT}include # include directory of GRAMPC
-        ${GRAMPC_ROOT}python/include # include directory of PyGRAMPC
-    )
+    find_package(pygrampc REQUIRED CONFIG)
 
 Finally the pybind11 module is defined with
 
 .. code-block:: cmake  
 
     pybind11_add_module(crane_problem MODULE Crane2D.cpp)
-    target_link_libraries(crane_problem PRIVATE Eigen3::Eigen) # linking against Eigen is necessary
+    target_link_libraries(crane_problem PRIVATE Eigen3::Eigen pygrampc) # linking against Eigen and pygrampc
     install(TARGETS crane_problem DESTINATION .) # copy the .pyd (Windows) or .so (Linux) to the correct installation folder where Python finds the extension
 
 Note that ``pybind11_add_module`` is similar to ``add_executeable`` from CMake. 
 Here all source files and the target is defined.
+Additionally, your target needs to link against Eigen and also PyGRAMPC.
 The install command is necessary to move the compiled module into ``site-packages``, so Python can directly import the problem definition.
 
 .. important:: The CMake target in ``pybind11_add_module`` and the module name in ``PYBIND11_MODULE`` has to be same! 
@@ -200,7 +192,7 @@ and then imported by
 
     from crane_problem import Crane2D
 
-For an example of the project layout, please refer to ``<grampc root>/python/examples/Crane2D``.
+For an example of the project layout, please refer to ``<grampc_root>/python/examples/Crane2D``.
 
 Problem Formulation in Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -249,12 +241,12 @@ Thus, the results must explicitly write into the allocated memory so statements 
 
 correctly set values to ``out``.
 Note that ``out = out + 1`` computes ``out + 1`` and saves the result in the new variable ``out``, which does not point to the allocated memory from GRAMPC.
-For a correct usage, please refer to the examples in ``<grampc root>/python/examples``.
+For a correct usage, please refer to the examples in ``<grampc_root>/python/examples``.
 
 Usage in Python
 ~~~~~~~~~~~~~~~
 
-The usage of GRAMPC in Python is described via the ``DoubleIntegrator.py`` example in ``<grampc root>/python/examples/DoubleIntegrator``.
+The usage of GRAMPC in Python is described via the ``DoubleIntegrator.py`` example in ``<grampc_root>/python/examples/DoubleIntegrator``.
 We first start with importing the relevant packages
 
 .. code-block:: python
@@ -356,4 +348,4 @@ To run the example, either use your preferred python code editor, or run directl
     $ cd <grampc_root>/python/examples/DoubleIntegrator
     $ python DoubleIntegrator.py
 
-For the usage in Python code, please refer to the examples in ``<grampc root>/python/examples``.
+For the usage in Python code, please refer to the examples in ``<grampc_root>/python/examples``.
