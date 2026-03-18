@@ -74,6 +74,7 @@ else()
     # installation
     configure_file(grampc-config-version.cmake ${CMAKE_CURRENT_BINARY_DIR}/grampc-config-version.cmake @ONLY)
     install(DIRECTORY include/ DESTINATION ${grampc_include_dest})
+    install(DIRECTORY python/include/ DESTINATION ${grampc_include_dest}/python)
     install(TARGETS grampc EXPORT grampc DESTINATION ${grampc_lib_dest})
     install(EXPORT grampc DESTINATION ${grampc_lib_dest})
     install(FILES grampc-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/grampc-config-version.cmake DESTINATION ${grampc_lib_dest})
