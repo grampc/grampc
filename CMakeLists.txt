@@ -18,6 +18,11 @@ if(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 endif()
 
+if(WIN32)
+    # this define enables constants like M_PI
+    add_compile_definitions(_USE_MATH_DEFINES)
+endif()
+
 # Check whether math library needs to be linked again (Yes with GCC, no with MSVC)
 find_library(MATH_LIBRARY m)
 if(MATH_LIBRARY)

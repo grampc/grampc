@@ -7,5 +7,12 @@ name = "template"
 version = "1.0"
 description="Template problem for GRAMPC"
 
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pygrampc"
+]
+
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
